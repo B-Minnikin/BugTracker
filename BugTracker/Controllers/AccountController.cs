@@ -38,5 +38,17 @@ namespace BugTracker.Controllers
 		{
 			return View();
 		}
+
+		[HttpGet]
+		public ViewResult EditProfile()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public ViewResult EditProfile(ProfileViewModel profile)
+		{
+			return View();
+		}
 	}
 }
