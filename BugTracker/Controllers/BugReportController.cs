@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult CreateReport()
+		public ViewResult CreateReport(BugReportViewModel model)
 		{
 			return View();
 		}
@@ -35,7 +36,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult EditReport()
+		public ViewResult EditReport(BugReportViewModel model)
 		{
 			return View();
 		}
