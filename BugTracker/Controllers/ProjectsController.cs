@@ -22,6 +22,11 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
+		public ViewResult Overview()
+		{
+			return View();
+		}
+
 		[HttpGet]
 		public ViewResult CreateProject()
 		{
