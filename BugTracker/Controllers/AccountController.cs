@@ -46,7 +46,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult EditProfile(ProfileViewModel profile)
+		public ViewResult EditProfile(EditProfileViewModel profile)
 		{
 			return View();
 		}
