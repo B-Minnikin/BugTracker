@@ -40,5 +40,17 @@ namespace BugTracker.Controllers
 		{
 			return View();
 		}
+
+		[HttpGet]
+		public ViewResult CreateComment()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public ViewResult CreateComment(CommentViewModel model)
+		{
+			return View();
+		}
 	}
 }
