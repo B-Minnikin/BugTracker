@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
+
 <body>
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: #5a90ad">
             <div class="navbar-nav ml-auto">
@@ -15,10 +17,14 @@
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
-                <a class="nav-link disabled" href="#">Profile Placeholder!</a>
+
+                <a asp-action="register" asp-controller="account" class="nav-link">Register</a>
+                <a asp-action="login" asp-controller="account" class="nav-link">Login</a>
+
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
