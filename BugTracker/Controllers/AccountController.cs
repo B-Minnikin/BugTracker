@@ -17,7 +17,7 @@ namespace BugTracker.Controllers
 			this.logger = logger;
 		}
 
-		public ViewResult LogIn()
+		public ViewResult Login()
 		{
 			return View();
 		}
