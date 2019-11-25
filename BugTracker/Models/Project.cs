@@ -15,5 +15,7 @@ namespace BugTracker.Models
 		public DateTime CreationTime { get; set; }
 		public DateTime LastUpdateTime { get; set; }
 		public bool Hidden { get; set; }
+
+		public IEnumerable<BugReport> BugReports { get; set; }
 	}
 }
