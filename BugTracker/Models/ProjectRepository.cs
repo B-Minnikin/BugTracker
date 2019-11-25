@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
-	public class ProjectRepository
+	public class ProjectRepository : IProjectRepository
 	{
 		private readonly BugTrackerDbContext _context;
 
