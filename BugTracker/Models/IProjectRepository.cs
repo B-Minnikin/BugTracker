@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
-	interface IProjectRepository
+	public interface IProjectRepository
 	{
 		Project GetProject(int Id);
 		IEnumerable<Project> GetAllProjects();
