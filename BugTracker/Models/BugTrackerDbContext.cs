@@ -13,6 +13,7 @@ namespace BugTracker.Models
 
 		}
 
+		public DbSet<Project> Projects { get; set; }
 		public DbSet<BugReport> BugReports { get; set; }
 	}
 }
