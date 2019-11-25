@@ -22,7 +22,9 @@ namespace BugTracker.Controllers
 
 		public ViewResult Projects()
 		{
-			return View();
+			var model = projectRepository.GetAllProjects();
+
+			return View(model);
 		}
 
 		public ViewResult Overview()
