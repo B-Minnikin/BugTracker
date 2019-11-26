@@ -27,7 +27,7 @@ namespace BugTracker.Controllers
 			return View(model);
 		}
 
-		public ViewResult Overview()
+		public ViewResult Overview(int? id)
 		{
 			return View();
 		}
@@ -39,8 +39,25 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult CreateProject(Project project)
+		public ViewResult CreateProject(Project model)
 		{
+			if (ModelState.IsValid)
+			{
+				Project newProject = new Project
+				{
+					Name = model.Name,
+					Description = model.Description,
+					CreationTime = DateTime.Now,
+					LastUpdateTime = DateTime.Now,
+					Hidden = model.Hidden,
+					BugReports = new List<BugReport>()
+				};
+
+				projectRepository.Add(newProject);
+
+				RedirectToAction("overview", model.Id);
+			}
+
 			return View();
 		}
 	}
