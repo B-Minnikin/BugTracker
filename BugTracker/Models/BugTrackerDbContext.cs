@@ -14,5 +14,9 @@ namespace BugTracker.Models
 		}
 
 		public DbSet<Project> Projects { get; set; }
+		public DbSet<BugReport> BugReports { get; set; }
+		public DbSet<BugState> BugStates { get; set; }
+		public DbSet <BugReportComment> BugReportComments { get; set; }
+		public DbSet<AttachmentPath> AttachmentPaths { get; set; }
 	}
 }
