@@ -1,24 +1,25 @@
 ﻿@model IEnumerable<Project>
 
-@{ 
-      ViewBag.Title = "Projects List";
+@{
+    ViewBag.Title = "Projects List";
 }
 
 <h1>Projects List - WIP</h1>
 
 <a asp-controller="projects" asp-action="createproject" class="btn btn-primary">Create New Project</a>
+<a asp-controller="home" asp-action="index" class="btn btn-primary">Cancel</a>
 
 <div class="card-deck">
-    @foreach(var project in Model)
+    @foreach (var project in Model)
     {
-          <div class="card m-3">
-              <div class="card-header">
-                  <h3>@project.Name</h3>
-              </div>
+        <div class="card m-3">
+            <div class="card-header">
+                <h3>@project.Name</h3>
+            </div>
 
-              <div class="card-body">
-                  <p>@project.Description</p>
-              </div>
-          </div>
+            <div class="card-body">
+                <p>@project.Description</p>
+            </div>
+        </div>
     }
 </div>
