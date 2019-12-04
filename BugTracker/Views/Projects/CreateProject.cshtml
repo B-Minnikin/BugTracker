@@ -19,7 +19,7 @@
     <div class="form-group row">
         <label asp-for="Description" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <textarea id="Description" class="form-control" placeholder="Description" rows="4"></textarea>
+            <textarea asp-for="Description" id="Description" class="form-control" placeholder="Description" rows="4"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
     </div>
