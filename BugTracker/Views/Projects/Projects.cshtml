@@ -20,7 +20,7 @@
 
                 <div class="card-body">
                     <p>@project.Description</p>
-                    <a asp-controller="projects" asp-action="overview" class="stretched-link"></a>
+                    <a asp-controller="projects" asp-action="overview" asp-route-id="@project.Id" class="stretched-link"></a>
                 </div>
             </div>
     </div>
