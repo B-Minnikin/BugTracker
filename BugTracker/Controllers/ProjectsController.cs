@@ -70,5 +70,10 @@ namespace BugTracker.Controllers
 
 			return View();
 		}
+
+		public ViewResult DeleteProject()
+		{
+			return View();
+		}
 	}
 }
