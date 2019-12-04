@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,9 +28,18 @@ namespace BugTracker.Controllers
 			return View(model);
 		}
 
-		public ViewResult Overview(int? id)
+		public ViewResult Overview(int id)
 		{
-			return View();
+			Project project = projectRepository.GetProject(id);
+
+			OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
+			{
+				Project = project
+			};
+
+			// if project NULL -- redirect to error page !!
+
+			return View(overviewProjectViewModel);
 		}
 
 		[HttpGet]
