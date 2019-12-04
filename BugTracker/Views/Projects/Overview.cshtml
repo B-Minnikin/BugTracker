@@ -10,30 +10,33 @@
 
 
 <!-- List of bug reports -->
+<h3>Bug Reports</h3>
 <div class="card-deck">
-    @foreach(var bugReport in Model.Project.BugReports)
-    {
-          <div class="row col-12">
-              <div class="card m-3">
-                  <div class="card-header">
-                      <h3>@bugReport.Title</h3>
-                  </div>
+    @if(Model.Project.BugReports != null) {
+        foreach(var bugReport in Model.Project.BugReports)
+        {
+        <div class="row col-12">
+            <div class="card m-3">
+                <div class="card-header">
+                    <h3>@bugReport.Title</h3>
+                </div>
 
-                  <div class="card-body">
-                      <p>@bugReport.ProgramBehaviour</p>
-                  </div>
+                <div class="card-body">
+                    <p>@bugReport.ProgramBehaviour</p>
+                </div>
 
-                  @*
-                      Posting time
-                      Person Reporting
-                      Number of replies
-                      Severity
-                      Importance
-                      Query state history - closed / open, etc
-                  *@
+                @*
+                    Posting time
+                    Person Reporting
+                    Number of replies
+                    Severity
+                    Importance
+                    Query state history - closed / open, etc
+                *@
 
-                  <a asp-controller="bugreport" asp-action="overview" asp-route-id="@bugReport.Id" class="stretched-link"></a>
-              </div>
-          </div>
+                <a asp-controller="bugreport" asp-action="overview" asp-route-id="@bugReport.Id" class="stretched-link"></a>
+            </div>
+        </div>
+        }
     }
 </div>
