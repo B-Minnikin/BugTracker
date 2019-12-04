@@ -7,3 +7,33 @@
 <h1>Project Overview</h1>
 
 <h1>Project Name - @Model.Project.Name</h1>
+
+
+<!-- List of bug reports -->
+<div class="card-deck">
+    @foreach(var bugReport in Model.Project.BugReports)
+    {
+          <div class="row col-12">
+              <div class="card m-3">
+                  <div class="card-header">
+                      <h3>@bugReport.Title</h3>
+                  </div>
+
+                  <div class="card-body">
+                      <p>@bugReport.ProgramBehaviour</p>
+                  </div>
+
+                  @*
+                      Posting time
+                      Person Reporting
+                      Number of replies
+                      Severity
+                      Importance
+                      Query state history - closed / open, etc
+                  *@
+
+                  <a asp-controller="bugreport" asp-action="overview" asp-route-id="@bugReport.Id" class="stretched-link"></a>
+              </div>
+          </div>
+    }
+</div>
