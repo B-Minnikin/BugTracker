@@ -9,5 +9,8 @@ namespace BugTracker.ViewModels
 	public class CreateBugReportViewModel
 	{
 		public BugReport BugReport { get; set; }
+		public string Title { get; set; }
+		public string ProgramBehaviour { get; set; }
+		public string DetailsToReproduce {get; set;}
 	}
 }
