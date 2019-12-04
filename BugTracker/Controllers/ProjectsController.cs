@@ -39,7 +39,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult CreateProject(Project model)
+		public IActionResult CreateProject(Project model)
 		{
 			if (ModelState.IsValid)
 			{
