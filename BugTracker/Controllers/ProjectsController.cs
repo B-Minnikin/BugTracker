@@ -71,9 +71,11 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
-		public ViewResult DeleteProject()
+		public IActionResult DeleteProject(int id)
 		{
-			return View();
+			projectRepository.Delete(id);
+
+			return RedirectToAction("projects");
 		}
 	}
 }
