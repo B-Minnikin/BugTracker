@@ -23,7 +23,13 @@ namespace BugTracker.Models
 
 		public Project Delete(int Id)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true"))
+			{
+				var deletedProject = connection.QueryFirst("dbo.Projects_GetById @ProjectId", new { ProjectId = Id });
+				var result = connection.Execute("dbo.Projects_Delete @ProjectId", new { ProjectId = Id });
+
+				return deletedProject;
+			}
 		}
 
 		public IEnumerable<Project> GetAllProjects()
