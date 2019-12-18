@@ -34,7 +34,11 @@ namespace BugTracker.Models
 
 		public IEnumerable<Project> GetAllProjects()
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true"))
+			{
+				var query = connection.Query<Project>("dbo.Projects_GetAll");
+				return query;
+			}
 		}
 
 		public Project GetProject(int Id)
