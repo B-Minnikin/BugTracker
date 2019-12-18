@@ -26,7 +26,7 @@ namespace BugTracker
 		{
 
 			services.AddControllersWithViews();
-			services.AddScoped<IProjectRepository, ProjectRepository>();
+			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
