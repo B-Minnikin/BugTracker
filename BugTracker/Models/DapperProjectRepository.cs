@@ -43,7 +43,11 @@ namespace BugTracker.Models
 
 		public Project GetProject(int Id)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true")) // rather than static helper class function - string here
+			{
+				var output = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = Id });
+				return output;
+			}
 		}
 
 		public Project Update(Project projectChanges)
