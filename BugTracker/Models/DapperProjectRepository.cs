@@ -11,9 +11,8 @@ namespace BugTracker.Models
 	{
 		public Project Add(Project project)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true")) // rather than static helper class function - string here
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true"))
 			{
-				//var query = connection.Query<Project>("Select * FROM Projects");
 				var result = connection.Execute("dbo.Projects_Insert @Name @Description @CreationTime @LastUpdateTime @Hidden",
 					new { Name = project.Name, Description = project.Description, CreationTime = project.CreationTime, LastUpdateTime = project.LastUpdateTime, Hidden = project.Hidden });
 				var query = connection.QueryFirst<Project>("dbo.Projects_GetProject @ProjectId", new { ProjectId = result });
@@ -43,7 +42,7 @@ namespace BugTracker.Models
 
 		public Project GetProject(int Id)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true")) // rather than static helper class function - string here
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true"))
 			{
 				var output = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = Id });
 				return output;
@@ -52,7 +51,12 @@ namespace BugTracker.Models
 
 		public Project Update(Project projectChanges)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB_cookies;Trusted_Connection=true"))
+			{
+				var output = connection.Execute("dbo.Projects_Update @ProjectId @Name @Description @CreationTime @LastUpdateTime @Hidden", projectChanges);
+				var query = this.GetProject(output);
+				return query;
+			}
 		}
 	}
 }
