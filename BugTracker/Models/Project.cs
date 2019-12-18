@@ -10,7 +10,13 @@ namespace BugTracker.Models
 	{
 		[Key]
 		public int Id { get; set; }
+		[Required]
 		public string Name { get; set; }
+		public string Description { get; set; }
+		public DateTime CreationTime { get; set; }
+		public DateTime LastUpdateTime { get; set; }
 		public bool Hidden { get; set; }
+
+		public IEnumerable<BugReport> BugReports { get; set; }
 	}
 }

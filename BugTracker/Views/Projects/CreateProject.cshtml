@@ -1,6 +1,39 @@
-﻿@{
+﻿@model CreateProjectViewModel
+
+@{
     ViewBag.Title = "Create New Project";
 }
 
 <h1>Create New Project - WIP</h1>
 
+<form asp-controller="projects" asp-action="createproject" method="post" class="mt-3">
+
+    <div class="form-group row">
+        <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Name" class="form-control" placeholder="Name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="Description" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <textarea asp-for="Description" id="Description" class="form-control" placeholder="Description" rows="4"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Create Project</button>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <button asp-controller="projects" asp-action="projects" class="btn btn-primary">Cancel</button>
+        </div>
+    </div>
+
+</form>

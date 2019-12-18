@@ -1,4 +1,5 @@
-﻿using BugTracker.ViewModels;
+﻿using BugTracker.Models;
+using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -24,8 +25,26 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult CreateReport(BugReportViewModel model)
+		public ViewResult CreateReport(CreateBugReportViewModel model)
 		{
+			if (ModelState.IsValid)
+			{
+				BugReport newBugReport = new BugReport
+				{
+					Title = model.Title,
+					ProgramBehaviour = model.ProgramBehaviour,
+					DetailsToReproduce = model.DetailsToReproduce,
+					ReportTime = DateTime.Now,
+					Hidden = false, // to implement
+					Severity = 1, // to implement
+					Importance = 1, // to implement
+					PersonReporting = "User" // to implement
+									  // add BugState = open as default
+				};
+
+				// add bug report to current project
+			}
+
 			return View();
 		}
 

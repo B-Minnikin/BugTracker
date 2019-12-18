@@ -13,6 +13,11 @@ namespace BugTracker.Models
 
 		}
 
-		public DbSet<BugReport> BugReports { get; set; }
+		public DbSet<Project> Projects { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+		}
 	}
 }

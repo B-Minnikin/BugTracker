@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,20 +12,34 @@ namespace BugTracker.Controllers
 	public class ProjectsController : Controller
 	{
 		private readonly ILogger<HomeController> _logger;
+		private readonly IProjectRepository projectRepository;
 
-		public ProjectsController(ILogger<HomeController> logger)									
+		public ProjectsController(ILogger<HomeController> logger,
+									IProjectRepository projectRepository)
 		{
 			this._logger = logger;
+			this.projectRepository = projectRepository;
 		}
 
 		public ViewResult Projects()
 		{
-			return View();
+			var model = projectRepository.GetAllProjects();
+
+			return View(model);
 		}
 
-		public ViewResult Overview()
+		public ViewResult Overview(int id)
 		{
-			return View();
+			Project project = projectRepository.GetProject(id);
+
+			OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
+			{
+				Project = project
+			};
+
+			// if project NULL -- redirect to error page !!
+
+			return View(overviewProjectViewModel);
 		}
 
 		[HttpGet]
@@ -34,9 +49,33 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult CreateProject(Project project)
+		public IActionResult CreateProject(Project model)
 		{
+			if (ModelState.IsValid)
+			{
+				Project newProject = new Project
+				{
+					Name = model.Name,
+					Description = model.Description,
+					CreationTime = DateTime.Now,
+					LastUpdateTime = DateTime.Now,
+					Hidden = model.Hidden,
+					BugReports = new List<BugReport>()
+				};
+
+				Project addedProject = projectRepository.Add(newProject);
+
+				return RedirectToAction("overview", addedProject.Id);
+			}
+
 			return View();
+		}
+
+		public IActionResult DeleteProject(int id)
+		{
+			projectRepository.Delete(id);
+
+			return RedirectToAction("projects");
 		}
 	}
 }

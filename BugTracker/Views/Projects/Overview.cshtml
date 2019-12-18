@@ -1,6 +1,43 @@
-﻿@{
+﻿@model OverviewProjectViewModel
+
+@{
     ViewBag.Title = "Project Overview";
 }
 
-<h1>Project Overview</h1>
+<h1>Project Overview - @Model.Project.Name</h1>
 
+<a asp-controller="bugreport" asp-action="createreport" class="btn btn-primary">Create Bug Report</a>
+<a asp-controller="projects" asp-action="deleteproject" asp-route-id="@Model.Project.Id" class="btn btn-primary">Delete Project</a>
+
+<!-- List of bug reports -->
+<h3>Bug Reports</h3>
+<div class="card-deck">
+    @if (Model.Project.BugReports != null)
+    {
+        foreach (var bugReport in Model.Project.BugReports)
+        {
+            <div class="row col-12">
+                <div class="card m-3">
+                    <div class="card-header">
+                        <h3>@bugReport.Title</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <p>@bugReport.ProgramBehaviour</p>
+                    </div>
+
+                    @*
+                        Posting time
+                        Person Reporting
+                        Number of replies
+                        Severity
+                        Importance
+                        Query state history - closed / open, etc
+                    *@
+
+                    <a asp-controller="bugreport" asp-action="overview" asp-route-id="@bugReport.Id" class="stretched-link"></a>
+                </div>
+            </div>
+        }
+    }
+</div>
