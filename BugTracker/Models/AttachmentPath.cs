@@ -9,7 +9,7 @@ namespace BugTracker.Models
 	public class AttachmentPath
 	{
 		[Key]
-		public int Id { get; set; }
+		public int AttachmentPathId { get; set; }
 		public string Path { get; set; }
 	}
 }

@@ -9,7 +9,7 @@ namespace BugTracker.Models
 	public class BugState
 	{
 		[Key]
-		public int Id { get; set; }
+		public int BugStateId { get; set; }
 		public DateTime Time { get; set; }
 		public string Author { get; set; } // link to profile
 		public string StateName { get; set; }

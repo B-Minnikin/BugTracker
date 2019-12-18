@@ -9,7 +9,7 @@ namespace BugTracker.Models
 	public class Project
 	{
 		[Key]
-		public int Id { get; set; }
+		public int ProjectId { get; set; }
 		[Required]
 		public string Name { get; set; }
 		public string Description { get; set; }
