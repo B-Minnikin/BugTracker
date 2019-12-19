@@ -12,10 +12,13 @@ namespace BugTracker.Controllers
 	public class BugReportController : Controller
 	{
 		private readonly ILogger<BugReportController> logger;
+		private readonly IProjectRepository projectRepository;
 
-		public BugReportController(ILogger<BugReportController> logger)
+		public BugReportController(ILogger<BugReportController> logger,
+									        IProjectRepository projectRepository)
 		{
 			this.logger = logger;
+			this.projectRepository = projectRepository;
 		}
 
 		[HttpGet]
