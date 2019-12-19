@@ -11,7 +11,7 @@ namespace BugTracker.Models
 	{
 		public Project Add(Project project)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB;Trusted_Connection=true"))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
 				var result = connection.Execute("dbo.Projects_Insert @Name @Description @CreationTime @LastUpdateTime @Hidden",
 					new { Name = project.Name, Description = project.Description, CreationTime = project.CreationTime, LastUpdateTime = project.LastUpdateTime, Hidden = project.Hidden });
@@ -22,7 +22,7 @@ namespace BugTracker.Models
 
 		public Project Delete(int Id)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB;Trusted_Connection=true"))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
 				var deletedProject = connection.QueryFirst("dbo.Projects_GetById @ProjectId", new { ProjectId = Id });
 				var result = connection.Execute("dbo.Projects_Delete @ProjectId", new { ProjectId = Id });
@@ -33,7 +33,7 @@ namespace BugTracker.Models
 
 		public IEnumerable<Project> GetAllProjects()
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB;Trusted_Connection=true"))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
 				var query = connection.Query<Project>("dbo.Projects_GetAll");
 				return query;
@@ -42,7 +42,7 @@ namespace BugTracker.Models
 
 		public Project GetProject(int Id)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB;Trusted_Connection=true"))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
 				var output = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = Id });
 				return output;
@@ -51,7 +51,7 @@ namespace BugTracker.Models
 
 		public Project Update(Project projectChanges)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection("server=(localdb)\\MSSQLLocalDB;database=BugTrackerDB;Trusted_Connection=true"))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
 				var output = connection.Execute("dbo.Projects_Update @ProjectId @Name @Description @CreationTime @LastUpdateTime @Hidden", projectChanges);
 				var query = this.GetProject(output);
