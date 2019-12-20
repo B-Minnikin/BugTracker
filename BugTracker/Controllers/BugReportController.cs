@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -43,7 +44,7 @@ namespace BugTracker.Controllers
 					Importance = model.Importance,
 					PersonReporting = "User", // to implement
 									  // add BugState = open as default
-					ProjectId = 12 // GET FROM COOKIES
+					ProjectId = (int)HttpContext.Session.GetInt32("currentProject") // get project ID from cookie
 				};
 
 				// add bug report to current project
