@@ -12,5 +12,6 @@ namespace BugTracker.ViewModels
 		public string Title { get; set; }
 		public string ProgramBehaviour { get; set; }
 		public string DetailsToReproduce {get; set;}
+		public int Severity { get; set; }
 	}
 }
