@@ -9,35 +9,30 @@
 <a asp-controller="bugreport" asp-action="createreport" class="btn btn-primary">Create Bug Report</a>
 <a asp-controller="projects" asp-action="deleteproject" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Delete Project</a>
 
-<!-- List of bug reports -->
 <h3>Bug Reports</h3>
 <div class="card-deck">
-    @if (Model.Project.BugReports != null)
+    @foreach (var bugReport in Model.BugReports)
     {
-        foreach (var bugReport in Model.BugReports)
-        {
-            <div class="row col-12">
-                <div class="card m-3">
-                    <div class="card-header">
-                        <h3>@bugReport.Title</h3>
-                    </div>
-
-                    <div class="card-body">
-                        <p>@bugReport.ProgramBehaviour</p>
-                    </div>
-
-                    @*
-                        Posting time
-                        Person Reporting
-                        Number of replies
-                        Severity
-                        Importance
-                        Query state history - closed / open, etc
-                    *@
-
-                    <a asp-controller="bugreport" asp-action="overview" asp-route-id="@bugReport.BugReportId" class="stretched-link"></a>
+        <div class="row col-12">
+            <div class="card m-3">
+                <div class="card-header">
+                    <h3>@bugReport.Title -- @bugReport.CreationTime -- @bugReport.PersonReporting</h3>
                 </div>
+
+                <div class="card-body">
+                    <p>Program Behaviour: @bugReport.ProgramBehaviour</p>
+                    <p>Details to Reproduce: @bugReport.DetailsToReproduce</p>
+                    <p>Severity: @bugReport.Severity</p>
+                    <p>Importance: @bugReport.Importance</p>
+                </div>
+
+                @*
+                Number of replies
+                Bug report state history - closed / open, etc
+                *@
+
+                <a asp-controller="bugreport" asp-action="overview" asp-route-id="@bugReport.BugReportId" class="stretched-link"></a>
             </div>
-        }
+        </div>
     }
 </div>
