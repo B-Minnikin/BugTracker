@@ -77,5 +77,10 @@ namespace BugTracker.Controllers
 		{
 			return View();
 		}
+
+		public ViewResult ReportOverview()
+		{
+			return View();
+		}
 	}
 }
