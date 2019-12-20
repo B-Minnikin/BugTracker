@@ -40,7 +40,7 @@ namespace BugTracker.Controllers
 					CreationTime = DateTime.Now,
 					Hidden = false, // to implement
 					Severity = model.Severity,
-					Importance = 1, // to implement
+					Importance = model.Importance,
 					PersonReporting = "User", // to implement
 									  // add BugState = open as default
 					ProjectId = 12 // GET FROM COOKIES
