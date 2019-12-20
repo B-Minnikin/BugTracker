@@ -39,7 +39,7 @@ namespace BugTracker.Controllers
 					ProgramBehaviour = model.ProgramBehaviour,
 					DetailsToReproduce = model.DetailsToReproduce,
 					CreationTime = DateTime.Now,
-					Hidden = false, // to implement
+					Hidden = model.Hidden, // to implement
 					Severity = model.Severity,
 					Importance = model.Importance,
 					PersonReporting = "User", // to implement
