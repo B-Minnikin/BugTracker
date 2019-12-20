@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,6 +32,7 @@ namespace BugTracker.Controllers
 		public ViewResult Overview(int id)
 		{
 			Project project = projectRepository.GetProject(id);
+			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
 			OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
 			{
