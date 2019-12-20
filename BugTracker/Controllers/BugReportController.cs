@@ -29,7 +29,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult CreateReport(CreateBugReportViewModel model)
+		public IActionResult CreateReport(CreateBugReportViewModel model)
 		{
 			if (ModelState.IsValid)
 			{
@@ -48,7 +48,8 @@ namespace BugTracker.Controllers
 				};
 
 				// add bug report to current project
-				projectRepository.AddBugReport(newBugReport);
+				BugReport addedReport = projectRepository.AddBugReport(newBugReport);
+				return RedirectToAction("ReportOverview", addedReport);
 			}
 
 			return View();
@@ -78,7 +79,7 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
-		public ViewResult ReportOverview()
+		public ViewResult ReportOverview(BugReport bugReport)
 		{
 			return View();
 		}
