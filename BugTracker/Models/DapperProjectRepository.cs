@@ -20,6 +20,20 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugReport AddBugReport(BugReport bugReport)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var insertedBugReportId = connection.ExecuteScalar("dbo.BugReports_Insert", new {
+					Title = bugReport.Title, ProgramBehaviour = bugReport.ProgramBehaviour, DetailsToReproduce = bugReport.DetailsToReproduce, 
+					CreationTime = bugReport.CreationTime, Severity = bugReport.Severity, Importance = bugReport.Importance, 
+					PersonReporting = bugReport.PersonReporting, Hidden = bugReport.Hidden, ProjectId = bugReport.ProjectId },
+					commandType: CommandType.StoredProcedure);
+				BugReport insertedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = insertedBugReportId });
+				return insertedBugReport;
+			}
+		}
+
 		public Project Delete(int Id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))

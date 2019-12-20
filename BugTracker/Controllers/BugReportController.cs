@@ -37,15 +37,17 @@ namespace BugTracker.Controllers
 					Title = model.Title,
 					ProgramBehaviour = model.ProgramBehaviour,
 					DetailsToReproduce = model.DetailsToReproduce,
-					ReportTime = DateTime.Now,
+					CreationTime = DateTime.Now,
 					Hidden = false, // to implement
 					Severity = 1, // to implement
 					Importance = 1, // to implement
-					PersonReporting = "User" // to implement
+					PersonReporting = "User", // to implement
 									  // add BugState = open as default
+					ProjectId = 12 // GET FROM COOKIES
 				};
 
 				// add bug report to current project
+				projectRepository.AddBugReport(newBugReport);
 			}
 
 			return View();

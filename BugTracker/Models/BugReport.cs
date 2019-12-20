@@ -11,13 +11,16 @@ namespace BugTracker.Models
 		[Key]
 		public int BugReportId { get; set; }
 		public bool Hidden { get; set; }
-		public DateTime ReportTime { get; set; }
+		public DateTime CreationTime { get; set; }
 		public int Severity { get; set; }
 		public int Importance { get; set; }
 		public string Title { get; set; }
 		public string ProgramBehaviour { get; set; }
 		public string DetailsToReproduce { get; set; }
 		public string PersonReporting { get; set; }
+		
+		public int ProjectId { get; set; }
+
 		public IEnumerable<BugReportComment> Comments { get; set; }
 		public IEnumerable<BugState> StateHistory { get; set; }
 		public IEnumerable<AttachmentPath> AttachmentPaths { get; set; }
