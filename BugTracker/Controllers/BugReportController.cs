@@ -56,14 +56,31 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public ViewResult Edit()
+		public ViewResult Edit(int bugReportId)
 		{
-			return View();
+			BugReport bugReport = projectRepository.GetBugReportById(bugReportId);
+
+			return View(bugReport);
 		}
 
 		[HttpPost]
-		public ViewResult Edit(BugReportViewModel model)
+		public IActionResult Edit(BugReport model)
 		{
+			if (ModelState.IsValid)
+			{
+				BugReport bugReport = projectRepository.GetBugReportById(model.BugReportId);
+				bugReport.Title = model.Title;
+				bugReport.DetailsToReproduce = model.DetailsToReproduce;
+				bugReport.ProgramBehaviour = model.ProgramBehaviour;
+				bugReport.Severity = model.Severity;
+				bugReport.Importance = model.Importance;
+				bugReport.Hidden = model.Hidden;
+				bugReport.CreationTime = model.CreationTime;
+
+				projectRepository.UpdateBugReport(bugReport);
+				return RedirectToAction("ReportOverview", new { id = bugReport.BugReportId});
+			}
+
 			return View();
 		}
 
