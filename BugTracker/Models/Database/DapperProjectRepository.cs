@@ -137,6 +137,20 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugReportComment UpdateBugReportComment(BugReportComment bugReportCommentChanges)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var updatedBugReportId = connection.ExecuteScalar("dbo.BugReports_Update", new
+				{
+					Author = bugReportCommentChanges.Author,
+					MainText = bugReportCommentChanges.MainText
+				}, commandType: CommandType.StoredProcedure);
+				BugReportComment updatedBugReport = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportId = updatedBugReportId });
+				return updatedBugReport;
+			}
+		}
+
 		public IEnumerable<BugReportComment> GetBugReportComments(int bugReportId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
