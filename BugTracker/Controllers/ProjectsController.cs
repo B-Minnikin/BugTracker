@@ -31,7 +31,7 @@ namespace BugTracker.Controllers
 
 		public ViewResult Overview(int id)
 		{
-			Project project = projectRepository.GetProject(id);
+			Project project = projectRepository.GetProjectById(id);
 			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
 			OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
@@ -66,7 +66,7 @@ namespace BugTracker.Controllers
 					BugReports = new List<BugReport>()
 				};
 
-				Project addedProject = projectRepository.Add(newProject);
+				Project addedProject = projectRepository.CreateProject(newProject);
 
 				return RedirectToAction("overview", new { id = addedProject.ProjectId });
 			}
@@ -76,7 +76,7 @@ namespace BugTracker.Controllers
 
 		public IActionResult DeleteProject(int id)
 		{
-			projectRepository.Delete(id);
+			projectRepository.DeleteProject(id);
 
 			return RedirectToAction("projects");
 		}
