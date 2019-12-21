@@ -60,7 +60,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult Edit(BugReportComment model)
+		public IActionResult Edit(BugReportComment model)
 		{
 			if (ModelState.IsValid)
 			{
@@ -69,8 +69,8 @@ namespace BugTracker.Controllers
 				// increment edit count
 				// update edit time
 
-				projectRepository.UpdateButReportComment(comment);
-				return RedirectToAction("ReportOverview", "BugReport", new { });
+				projectRepository.UpdateBugReportComment(comment);
+				return RedirectToAction("ReportOverview", "BugReport", new { id = comment.BugReportId});
 			}
 
 			return View();
