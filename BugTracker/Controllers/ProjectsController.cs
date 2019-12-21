@@ -31,7 +31,7 @@ namespace BugTracker.Controllers
 
 		public ViewResult Overview(int id)
 		{
-			Project project = projectRepository.GetProject(id);
+			Project project = projectRepository.GetProjectById(id);
 			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
 			OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()

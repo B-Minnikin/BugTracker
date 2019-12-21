@@ -56,7 +56,7 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project GetProject(int Id)
+		public Project GetProjectById(int Id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -70,7 +70,7 @@ namespace BugTracker.Models
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
 				var output = connection.Execute("dbo.Projects_Update @ProjectId @Name @Description @CreationTime @LastUpdateTime @Hidden", projectChanges);
-				var query = this.GetProject(output);
+				var query = this.GetProjectById(output);
 				return query;
 			}
 		}
