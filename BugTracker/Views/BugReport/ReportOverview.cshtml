@@ -1,6 +1,8 @@
-﻿
+﻿@model BugReport
+
 @{
     ViewBag.Title = "Bug Report Overview";
 }
 
-<h1>Bug Report Overview</h1>
+<h1>Title: @Model.Title</h1>
+<p>Details to Reproduce: @Model.DetailsToReproduce</p>

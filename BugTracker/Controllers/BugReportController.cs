@@ -49,7 +49,7 @@ namespace BugTracker.Controllers
 
 				// add bug report to current project
 				BugReport addedReport = projectRepository.AddBugReport(newBugReport);
-				return RedirectToAction("ReportOverview", addedReport);
+				return RedirectToAction("ReportOverview", addedReport.BugReportId);
 			}
 
 			return View();
@@ -79,9 +79,11 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
-		public ViewResult ReportOverview(BugReport bugReport)
+		public ViewResult ReportOverview(int id)
 		{
-			return View();
+			BugReport bugReport = projectRepository.GetBugReportById(id);
+
+			return View(bugReport);
 		}
 	}
 }
