@@ -100,6 +100,15 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugReportComment GetBugReportCommentById(int bugReportCommentId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var comment = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportCommentId = bugReportCommentId });
+				return comment;
+			}
+		}
+
 		public Project UpdateProject(Project projectChanges)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
