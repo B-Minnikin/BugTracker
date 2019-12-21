@@ -4,5 +4,16 @@
     ViewBag.Title = "Bug Report Overview";
 }
 
+@* Delete bug report button *@
+
 <h1>Title: @Model.Title</h1>
+<p>Reporter: @Model.PersonReporting</p>
+<p>Report Time: @Model.CreationTime</p>
+<p>Program Behaviour: @Model.ProgramBehaviour</p>
 <p>Details to Reproduce: @Model.DetailsToReproduce</p>
+<p>Private: @Model.Hidden</p>
+<p>Importance: @Model.Importance</p>
+<p>Severity: @Model.Severity</p>
+
+<h1>Comments</h1>
+@* List comments down here *@
