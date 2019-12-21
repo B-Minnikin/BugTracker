@@ -27,8 +27,21 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult Create(BugReportComment model)
+		public IActionResult Create(BugReportComment model)
 		{
+			if (ModelState.IsValid)
+			{
+				BugReportComment newComment = new BugReportComment
+				{
+					Author = "User", // WIP user profiles
+					Date = DateTime.Now,
+					MainText = model.MainText
+				};
+
+				BugReportComment addedComment = projectRepository.AddComment(newComment);
+				return RedirectToAction("");
+			}
+
 			return View();
 		}
 
