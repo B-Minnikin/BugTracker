@@ -13,10 +13,12 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var result = connection.Execute("dbo.Projects_Insert @Name @Description @CreationTime @LastUpdateTime @Hidden",
-					new { Name = project.Name, Description = project.Description, CreationTime = project.CreationTime, LastUpdateTime = project.LastUpdateTime, Hidden = project.Hidden });
-				var query = connection.QueryFirst<Project>("dbo.Projects_GetProject @ProjectId", new { ProjectId = result });
-				return query;
+				var insertedProjectId = connection.ExecuteScalar("dbo.Projects_Insert", new { 
+					Name = project.Name, Description = project.Description, CreationTime = project.CreationTime, 
+					LastUpdateTime = project.LastUpdateTime, Hidden = project.Hidden },
+					commandType: CommandType.StoredProcedure);
+				var insertedProject = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = insertedProjectId });
+				return insertedProject;
 			}
 		}
 
