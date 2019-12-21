@@ -23,6 +23,7 @@ namespace BugTracker.Models
 		// Bug Report Comments
 		BugReportComment CreateComment(BugReportComment bugReportComment);
 		IEnumerable<BugReportComment> GetBugReportComments(int bugReportId);
+		BugReportComment GetBugReportCommentById(int bugReportCommentId);
 
 		// Bug Report States
 		IEnumerable<BugState> GetBugStates(int bugReportId);
