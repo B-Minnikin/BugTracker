@@ -56,13 +56,13 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public ViewResult EditReport()
+		public ViewResult Edit()
 		{
 			return View();
 		}
 
 		[HttpPost]
-		public ViewResult EditReport(BugReportViewModel model)
+		public ViewResult Edit(BugReportViewModel model)
 		{
 			return View();
 		}
