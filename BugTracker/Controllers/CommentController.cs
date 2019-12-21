@@ -62,6 +62,17 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public ViewResult Edit(BugReportComment model)
 		{
+			if (ModelState.IsValid)
+			{
+				BugReportComment comment = projectRepository.GetBugReportCommentById(model.BugReportCommentId);
+				comment.MainText = model.MainText;
+				// increment edit count
+				// update edit time
+
+				projectRepository.UpdateButReportComment(comment);
+				return RedirectToAction("ReportOverview", "BugReport", new { });
+			}
+
 			return View();
 		}
 
