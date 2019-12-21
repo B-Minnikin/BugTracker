@@ -45,7 +45,7 @@ namespace BugTracker.Controllers
 				};
 
 				BugReportComment addedComment = projectRepository.CreateComment(newComment);
-				return RedirectToAction("reportoverview", "bugreportcontroller", new { id = addedComment.BugReportId});
+				return RedirectToAction("reportoverview", "bugreport", new { id = addedComment.BugReportId});
 			}
 
 			return View();
