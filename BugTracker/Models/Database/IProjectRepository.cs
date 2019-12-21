@@ -17,5 +17,6 @@ namespace BugTracker.Models
 		// Bug Reports
 		BugReport AddBugReport(BugReport bugReport);
 		IEnumerable<BugReport> GetAllBugReports(int ProjectId);
+		BugReport GetBugReportById(int BugReportId);
 	}
 }
