@@ -36,6 +36,23 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugReportComment CreateComment(BugReportComment bugReportComment)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var insertedCommentId = connection.ExecuteScalar("dbo.Comments_Insert", new
+				{
+					Author = bugReportComment.Author,
+					Date = bugReportComment.Date,
+					MainText = bugReportComment.MainText,
+					BugReportId = bugReportComment.BugReportId
+				},
+					commandType: CommandType.StoredProcedure);
+				BugReportComment insertedComment = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportCommentId = insertedCommentId });
+				return insertedComment;
+			}
+		}
+
 		public Project DeleteProject(int Id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))

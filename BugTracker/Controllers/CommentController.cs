@@ -35,10 +35,11 @@ namespace BugTracker.Controllers
 				{
 					Author = "User", // WIP user profiles
 					Date = DateTime.Now,
-					MainText = model.MainText
+					MainText = model.MainText,
+					BugReportId = model.BugReportId
 				};
 
-				BugReportComment addedComment = projectRepository.AddComment(newComment);
+				BugReportComment addedComment = projectRepository.CreateComment(newComment);
 				return RedirectToAction("");
 			}
 

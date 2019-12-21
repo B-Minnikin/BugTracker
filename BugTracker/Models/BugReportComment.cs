@@ -13,6 +13,8 @@ namespace BugTracker.Models
 		public string Author { get; set; }
 		public DateTime Date { get; set; }
 		public string MainText { get; set; }
+		public int BugReportId { get; set; }
+
 		public IEnumerable<AttachmentPath> AttachmentPaths { get; set; }
 	}
 }
