@@ -1,5 +1,33 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model BugReportComment
+
 @{
+    ViewBag.Title = "Edit Comment";
 }
+
+<h1>Edit Comment</h1>
+
+<form asp-controller="comment" asp-action="edit" method="post" class="mt-3">
+
+    <div class="form-group row">
+        <input asp-for="MainText" class="form-control" placeholder="@Model.MainText" />
+    </div>
+
+    @* Add attachment *@
+
+
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Post</button>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <a class="btn btn-primary" href='javascript:history.go(-1)'>Cancel</a>
+        </div>
+    </div>
+
+</form>
+
+@* Delete comment button *@
+<a asp-controller="comment" asp-action="delete" asp-route-id="@Model.BugReportCommentId" class="btn btn-primary">Delete Comment</a>
