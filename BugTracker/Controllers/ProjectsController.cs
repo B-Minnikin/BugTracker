@@ -75,7 +75,7 @@ namespace BugTracker.Controllers
 
 		public IActionResult DeleteProject(int id)
 		{
-			projectRepository.Delete(id);
+			projectRepository.DeleteProject(id);
 
 			return RedirectToAction("projects");
 		}

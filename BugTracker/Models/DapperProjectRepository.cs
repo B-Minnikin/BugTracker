@@ -36,7 +36,7 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project Delete(int Id)
+		public Project DeleteProject(int Id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
