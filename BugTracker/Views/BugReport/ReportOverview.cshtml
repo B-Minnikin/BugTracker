@@ -15,7 +15,7 @@
 <p>Importance: @Model.BugReport.Importance</p>
 <p>Severity: @Model.BugReport.Severity</p>
 
-<a asp-controller="bugreport" asp-action="edit" class="btn btn-primary">Edit Bug Report</a>
+<a asp-controller="bugreport" asp-action="edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
 
 <h1>Comments</h1>
 @* List comments down here *@
