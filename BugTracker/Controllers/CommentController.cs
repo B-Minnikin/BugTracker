@@ -54,7 +54,9 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public ViewResult Edit(int id)
 		{
-			return View();
+			BugReportComment bugReportComment = projectRepository.GetBugReportCommentById(id);
+
+			return View(bugReportComment);
 		}
 
 		[HttpPost]
