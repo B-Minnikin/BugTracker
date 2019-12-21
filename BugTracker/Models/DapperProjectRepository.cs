@@ -9,7 +9,7 @@ namespace BugTracker.Models
 {
 	public class DapperProjectRepository : IProjectRepository
 	{
-		public Project Add(Project project)
+		public Project CreateProject(Project project)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{

@@ -65,7 +65,7 @@ namespace BugTracker.Controllers
 					BugReports = new List<BugReport>()
 				};
 
-				Project addedProject = projectRepository.Add(newProject);
+				Project addedProject = projectRepository.CreateProject(newProject);
 
 				return RedirectToAction("overview", addedProject.ProjectId);
 			}

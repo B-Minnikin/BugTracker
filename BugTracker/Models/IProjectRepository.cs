@@ -9,7 +9,7 @@ namespace BugTracker.Models
 	{
 		Project GetProject(int Id);
 		IEnumerable<Project> GetAllProjects();
-		Project Add(Project project);
+		Project CreateProject(Project project);
 		BugReport AddBugReport(BugReport bugReport);
 		Project Update(Project projectChanges);
 		Project Delete(int Id);
