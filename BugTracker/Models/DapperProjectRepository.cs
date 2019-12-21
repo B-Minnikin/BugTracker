@@ -51,8 +51,8 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var query = connection.Query<Project>("dbo.Projects_GetAll");
-				return query;
+				var projects = connection.Query<Project>("dbo.Projects_GetAll");
+				return projects;
 			}
 		}
 
@@ -69,9 +69,9 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var output = connection.Execute("dbo.Projects_Update @ProjectId @Name @Description @CreationTime @LastUpdateTime @Hidden", projectChanges);
-				var query = this.GetProjectById(output);
-				return query;
+				var projectId = connection.Execute("dbo.Projects_Update @ProjectId @Name @Description @CreationTime @LastUpdateTime @Hidden", projectChanges);
+				var project = this.GetProjectById(projectId);
+				return project;
 			}
 		}
 	}
