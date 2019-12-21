@@ -18,5 +18,14 @@ namespace BugTracker.Models
 		BugReport AddBugReport(BugReport bugReport);
 		IEnumerable<BugReport> GetAllBugReports(int ProjectId);
 		BugReport GetBugReportById(int BugReportId);
+
+		// Bug Report Comments
+		IEnumerable<BugReportComment> GetBugReportComments(int bugReportId);
+
+		// Bug Report States
+		IEnumerable<BugState> GetBugStates(int bugReportId);
+
+		// Attachment Paths
+		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
 	}
 }

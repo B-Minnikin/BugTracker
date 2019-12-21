@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
+	public enum AttachmentParentType
+	{
+		BugReport, Comment
+	}
+
 	public class AttachmentPath
 	{
 		[Key]
