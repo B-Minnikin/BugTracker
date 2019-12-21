@@ -93,6 +93,24 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugReport UpdateBugReport(BugReport bugReportChanges)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var updatedBugReportId = connection.ExecuteScalar("dbo.BugReports_Update", new
+				{
+					Title = bugReportChanges.Title,
+					ProgramBehaviour = bugReportChanges.ProgramBehaviour,
+					DetailsToReproduce = bugReportChanges.DetailsToReproduce,
+					Severity = bugReportChanges.Severity,
+					Importance = bugReportChanges.Importance,
+					Hidden = bugReportChanges.Hidden
+				}, commandType: CommandType.StoredProcedure);
+				BugReport updatedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = updatedBugReportId });
+				return updatedBugReport;
+			}
+		}
+
 		public IEnumerable<BugReportComment> GetBugReportComments(int bugReportId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
