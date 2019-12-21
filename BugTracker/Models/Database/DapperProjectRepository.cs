@@ -56,6 +56,15 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugReport GetBugReportById(int BugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = BugReportId });
+				return bugReport;
+			}
+		}
+
 		public IEnumerable<Project> GetAllProjects()
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
