@@ -141,7 +141,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var updatedBugReportId = connection.ExecuteScalar("dbo.BugReports_Update", new
+				var updatedBugReportId = connection.ExecuteScalar("dbo.Comments_Update", new
 				{
 					Author = bugReportCommentChanges.Author,
 					MainText = bugReportCommentChanges.MainText
