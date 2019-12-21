@@ -20,5 +20,34 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 		}
 
+		[HttpGet]
+		public ViewResult Create()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public ViewResult Create(BugReportComment model)
+		{
+			return View();
+		}
+
+		[HttpGet]
+		public ViewResult Edit(int id)
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public ViewResult Edit(BugReportComment model)
+		{
+			return View();
+		}
+
+		public ViewResult Delete(int id)
+		{
+			return View();
+		}
+
 	}
 }
