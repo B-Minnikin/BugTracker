@@ -21,9 +21,14 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public ViewResult Create()
+		public ViewResult Create(int bugReportId)
 		{
-			return View();
+			BugReportComment newComment = new BugReportComment
+			{
+				BugReportId = bugReportId
+			};
+
+			return View(newComment);
 		}
 
 		[HttpPost]

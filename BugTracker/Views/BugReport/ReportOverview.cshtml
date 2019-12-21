@@ -40,4 +40,4 @@
     </div>
 }
 
-<a asp-controller="comment" asp-action="create" class="btn btn-primary">Post Comment</a>
+<a asp-controller="comment" asp-action="create" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Post Comment</a>
