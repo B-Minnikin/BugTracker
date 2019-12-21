@@ -9,5 +9,6 @@ namespace BugTracker.ViewModels
 	public class OverviewProjectViewModel
 	{
 		public Project Project { get; set; }
+		public List<BugReport> BugReports {get; set;}
 	}
 }

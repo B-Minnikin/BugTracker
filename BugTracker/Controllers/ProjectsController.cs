@@ -36,7 +36,8 @@ namespace BugTracker.Controllers
 
 			OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
 			{
-				Project = project
+				Project = project,
+				BugReports = projectRepository.GetAllBugReports(id).ToList()
 			};
 
 			// if project NULL -- redirect to error page !!
