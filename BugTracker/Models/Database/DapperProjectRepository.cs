@@ -92,5 +92,46 @@ namespace BugTracker.Models
 				return project;
 			}
 		}
+
+		public IEnumerable<BugReportComment> GetBugReportComments(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var comments = connection.Query<BugReportComment>("dbo.Comments_GetAll @BugReportId", new { BugReportId = bugReportId});
+				return comments;
+			}
+		}
+
+		public IEnumerable<BugState> GetBugStates(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugStates = connection.Query<BugState>("dbo.BugStates_GetAll @BugReportId", new { BugReportId = bugReportId });
+				return bugStates;
+			}
+		}
+
+		public IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				string procedure;
+
+				switch (parentType)
+				{
+					case AttachmentParentType.BugReport:
+						procedure = "dbo.AttachmentPaths_BugReport_GetAll @ParentId";
+						break;
+					case AttachmentParentType.Comment:
+						procedure = "dbo.AttachmentPaths_Comment_GetAll @ParentId";
+						break;
+					default:
+						throw new System.ArgumentException("Parameter must be a valid type", "parentType");
+				}
+
+				var attachmentPaths = connection.Query<AttachmentPath>(procedure, new { ParentId = parentId });
+				return attachmentPaths;
+			}
+		}
 	}
 }

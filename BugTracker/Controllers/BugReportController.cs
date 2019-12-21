@@ -86,9 +86,9 @@ namespace BugTracker.Controllers
 			OverviewBugReportViewModel bugViewModel = new OverviewBugReportViewModel
 			{
 				BugReport = bugReport,
-				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId),
-				BugStates = projectRepository.GetBugStates(bugReport.BugReportId),
-				AttachmentPaths = projectRepository.GetAttachmentPaths(bugReport.BugReportId)
+				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
+				BugStates = projectRepository.GetBugStates(bugReport.BugReportId).ToList(),
+				AttachmentPaths = projectRepository.GetAttachmentPaths(AttachmentParentType.BugReport, bugReport.BugReportId).ToList()
 			};
 
 			return View(bugViewModel);
