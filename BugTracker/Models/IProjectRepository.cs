@@ -11,7 +11,7 @@ namespace BugTracker.Models
 		IEnumerable<Project> GetAllProjects();
 		Project CreateProject(Project project);
 		BugReport AddBugReport(BugReport bugReport);
-		Project Update(Project projectChanges);
+		Project UpdateProject(Project projectChanges);
 		Project DeleteProject(int Id);
 	}
 }

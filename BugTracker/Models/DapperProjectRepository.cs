@@ -65,7 +65,7 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project Update(Project projectChanges)
+		public Project UpdateProject(Project projectChanges)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
