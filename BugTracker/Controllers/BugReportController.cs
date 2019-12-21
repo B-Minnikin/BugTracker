@@ -83,7 +83,15 @@ namespace BugTracker.Controllers
 		{
 			BugReport bugReport = projectRepository.GetBugReportById(id);
 
-			return View(bugReport);
+			OverviewBugReportViewModel bugViewModel = new OverviewBugReportViewModel
+			{
+				BugReport = bugReport,
+				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId),
+				BugStates = projectRepository.GetBugStates(bugReport.BugReportId),
+				AttachmentPaths = projectRepository.GetAttachmentPaths(bugReport.BugReportId)
+			};
+
+			return View(bugViewModel);
 		}
 	}
 }

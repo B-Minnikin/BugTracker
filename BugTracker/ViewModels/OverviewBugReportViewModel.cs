@@ -8,9 +8,9 @@ namespace BugTracker.ViewModels
 {
 	public class OverviewBugReportViewModel
 	{
-		BugReport bugReport { get; set; }
-		List<BugReportComment> BugReportComments { get; set; }
-		List<BugState> BugStates { get; set; }
-		List<AttachmentPath> AttachmentPaths { get; set; }
+		public BugReport BugReport { get; set; }
+		public List<BugReportComment> BugReportComments { get; set; }
+		public List<BugState> BugStates { get; set; }
+		public List<AttachmentPath> AttachmentPaths { get; set; }
 	}
 }
