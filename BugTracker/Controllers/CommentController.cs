@@ -78,6 +78,8 @@ namespace BugTracker.Controllers
 
 		public ViewResult Delete(int id)
 		{
+			projectRepository.DeleteComment(id);
+
 			return View();
 		}
 
