@@ -49,7 +49,7 @@ namespace BugTracker.Controllers
 
 				// add bug report to current project
 				BugReport addedReport = projectRepository.AddBugReport(newBugReport);
-				return RedirectToAction("ReportOverview", addedReport.BugReportId);
+				return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });
 			}
 
 			return View();
