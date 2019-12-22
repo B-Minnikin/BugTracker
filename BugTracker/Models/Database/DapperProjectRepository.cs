@@ -201,5 +201,14 @@ namespace BugTracker.Models
 					commandType: CommandType.StoredProcedure);
 			}
 		}
+
+		public int GetCommentParentId(int bugReportCommentId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var parentId = connection.QueryFirst<int>("dbo.Comments_GetParentId @BugReportCommentId", new { BugReportCommentId = bugReportCommentId });
+				return parentId;
+			}
+		}
 	}
 }

@@ -78,10 +78,10 @@ namespace BugTracker.Controllers
 
 		public IActionResult Delete(int id)
 		{
+			int parentBugReportId = projectRepository.GetCommentParentId(id);
 			projectRepository.DeleteComment(id);
 
-			return RedirectToAction("ReportOverview", "BugReport");
+			return RedirectToAction("ReportOverview", "BugReport", new { id = parentBugReportId });
 		}
-
 	}
 }
