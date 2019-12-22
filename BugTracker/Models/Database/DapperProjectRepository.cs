@@ -192,5 +192,14 @@ namespace BugTracker.Models
 				return attachmentPaths;
 			}
 		}
+
+		public void DeleteComment(int bugReportCommentId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.Comments_DeleteById @BugReportCommentId", new { BugReportCommentId = bugReportCommentId }, 
+					commandType: CommandType.StoredProcedure);
+			}
+		}
 	}
 }
