@@ -197,7 +197,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				connection.Execute("dbo.Comments_DeleteById @BugReportCommentId", new { BugReportCommentId = bugReportCommentId }, 
+				connection.Execute("dbo.Comments_DeleteById", new { BugReportCommentId = bugReportCommentId }, 
 					commandType: CommandType.StoredProcedure);
 			}
 		}

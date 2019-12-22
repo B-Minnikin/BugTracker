@@ -76,11 +76,11 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
-		public ViewResult Delete(int id)
+		public IActionResult Delete(int id)
 		{
 			projectRepository.DeleteComment(id);
 
-			return View();
+			return RedirectToAction("ReportOverview", "BugReport");
 		}
 
 	}
