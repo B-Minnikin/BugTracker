@@ -18,7 +18,6 @@
 <a asp-controller="bugreport" asp-action="edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
 
 <h1>Comments</h1>
-@* List comments down here *@
 @foreach (var comment in Model.BugReportComments)
 {
     <div class="row col-12">
