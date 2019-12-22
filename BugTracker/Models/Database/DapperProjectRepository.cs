@@ -141,13 +141,14 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var updatedBugReportId = connection.ExecuteScalar("dbo.Comments_Update", new
+				connection.Execute("dbo.Comments_Update", new
 				{
+					BugReportCommentId = bugReportCommentChanges.BugReportCommentId,
 					Author = bugReportCommentChanges.Author,
 					MainText = bugReportCommentChanges.MainText
 				}, commandType: CommandType.StoredProcedure);
-				BugReportComment updatedBugReport = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportId = updatedBugReportId });
-				return updatedBugReport;
+				BugReportComment updatedComment = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportCommentId = bugReportCommentChanges.BugReportCommentId });
+				return updatedComment;
 			}
 		}
 
