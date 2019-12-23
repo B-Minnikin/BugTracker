@@ -19,6 +19,7 @@ namespace BugTracker.Models
 		IEnumerable<BugReport> GetAllBugReports(int ProjectId);
 		BugReport GetBugReportById(int BugReportId);
 		BugReport UpdateBugReport(BugReport reportChanges);
+		BugReport DeleteBugReport(int id);
 
 		// Bug Report Comments
 		BugReportComment CreateComment(BugReportComment bugReportComment);

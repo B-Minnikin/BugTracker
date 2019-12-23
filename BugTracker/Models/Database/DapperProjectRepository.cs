@@ -210,5 +210,16 @@ namespace BugTracker.Models
 				return parentId;
 			}
 		}
+
+		public BugReport DeleteBugReport(int id)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var deletedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = id });
+				connection.Execute("dbo.BugReports_DeleteById", new { BugReportId = id },
+					commandType: CommandType.StoredProcedure);
+				return deletedBugReport;
+			}
+		}
 	}
 }
