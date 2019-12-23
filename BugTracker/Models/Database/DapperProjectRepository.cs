@@ -53,31 +53,31 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project DeleteProject(int Id)
+		public Project DeleteProject(int id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var deletedProject = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = Id });
-				var result = connection.Execute("dbo.Projects_Delete @ProjectId", new { ProjectId = Id });
+				var deletedProject = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
+				var result = connection.Execute("dbo.Projects_Delete @ProjectId", new { ProjectId = id });
 
 				return deletedProject;
 			}
 		}
 
-		public IEnumerable<BugReport> GetAllBugReports(int ProjectId)
+		public IEnumerable<BugReport> GetAllBugReports(int projectId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = ProjectId});
+				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = projectId});
 				return bugReports;
 			}
 		}
 
-		public BugReport GetBugReportById(int BugReportId)
+		public BugReport GetBugReportById(int bugReportId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = BugReportId });
+				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = bugReportId });
 				return bugReport;
 			}
 		}
@@ -91,11 +91,11 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project GetProjectById(int Id)
+		public Project GetProjectById(int id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var project = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = Id });
+				var project = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
 				return project;
 			}
 		}

@@ -8,16 +8,16 @@ namespace BugTracker.Models
 	public interface IProjectRepository
 	{
 		// Projects
-		Project GetProjectById(int Id);
+		Project GetProjectById(int id);
 		IEnumerable<Project> GetAllProjects();
 		Project CreateProject(Project project);
 		Project UpdateProject(Project projectChanges);
-		Project DeleteProject(int Id);
+		Project DeleteProject(int id);
 
 		// Bug Reports
 		BugReport AddBugReport(BugReport bugReport);
-		IEnumerable<BugReport> GetAllBugReports(int ProjectId);
-		BugReport GetBugReportById(int BugReportId);
+		IEnumerable<BugReport> GetAllBugReports(int projectId);
+		BugReport GetBugReportById(int bugReportId);
 		BugReport UpdateBugReport(BugReport reportChanges);
 		BugReport DeleteBugReport(int id);
 
