@@ -84,6 +84,11 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
+		public IActionResult Delete(int id)
+		{
+
+		}
+
 		public ViewResult ReportOverview(int id)
 		{
 			BugReport bugReport = projectRepository.GetBugReportById(id);
@@ -93,7 +98,7 @@ namespace BugTracker.Controllers
 				BugReport = bugReport,
 				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
 				BugStates = projectRepository.GetBugStates(bugReport.BugReportId).ToList(),
-				AttachmentPaths = projectRepository.GetAttachmentPaths(AttachmentParentType.BugReport, bugReport.BugReportId).ToList()
+				//AttachmentPaths = projectRepository.GetAttachmentPaths(AttachmentParentType.BugReport, bugReport.BugReportId).ToList()
 			};
 
 			return View(bugViewModel);
