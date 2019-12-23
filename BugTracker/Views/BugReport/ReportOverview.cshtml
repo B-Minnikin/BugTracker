@@ -16,6 +16,7 @@
 <p>Severity: @Model.BugReport.Severity</p>
 
 <a asp-controller="bugreport" asp-action="edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
+<a asp-controller="bugreport" asp-action="delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
 
 <h1>Comments</h1>
 @foreach (var comment in Model.BugReportComments)

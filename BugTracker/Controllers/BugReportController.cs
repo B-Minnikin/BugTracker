@@ -84,9 +84,9 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
-		public IActionResult Delete(int id)
+		public IActionResult Delete(int bugReportId)
 		{
-			projectRepository.DeleteBugReport(id);
+			projectRepository.DeleteBugReport(bugReportId);
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
 
 			return RedirectToAction("Overview", "Projects", new { id = currentProjectId });
