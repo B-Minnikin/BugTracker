@@ -123,8 +123,9 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var updatedBugReportId = connection.ExecuteScalar("dbo.BugReports_Update", new
+				connection.ExecuteScalar("dbo.BugReports_Update", new
 				{
+					BugReportId = bugReportChanges.BugReportId,
 					Title = bugReportChanges.Title,
 					ProgramBehaviour = bugReportChanges.ProgramBehaviour,
 					DetailsToReproduce = bugReportChanges.DetailsToReproduce,
@@ -132,7 +133,7 @@ namespace BugTracker.Models
 					Importance = bugReportChanges.Importance,
 					Hidden = bugReportChanges.Hidden
 				}, commandType: CommandType.StoredProcedure);
-				BugReport updatedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = updatedBugReportId });
+				BugReport updatedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = bugReportChanges.BugReportId });
 				return updatedBugReport;
 			}
 		}
