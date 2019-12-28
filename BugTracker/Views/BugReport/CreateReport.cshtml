@@ -19,7 +19,7 @@
     <div class="form-group row">
         <label asp-for="ProgramBehaviour" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <input asp-for="ProgramBehaviour" class="form-control" placeholder="Program behaviour" />
+            <textarea asp-for="ProgramBehaviour" class="form-control" placeholder="Program behaviour" rows="4"></textarea>
             <span asp-validation-for="ProgramBehaviour" class="text-danger"></span>
         </div>
     </div>
@@ -27,7 +27,7 @@
     <div class="form-group row">
         <label asp-for="DetailsToReproduce" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <input asp-for="DetailsToReproduce" class="form-control" placeholder="Details to reproduce" />
+            <textarea asp-for="DetailsToReproduce" class="form-control" placeholder="Details to reproduce" rows="4"></textarea>
             <span asp-validation-for="DetailsToReproduce" class="text-danger"></span>
         </div>
     </div>
