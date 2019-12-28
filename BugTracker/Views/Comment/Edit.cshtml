@@ -9,7 +9,7 @@
 <form asp-controller="comment" asp-action="edit" method="post" class="mt-3">
 
     <div class="form-group row">
-        <input asp-for="MainText" class="form-control" placeholder="@Model.MainText" />
+        <textarea asp-for="MainText" class="form-control" placeholder="@Model.MainText" rows="4" ></textarea>
     </div>
 
     <input hidden asp-for="BugReportCommentId" placeholder="@Model.BugReportCommentId"/>
