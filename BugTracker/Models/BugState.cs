@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
+	public enum StateType
+	{
+		open,
+		resolved,
+		closed
+	}
+
 	public class BugState
 	{
 		[Key]
 		public int BugStateId { get; set; }
 		public DateTime Time { get; set; }
+		public StateType StateType { get; set; }
 		public string Author { get; set; } // link to profile
-		public string StateName { get; set; }
+		public int BugReportId { get; set; }
 	}
 }
