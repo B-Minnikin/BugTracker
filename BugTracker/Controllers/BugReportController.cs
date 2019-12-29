@@ -43,12 +43,21 @@ namespace BugTracker.Controllers
 					Severity = model.Severity,
 					Importance = model.Importance,
 					PersonReporting = "User", // to implement
-									  // add BugState = open as default
 					ProjectId = (int)HttpContext.Session.GetInt32("currentProject") // get project ID from cookie
 				};
 
 				// add bug report to current project
 				BugReport addedReport = projectRepository.AddBugReport(newBugReport);
+
+				BugState newBugState = new BugState
+				{
+					Time = DateTime.Now,
+					StateType = StateType.open,
+					Author = "User" // to implement
+					BugReportId = addedReport.BugReportId
+				};
+				BugState addedBugState = projectRepository.CreateBugState(newBugState);
+
 				return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });
 			}
 
