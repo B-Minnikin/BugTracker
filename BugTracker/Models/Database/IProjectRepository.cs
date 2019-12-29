@@ -32,6 +32,7 @@ namespace BugTracker.Models
 
 		// Bug Report States
 		IEnumerable<BugState> GetBugStates(int bugReportId);
+		BugState CreateBugState(BugState bugState);
 
 		// Attachment Paths
 		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
