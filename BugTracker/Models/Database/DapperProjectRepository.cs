@@ -222,5 +222,14 @@ namespace BugTracker.Models
 				return deletedBugReport;
 			}
 		}
+
+		public int GetCommentCountById(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				int count = connection.ExecuteScalar<int>("dbo.BugReports_CommentCount @BugReportId", new { BugReportId = bugReportId });
+				return count;
+			}
+		}
 	}
 }

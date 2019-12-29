@@ -26,6 +26,10 @@
                     <p>Importance: @bugReport.Importance</p>
                 </div>
 
+                <div class="card-footer">
+                    <p>Replies: @Model.CommentCountHandler(bugReport.BugReportId)</p>
+                </div>
+
                 @*
                 Number of replies
                 Bug report state history - closed / open, etc

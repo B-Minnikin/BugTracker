@@ -20,7 +20,7 @@ namespace BugTracker.Models
 		BugReport GetBugReportById(int bugReportId);
 		BugReport UpdateBugReport(BugReport reportChanges);
 		BugReport DeleteBugReport(int id);
-		int GetCommentCountById(int BugReportId);
+		int GetCommentCountById(int bugReportId);
 
 		// Bug Report Comments
 		BugReportComment CreateComment(BugReportComment bugReportComment);
