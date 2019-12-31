@@ -90,7 +90,7 @@ namespace BugTracker.Controllers
 				bugReport.Hidden = model.BugReport.Hidden;
 				bugReport.CreationTime = model.BugReport.CreationTime;
 
-				BugReport updatedBugReport = projectRepository.UpdateBugReport(bugReport); // delete var?
+				_ = projectRepository.UpdateBugReport(bugReport);
 
 				BugState latestBugState = projectRepository.GetLatestState(bugReport.BugReportId);
 				if (!model.CurrentState.Equals(latestBugState.StateType))
