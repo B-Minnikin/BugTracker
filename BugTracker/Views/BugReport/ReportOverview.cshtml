@@ -18,7 +18,17 @@
 <a asp-controller="BugReport" asp-action="Edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
 <a asp-controller="BugReport" asp-action="Delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
 
-<h1>Comments</h1>
+<hr />
+<h3>State History -- <span class="badge badge-success">@Model.CurrentState</span></h3>
+@foreach (var state in Model.BugStates)
+{
+    <div class="row col-12">
+        <p>@state.Time -- @Enum.GetName(typeof(StateType), state.StateType)</p>
+    </div>
+}
+<hr />
+
+<h3>Comments</h3>
 @foreach (var comment in Model.BugReportComments)
 {
     <div class="row col-12">

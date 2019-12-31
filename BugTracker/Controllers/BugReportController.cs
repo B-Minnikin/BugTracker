@@ -43,12 +43,21 @@ namespace BugTracker.Controllers
 					Severity = model.Severity,
 					Importance = model.Importance,
 					PersonReporting = "User", // to implement
-									  // add BugState = open as default
 					ProjectId = (int)HttpContext.Session.GetInt32("currentProject") // get project ID from cookie
 				};
 
 				// add bug report to current project
 				BugReport addedReport = projectRepository.AddBugReport(newBugReport);
+
+				BugState newBugState = new BugState
+				{
+					Time = DateTime.Now,
+					StateType = StateType.open,
+					Author = "User", // to implement
+					BugReportId = addedReport.BugReportId
+				};
+				BugState addedBugState = projectRepository.CreateBugState(newBugState);
+
 				return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });
 			}
 
@@ -58,26 +67,45 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public ViewResult Edit(int bugReportId)
 		{
-			BugReport bugReport = projectRepository.GetBugReportById(bugReportId);
+			EditBugReportViewModel reportViewModel = new EditBugReportViewModel
+			{
+				BugReport = projectRepository.GetBugReportById(bugReportId),
+				CurrentState = projectRepository.GetLatestState(bugReportId).StateType
+			};
 
-			return View(bugReport);
+			return View(reportViewModel);
 		}
 
 		[HttpPost]
-		public IActionResult Edit(BugReport model)
+		public IActionResult Edit(EditBugReportViewModel model)
 		{
 			if (ModelState.IsValid)
 			{
-				BugReport bugReport = projectRepository.GetBugReportById(model.BugReportId);
-				bugReport.Title = model.Title;
-				bugReport.DetailsToReproduce = model.DetailsToReproduce;
-				bugReport.ProgramBehaviour = model.ProgramBehaviour;
-				bugReport.Severity = model.Severity;
-				bugReport.Importance = model.Importance;
-				bugReport.Hidden = model.Hidden;
-				bugReport.CreationTime = model.CreationTime;
+				BugReport bugReport = projectRepository.GetBugReportById(model.BugReport.BugReportId);
+				bugReport.Title = model.BugReport.Title;
+				bugReport.DetailsToReproduce = model.BugReport.DetailsToReproduce;
+				bugReport.ProgramBehaviour = model.BugReport.ProgramBehaviour;
+				bugReport.Severity = model.BugReport.Severity;
+				bugReport.Importance = model.BugReport.Importance;
+				bugReport.Hidden = model.BugReport.Hidden;
+				bugReport.CreationTime = model.BugReport.CreationTime;
 
-				projectRepository.UpdateBugReport(bugReport);
+				_ = projectRepository.UpdateBugReport(bugReport);
+
+				BugState latestBugState = projectRepository.GetLatestState(bugReport.BugReportId);
+				if (!model.CurrentState.Equals(latestBugState.StateType))
+				{
+					BugState newBugState = new BugState
+					{
+						Time = DateTime.Now,
+						StateType = model.CurrentState,
+						Author = "User", // to implement
+						BugReportId = bugReport.BugReportId
+					};
+
+					projectRepository.CreateBugState(newBugState);
+				}
+
 				return RedirectToAction("ReportOverview", new { id = bugReport.BugReportId});
 			}
 
@@ -100,8 +128,8 @@ namespace BugTracker.Controllers
 			{
 				BugReport = bugReport,
 				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
-				BugStates = projectRepository.GetBugStates(bugReport.BugReportId).ToList(),
-				//AttachmentPaths = projectRepository.GetAttachmentPaths(AttachmentParentType.BugReport, bugReport.BugReportId).ToList()
+				BugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList(),
+				CurrentState = projectRepository.GetLatestState(bugReport.BugReportId).StateType
 			};
 
 			return View(bugViewModel);

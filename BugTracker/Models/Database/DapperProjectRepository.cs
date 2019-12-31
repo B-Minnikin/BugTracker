@@ -231,5 +231,31 @@ namespace BugTracker.Models
 				return count;
 			}
 		}
+
+		public BugState CreateBugState(BugState bugState)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var insertedBugStateId = connection.ExecuteScalar("dbo.BugStates_Insert", new
+				{
+					Author = bugState.Author,
+					Time = bugState.Time,
+					StateType = bugState.StateType,
+					BugReportId = bugState.BugReportId
+				},
+					commandType: CommandType.StoredProcedure);
+				BugState insertedState = connection.QueryFirst<BugState>("dbo.BugStates_GetById @BugStateId", new { BugStateId = insertedBugStateId });
+				return insertedState;
+			}
+		}
+
+		public BugState GetLatestState(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				BugState currentState = connection.QueryFirst<BugState>("dbo.BugStates_GetLatest @BugReportId", new { BugReportId = bugReportId });
+				return currentState;
+			}
+		}
 	}
 }

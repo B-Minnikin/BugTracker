@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace BugTracker.ViewModels
 {
-	public class OverviewBugReportViewModel
+	public class EditBugReportViewModel
 	{
 		public BugReport BugReport { get; set; }
 		public StateType CurrentState { get; set; }
-		public List<BugReportComment> BugReportComments { get; set; }
-		public List<BugState> BugStates { get; set; }
-		public List<AttachmentPath> AttachmentPaths { get; set; }
 	}
 }
