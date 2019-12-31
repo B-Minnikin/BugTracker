@@ -129,6 +129,7 @@ namespace BugTracker.Controllers
 				BugReport = bugReport,
 				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
 				BugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList(),
+				CurrentState = projectRepository.GetLatestState(bugReport.BugReportId).StateType
 			};
 
 			return View(bugViewModel);

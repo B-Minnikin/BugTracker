@@ -19,7 +19,7 @@
 <a asp-controller="bugreport" asp-action="delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
 
 <hr />
-<h3>State History</h3>
+<h3>State History -- <span class="badge badge-success">@Model.CurrentState</span></h3>
 @foreach (var state in Model.BugStates)
 {
     <div class="row col-12">
