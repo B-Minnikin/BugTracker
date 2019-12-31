@@ -6,8 +6,8 @@
 
 <h1>Projects List - WIP</h1>
 
-<a asp-controller="projects" asp-action="createproject" class="btn btn-primary">Create New Project</a>
-<a asp-controller="home" asp-action="index" class="btn btn-primary">Cancel</a>
+<a asp-controller="Projects" asp-action="CreateProject" class="btn btn-primary">Create New Project</a>
+<a asp-controller="Home" asp-action="Index" class="btn btn-primary">Cancel</a>
 
 <div class="card-deck">
     @foreach (var project in Model)
@@ -34,7 +34,7 @@
                     }
 
                     <!-- Whole card links to project overview -->
-                    <a asp-controller="projects" asp-action="overview" asp-route-id="@project.ProjectId" class="stretched-link"></a>
+                    <a asp-controller="Projects" asp-action="Overview" asp-route-id="@project.ProjectId" class="stretched-link"></a>
                 </div>
             </div>
     </div>

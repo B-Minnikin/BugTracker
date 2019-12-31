@@ -6,8 +6,8 @@
 
 <h1>Project Overview - @Model.Project.Name</h1>
 
-<a asp-controller="bugreport" asp-action="createreport" class="btn btn-primary">Create Bug Report</a>
-<a asp-controller="projects" asp-action="deleteproject" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Delete Project</a>
+<a asp-controller="BugReport" asp-action="CreateReport" class="btn btn-primary">Create Bug Report</a>
+<a asp-controller="Projects" asp-action="DeleteProject" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Delete Project</a>
 
 <h3>Bug Reports</h3>
 <div class="card-deck">
@@ -35,7 +35,7 @@
                 Bug report state history - closed / open, etc
                 *@
 
-                <a asp-controller="bugreport" asp-action="reportoverview" asp-route-id="@bugReport.BugReportId" class="stretched-link"></a>
+                <a asp-controller="BugReport" asp-action="ReportOverview" asp-route-id="@bugReport.BugReportId" class="stretched-link"></a>
             </div>
         </div>
     }

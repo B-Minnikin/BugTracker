@@ -15,8 +15,8 @@
 <p>Importance: @Model.BugReport.Importance</p>
 <p>Severity: @Model.BugReport.Severity</p>
 
-<a asp-controller="bugreport" asp-action="edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
-<a asp-controller="bugreport" asp-action="delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
+<a asp-controller="BugReport" asp-action="Edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
+<a asp-controller="BugReport" asp-action="Delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
 
 <h1>Comments</h1>
 @foreach (var comment in Model.BugReportComments)
@@ -26,8 +26,8 @@
 
             <div class="card-header">
                 <h3>@comment.Author -- @comment.Date</h3>
-                <a asp-controller="comment" asp-action="edit" asp-route-id="@comment.BugReportCommentId" class="btn btn-primary">Edit</a>
-                <a asp-controller="comment" asp-action="delete" asp-route-id="@comment.BugReportCommentId" class="btn btn-primary">Delete</a>
+                <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.BugReportCommentId" class="btn btn-primary">Edit</a>
+                <a asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.BugReportCommentId" class="btn btn-primary">Delete</a>
             </div>
 
             <div class="card-body">
@@ -42,4 +42,4 @@
     </div>
 }
 
-<a asp-controller="comment" asp-action="create" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Post Comment</a>
+<a asp-controller="Comment" asp-action="Create" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Post Comment</a>
