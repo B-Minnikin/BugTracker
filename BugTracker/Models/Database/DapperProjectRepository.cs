@@ -248,5 +248,14 @@ namespace BugTracker.Models
 				return insertedState;
 			}
 		}
+
+		public BugState GetLatestState(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				BugState currentState = connection.QueryFirst<BugState>("dbo.BugStates_GetLatest @BugReportId", new { BugReportId = bugReportId });
+				return currentState;
+			}
+		}
 	}
 }
