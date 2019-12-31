@@ -129,7 +129,6 @@ namespace BugTracker.Controllers
 				BugReport = bugReport,
 				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
 				BugStates = projectRepository.GetBugStates(bugReport.BugReportId).ToList(),
-				//AttachmentPaths = projectRepository.GetAttachmentPaths(AttachmentParentType.BugReport, bugReport.BugReportId).ToList()
 			};
 
 			return View(bugViewModel);
