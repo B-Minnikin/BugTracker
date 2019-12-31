@@ -70,7 +70,7 @@ namespace BugTracker.Controllers
 			EditBugReportViewModel reportViewModel = new EditBugReportViewModel
 			{
 				BugReport = projectRepository.GetBugReportById(bugReportId),
-				CurrentState = projectRepository.GetLatestBugState(bugReportId)
+				CurrentState = projectRepository.GetLatestState(bugReportId).StateType
 			};
 
 			return View(reportViewModel);
