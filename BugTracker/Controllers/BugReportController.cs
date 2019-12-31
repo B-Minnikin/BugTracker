@@ -67,9 +67,13 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public ViewResult Edit(int bugReportId)
 		{
-			BugReport bugReport = projectRepository.GetBugReportById(bugReportId);
+			EditBugReportViewModel reportViewModel = new EditBugReportViewModel
+			{
+				BugReport = projectRepository.GetBugReportById(bugReportId),
+				CurrentState = projectRepository.GetLatestBugState(bugReportId)
+			};
 
-			return View(bugReport);
+			return View(reportViewModel);
 		}
 
 		[HttpPost]

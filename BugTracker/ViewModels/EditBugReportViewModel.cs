@@ -8,7 +8,7 @@ namespace BugTracker.ViewModels
 {
 	public class EditBugReportViewModel
 	{
-		BugReport BugReport { get; set; }
-		StateType CurrentState { get; set; }
+		public BugReport BugReport { get; set; }
+		public StateType CurrentState { get; set; }
 	}
 }
