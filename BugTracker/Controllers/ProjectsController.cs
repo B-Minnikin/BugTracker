@@ -69,7 +69,7 @@ namespace BugTracker.Controllers
 
 				Project addedProject = projectRepository.CreateProject(newProject);
 
-				return RedirectToAction("overview", new { id = addedProject.ProjectId });
+				return RedirectToAction("Overview", new { id = addedProject.ProjectId });
 			}
 
 			return View();
@@ -79,7 +79,7 @@ namespace BugTracker.Controllers
 		{
 			projectRepository.DeleteProject(id);
 
-			return RedirectToAction("projects");
+			return RedirectToAction("Projects");
 		}
 	}
 }
