@@ -20,9 +20,5 @@ namespace BugTracker.Models
 		public string PersonReporting { get; set; }
 		
 		public int ProjectId { get; set; }
-
-		public IEnumerable<BugReportComment> Comments { get; set; }
-		public IEnumerable<BugState> StateHistory { get; set; }
-		public IEnumerable<AttachmentPath> AttachmentPaths { get; set; }
 	}
 }
