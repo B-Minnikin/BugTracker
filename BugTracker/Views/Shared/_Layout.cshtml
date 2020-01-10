@@ -12,6 +12,15 @@
 
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: #5a90ad">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item"><a href="'#">Project</a></li>
+                    <li class="breadcrumb-item"><a href="'#">Bug Report</a></li>
+                </ol>
+            </nav>
+
             <div class="navbar-nav ml-auto">
                 <form class="form-inline">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -22,8 +31,9 @@
                 <a asp-action="login" asp-controller="account" class="nav-link">Login</a>
 
             </div>
-        </nav>
-    </header>
+
+         </nav>
+</header>
 
     <div class="container">
         <main role="main" class="pb-3">
