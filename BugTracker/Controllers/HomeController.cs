@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BugTracker.Models;
+using SmartBreadcrumbs.Attributes;
 
 namespace BugTracker.Controllers
 {
@@ -18,6 +19,7 @@ namespace BugTracker.Controllers
 			_logger = logger;
 		}
 
+		[DefaultBreadcrumb("Home")]
 		public IActionResult Index()
 		{
 			return View();
