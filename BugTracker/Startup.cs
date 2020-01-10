@@ -37,10 +37,7 @@ namespace BugTracker
 				options.Cookie.IsEssential = true;
 			});
 			
-			services.AddBreadcrumbs(GetType().Assembly, options =>
-			{
-				options.DontLookForDefaultNode = true;
-			});
+			services.AddBreadcrumbs(GetType().Assembly);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
