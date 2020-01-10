@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SmartBreadcrumbs.Extensions;
 
 namespace BugTracker
 {
@@ -34,6 +35,11 @@ namespace BugTracker
 			{
 				options.Cookie.HttpOnly = true;
 				options.Cookie.IsEssential = true;
+			});
+			
+			services.AddBreadcrumbs(GetType().Assembly, options =>
+			{
+				options.DontLookForDefaultNode = true;
 			});
 		}
 
