@@ -3,6 +3,8 @@ using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +24,7 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 		}
 
+		[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]
 		public ViewResult Projects()
 		{
 			var model = projectRepository.GetAllProjects();
@@ -29,8 +32,18 @@ namespace BugTracker.Controllers
 			return View(model);
 		}
 
+		[Breadcrumb("Overview", FromAction = "Projects", FromController = typeof(ProjectsController))]
 		public ViewResult Overview(int id)
 		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", "Overview test")
+			{
+				RouteValues = new { id = id},
+				Parent = projectsNode
+			};
+			//ViewData ["BreadcrumbNode"] = projectsNode;
+			ViewData["BreadcrumbNode"] = overviewNode;
+
 			Project project = projectRepository.GetProjectById(id);
 			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
@@ -47,6 +60,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
+		[Breadcrumb("Create Project", FromAction = "Projects", FromController = typeof(ProjectsController))]
 		public ViewResult CreateProject()
 		{
 			return View();
