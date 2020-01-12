@@ -1,6 +1,8 @@
 ﻿using BugTracker.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,28 @@ namespace BugTracker.Controllers
 			{
 				BugReportId = bugReportId
 			};
+
+			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+			var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
+			var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
+
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			{
+				RouteValues = new { id = currentProjectId },
+				Parent = projectsNode
+			};
+			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", currentBugReport.Title)
+			{
+				RouteValues = new {id = currentBugReportId},
+				Parent = overviewNode
+			};
+			var commentNode = new MvcBreadcrumbNode("Create", "Comment", "Comment")
+			{
+				Parent = reportNode
+			};
+			ViewData["BreadcrumbNode"] = commentNode;
 
 			return View(newComment);
 		}
@@ -55,6 +79,28 @@ namespace BugTracker.Controllers
 		public ViewResult Edit(int id)
 		{
 			BugReportComment bugReportComment = projectRepository.GetBugReportCommentById(id);
+
+			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+			var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
+			var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
+
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			{
+				RouteValues = new { id = currentProjectId },
+				Parent = projectsNode
+			};
+			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", currentBugReport.Title)
+			{
+				RouteValues = new { id = currentBugReportId },
+				Parent = overviewNode
+			};
+			var commentNode = new MvcBreadcrumbNode("Edit", "Comment", "Edit Comment")
+			{
+				Parent = reportNode
+			};
+			ViewData["BreadcrumbNode"] = commentNode;
 
 			return View(bugReportComment);
 		}
