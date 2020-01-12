@@ -3,6 +3,8 @@ using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,18 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public ViewResult CreateReport()
 		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", "Overview test")
+			{
+				RouteValues = new { id = HttpContext.Session.GetInt32("currentProject")},
+				Parent = projectsNode
+			};
+			var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", "Create Bug Report")
+			{
+				Parent = overviewNode
+			};
+			ViewData["BreadcrumbNode"] = reportNode;
+
 			return View();
 		}
 
