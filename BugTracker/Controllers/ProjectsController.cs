@@ -35,15 +35,6 @@ namespace BugTracker.Controllers
 		[Breadcrumb("Overview", FromAction = "Projects", FromController = typeof(ProjectsController))]
 		public ViewResult Overview(int id)
 		{
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", "Overview test")
-			{
-				RouteValues = new { id = id},
-				Parent = projectsNode
-			};
-			//ViewData ["BreadcrumbNode"] = projectsNode;
-			ViewData["BreadcrumbNode"] = overviewNode;
-
 			Project project = projectRepository.GetProjectById(id);
 			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
@@ -53,6 +44,14 @@ namespace BugTracker.Controllers
 				BugReports = projectRepository.GetAllBugReports(id).ToList(),
 				CommentCountHandler = projectRepository.GetCommentCountById
 			};
+
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = id },
+				Parent = projectsNode
+			};
+			ViewData["BreadcrumbNode"] = overviewNode;
 
 			// if project NULL -- redirect to error page !!
 

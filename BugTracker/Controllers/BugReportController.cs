@@ -27,10 +27,13 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public ViewResult CreateReport()
 		{
+			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+
 			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", "Overview test")
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 			{
-				RouteValues = new { id = HttpContext.Session.GetInt32("currentProject")},
+				RouteValues = new { id = currentProjectId},
 				Parent = projectsNode
 			};
 			var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", "Create Bug Report")
@@ -87,6 +90,26 @@ namespace BugTracker.Controllers
 				CurrentState = projectRepository.GetLatestState(bugReportId).StateType
 			};
 
+			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			{
+				RouteValues = new { id = currentProjectId },
+				Parent = projectsNode
+			};
+			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", reportViewModel.BugReport.Title)
+			{
+				RouteValues = new { id = reportViewModel.BugReport.BugReportId},
+				Parent = overviewNode
+			};
+			var editNode = new MvcBreadcrumbNode("Edit", "BugReport", "Edit")
+			{
+				Parent = reportNode
+			};
+			ViewData["BreadcrumbNode"] = editNode;
+
 			return View(reportViewModel);
 		}
 
@@ -136,6 +159,7 @@ namespace BugTracker.Controllers
 
 		public ViewResult ReportOverview(int id)
 		{
+
 			BugReport bugReport = projectRepository.GetBugReportById(id);
 
 			var bugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
@@ -147,6 +171,21 @@ namespace BugTracker.Controllers
 				BugStates = bugStates,
 				CurrentState = bugStates[0].StateType
 			};
+
+			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			{
+				RouteValues = new { id = currentProjectId },
+				Parent = projectsNode
+			};
+			var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", bugReport.Title)
+			{
+				Parent = overviewNode
+			};
+			ViewData["BreadcrumbNode"] = reportNode;
 
 			return View(bugViewModel);
 		}
