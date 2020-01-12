@@ -159,7 +159,7 @@ namespace BugTracker.Controllers
 
 		public ViewResult ReportOverview(int id)
 		{
-
+			HttpContext.Session.SetInt32("currentBugReport", id);
 			BugReport bugReport = projectRepository.GetBugReportById(id);
 
 			var bugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
