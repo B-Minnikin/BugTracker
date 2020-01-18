@@ -21,6 +21,6 @@ namespace BugTracker.ViewModels
 		[DataType(DataType.Password)]
 		[Display(Name = "Confirm Password")]
 		[Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-		public string ConfirmEmail { get; set; }
+		public string ConfirmPassword { get; set; }
 	}
 }
