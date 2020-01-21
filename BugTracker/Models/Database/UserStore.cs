@@ -44,9 +44,15 @@ namespace BugTracker.Models.Database
 			return IdentityResult.Success;
 		}
 
-		public Task<IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+		public async Task<IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var user = await connection.QueryFirstAsync<IdentityUser>("dbo.Users_FindById @Id", new { UserId = userId });
+				return user;
+			}
 		}
 
 		public Task<IdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
