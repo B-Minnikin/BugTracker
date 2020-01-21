@@ -52,6 +52,8 @@ namespace BugTracker.Controllers
 					await signInManager.SignInAsync(user, isPersistent: false);
 					return RedirectToAction("Projects", "Projects");
 				}
+
+				AddErrorToModelState(result);
 			}
 
 			return View(model);
@@ -72,6 +74,14 @@ namespace BugTracker.Controllers
 		public ViewResult EditProfile(EditProfileViewModel profile)
 		{
 			return View();
+		}
+
+		private void AddErrorToModelState(IdentityResult result)
+		{
+			foreach(var error in result.Errors)
+			{
+				ModelState.AddModelError(string.Empty, error.Description);
+			}
 		}
 	}
 }
