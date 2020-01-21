@@ -32,9 +32,16 @@ namespace BugTracker.Models.Database
 			return IdentityResult.Success;
 		}
 
-		public Task<IdentityResult> DeleteAsync(IdentityUser user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> DeleteAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				await connection.ExecuteAsync("dbo.Users_DeleteById @Id", new { Id = user.Id });
+			}
+
+			return IdentityResult.Success;
 		}
 
 		public Task<IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
