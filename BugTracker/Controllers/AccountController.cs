@@ -36,9 +36,25 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult Register(RegisterViewModel model)
+		public async Task<IActionResult> Register(RegisterViewModel model)
 		{
-			return View();
+			if (ModelState.IsValid)
+			{
+				var user = new IdentityUser
+				{
+					UserName = model.Email,
+					Email = model.Email
+				};
+				var result = await userManager.CreateAsync(user, model.Password);
+
+				if (result.Succeeded)
+				{
+					await signInManager.SignInAsync(user, isPersistent: false);
+					return RedirectToAction("Projects", "Projects");
+				}
+			}
+
+			return View(model);
 		}
 
 		public ViewResult LogOut()
