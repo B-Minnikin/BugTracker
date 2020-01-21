@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Dapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,9 +11,25 @@ namespace BugTracker.Models.Database
 {
 	public class UserStore : IUserStore<IdentityUser>
 	{
-		public Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				await connection.ExecuteScalarAsync("dbo.Users_Insert", new
+				{
+					UserName = user.UserName,
+					NormalizedUserName = user.NormalizedUserName,
+					Email = user.Email,
+					NormalizedEmail = user.NormalizedEmail,
+					PasswordHash = user.PasswordHash,
+					PhoneNumber = user.PhoneNumber
+				},
+					commandType: CommandType.StoredProcedure);
+			}
+
+			return IdentityResult.Success;
 		}
 
 		public Task<IdentityResult> DeleteAsync(IdentityUser user, CancellationToken cancellationToken)
