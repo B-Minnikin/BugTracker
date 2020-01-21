@@ -1,4 +1,5 @@
 ﻿using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,10 +12,16 @@ namespace BugTracker.Controllers
 	public class AccountController : Controller
 	{
 		private readonly ILogger<AccountController> logger;
+		private readonly UserManager<IdentityUser> userManager;
+		private readonly SignInManager<IdentityUser> signInManager;
 
-		public AccountController(ILogger<AccountController> logger)
+		public AccountController(ILogger<AccountController> logger,
+										UserManager<IdentityUser> userManager,
+										SignInManager<IdentityUser> signInManager)
 		{
 			this.logger = logger;
+			this.userManager = userManager;
+			this.signInManager = signInManager;
 		}
 
 		public ViewResult Login()
