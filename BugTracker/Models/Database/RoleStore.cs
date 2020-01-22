@@ -46,7 +46,7 @@ namespace BugTracker.Models.Database
 
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var role = await connection.QueryFirstAsync<IdentityRole>("dbo.Roles_FindById @RoleId", new { RoleId = roleId });
+				var role = await connection.QueryFirstOrDefaultAsync<IdentityRole>("dbo.Roles_FindById @RoleId", new { RoleId = roleId });
 				return role;
 			}
 		}
