@@ -1,4 +1,5 @@
 ﻿using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -25,12 +26,14 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
+		[AllowAnonymous]
 		public ViewResult Login()
 		{
 			return View();
 		}
 
 		[HttpPost]
+		[AllowAnonymous]
 		public async Task<IActionResult> Login(LoginViewModel model)
 		{
 			if (ModelState.IsValid)
@@ -49,12 +52,14 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
+		[AllowAnonymous]
 		public ViewResult Register()
 		{
 			return View();
 		}
 
 		[HttpPost]
+		[AllowAnonymous]
 		public async Task<IActionResult> Register(RegisterViewModel model)
 		{
 			if (ModelState.IsValid)
@@ -87,12 +92,14 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
+		[Authorize]
 		public ViewResult EditProfile()
 		{
 			return View();
 		}
 
 		[HttpPost]
+		[Authorize]
 		public ViewResult EditProfile(EditProfileViewModel profile)
 		{
 			return View();
