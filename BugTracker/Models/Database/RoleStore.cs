@@ -74,7 +74,7 @@ namespace BugTracker.Models.Database
 
 		public Task<string> GetRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult(role.Name);
 		}
 
 		public Task SetNormalizedRoleNameAsync(IdentityRole role, string normalizedName, CancellationToken cancellationToken)
