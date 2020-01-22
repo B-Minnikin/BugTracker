@@ -55,9 +55,15 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public Task<IdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+		public async Task<IdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var user = await connection.QueryFirstAsync<IdentityUser>("dbo.Users_FindByName @NormalizedUserName", new { NormalizedUserName = normalizedUserName });
+				return user;
+			}
 		}
 
 		public Task<string> GetNormalizedUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
