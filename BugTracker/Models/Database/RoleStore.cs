@@ -1,60 +1,74 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Dapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BugTracker.Models.Database
 {
-	public class RoleStore : IRoleStore<IdentityUser>
+	public class RoleStore : IRoleStore<IdentityRole>
 	{
-		public Task<IdentityResult> CreateAsync(IdentityUser role, CancellationToken cancellationToken)
+		public async Task<IdentityResult> CreateAsync(IdentityRole role, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				await connection.ExecuteScalarAsync("dbo.Roles_Insert", new
+				{
+					Name = role.Name,
+					NormalizedName = role.NormalizedName
+				},
+					commandType: CommandType.StoredProcedure);
+			}
+
+			return IdentityResult.Success;
+		}
+
+		public Task<IdentityResult> DeleteAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<IdentityResult> DeleteAsync(IdentityUser role, CancellationToken cancellationToken)
+		public Task<IdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<IdentityUser> FindByIdAsync(string roleId, CancellationToken cancellationToken)
+		public Task<IdentityRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<IdentityUser> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+		public Task<string> GetNormalizedRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<string> GetNormalizedRoleNameAsync(IdentityUser role, CancellationToken cancellationToken)
+		public Task<string> GetRoleIdAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<string> GetRoleIdAsync(IdentityUser role, CancellationToken cancellationToken)
+		public Task<string> GetRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<string> GetRoleNameAsync(IdentityUser role, CancellationToken cancellationToken)
+		public Task SetNormalizedRoleNameAsync(IdentityRole role, string normalizedName, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task SetNormalizedRoleNameAsync(IdentityUser role, string normalizedName, CancellationToken cancellationToken)
+		public Task SetRoleNameAsync(IdentityRole role, string roleName, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task SetRoleNameAsync(IdentityUser role, string roleName, CancellationToken cancellationToken)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IdentityResult> UpdateAsync(IdentityUser role, CancellationToken cancellationToken)
+		public Task<IdentityResult> UpdateAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
@@ -94,5 +108,6 @@ namespace BugTracker.Models.Database
 			// GC.SuppressFinalize(this);
 		}
 		#endregion
+
 	}
 }
