@@ -28,9 +28,16 @@ namespace BugTracker.Models.Database
 			return IdentityResult.Success;
 		}
 
-		public Task<IdentityResult> DeleteAsync(IdentityRole role, CancellationToken cancellationToken)
+		public async Task<IdentityResult> DeleteAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				await connection.ExecuteAsync("dbo.Roles_DeleteById @Id", new { Id = role.Id });
+			}
+
+			return IdentityResult.Success;
 		}
 
 		public Task<IdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
