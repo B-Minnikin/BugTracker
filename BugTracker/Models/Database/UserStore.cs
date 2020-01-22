@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.Database
 {
-	public class UserStore : IUserStore<IdentityUser>
+	public class UserStore : IUserStore<IdentityUser>, IUserPasswordStore<IdentityUser>
 	{
 		public async Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
@@ -147,6 +147,22 @@ namespace BugTracker.Models.Database
 			Dispose(true);
 			// TODO: uncomment the following line if the finalizer is overridden above.
 			// GC.SuppressFinalize(this);
+		}
+
+		public Task<string> GetPasswordHashAsync(IdentityUser user, CancellationToken cancellationToken)
+		{
+			return Task.FromResult(user.PasswordHash);
+		}
+
+		public Task<bool> HasPasswordAsync(IdentityUser user, CancellationToken cancellationToken)
+		{
+			return Task.FromResult(!string.IsNullOrEmpty(user.PasswordHash));
+		}
+
+		public Task SetPasswordHashAsync(IdentityUser user, string passwordHash, CancellationToken cancellationToken)
+		{
+			user.PasswordHash = passwordHash;
+			return Task.FromResult(0);
 		}
 		#endregion
 
