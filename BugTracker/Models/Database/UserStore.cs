@@ -78,7 +78,7 @@ namespace BugTracker.Models.Database
 
 		public Task<string> GetUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult(user.UserName);
 		}
 
 		public Task SetNormalizedUserNameAsync(IdentityUser user, string normalizedName, CancellationToken cancellationToken)
