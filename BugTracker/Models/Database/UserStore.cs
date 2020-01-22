@@ -93,9 +93,25 @@ namespace BugTracker.Models.Database
 			return Task.FromResult(0);
 		}
 
-		public Task<IdentityResult> UpdateAsync(IdentityUser user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> UpdateAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				await connection.ExecuteAsync("dbo.Users_Update", new
+				{
+					UserId = user.Id,
+					UserName = user.UserName,
+					NormalizedUserName = user.NormalizedUserName,
+					Email = user.Email,
+					NormalizedEmail = user.NormalizedEmail,
+					PhoneNumber = user.PhoneNumber,
+					PasswordHash = user.PasswordHash
+				}, commandType: CommandType.StoredProcedure);
+			}
+
+			return IdentityResult.Success;
 		}
 
 		#region IDisposable Support
