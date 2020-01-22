@@ -89,9 +89,21 @@ namespace BugTracker.Models.Database
 			return Task.FromResult(0);
 		}
 
-		public Task<IdentityResult> UpdateAsync(IdentityRole role, CancellationToken cancellationToken)
+		public async Task<IdentityResult> UpdateAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				await connection.ExecuteAsync("dbo.Roles_Update", new
+				{
+					RoleId = role.Id,
+					Name = role.Name,
+					NormalizedName = role.NormalizedName
+				}, commandType: CommandType.StoredProcedure);
+			}
+
+			return IdentityResult.Success;
 		}
 
 		#region IDisposable Support
