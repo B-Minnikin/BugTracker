@@ -24,9 +24,28 @@ namespace BugTracker.Controllers
 			this.signInManager = signInManager;
 		}
 
+		[HttpGet]
 		public ViewResult Login()
 		{
 			return View();
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Login(LoginViewModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: true, false);
+
+				if (result.Succeeded)
+				{
+					return RedirectToAction("Index", "Home");
+				}
+
+				ModelState.AddModelError(string.Empty, "Invalid login attempt");
+			}
+
+			return View(model);
 		}
 
 		[HttpGet]
