@@ -59,9 +59,12 @@ namespace BugTracker.Controllers
 			return View(model);
 		}
 
-		public ViewResult LogOut()
+		[HttpPost]
+		public async Task<IActionResult> LogOut()
 		{
-			return View();
+			await signInManager.SignOutAsync();
+
+			return RedirectToAction("Index", "Home");
 		}
 
 		[HttpGet]
