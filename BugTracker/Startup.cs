@@ -33,6 +33,7 @@ namespace BugTracker
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
+			services.AddTransient<IRoleStore<IdentityUser>, RoleStore>();
 			services.AddIdentity<IdentityUser, IdentityRole>();
 
 			services.AddDistributedMemoryCache();
