@@ -51,9 +51,15 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public Task<IdentityRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+		public async Task<IdentityRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var role = await connection.QueryFirstAsync<IdentityRole>("dbo.Roles_FindByName @NormalizedName", new { NormalizedName = normalizedRoleName });
+				return role;
+			}
 		}
 
 		public Task<string> GetNormalizedRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
