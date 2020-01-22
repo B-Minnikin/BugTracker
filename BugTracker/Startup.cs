@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Models;
+using BugTracker.Models.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +31,10 @@ namespace BugTracker
 		{
 			services.AddControllersWithViews();
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
+
+			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
+			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
+			services.AddIdentity<IdentityUser, IdentityRole>();
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
@@ -55,6 +61,8 @@ namespace BugTracker
 			}
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
+
+			app.UseAuthentication();
 
 			app.UseRouting();
 
