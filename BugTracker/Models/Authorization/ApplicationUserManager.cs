@@ -33,7 +33,7 @@ namespace BugTracker.Models.Authorization
 				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", user.Id));
 			}
 
-			var userRoles = await userRoleStore.GetUserRolesAsync(user, CancellationToken);
+			var userRoles = await userRoleStore.GetRolesAsync(user, CancellationToken);
 			if (userRoles.Contains(roleName))
 			{
 				IdentityError error = new IdentityError();
