@@ -178,7 +178,7 @@ namespace BugTracker.Models.Database
 
 		public Task<string> GetEmailAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult(user.Email);
 		}
 
 		public Task<bool> GetEmailConfirmedAsync(IdentityUser user, CancellationToken cancellationToken)
