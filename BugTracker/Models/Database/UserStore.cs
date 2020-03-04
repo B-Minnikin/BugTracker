@@ -165,9 +165,15 @@ namespace BugTracker.Models.Database
 			return Task.FromResult(0);
 		}
 
-		public Task<IdentityUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+		public async Task<IdentityUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var user = await connection.QuerySingleOrDefaultAsync<IdentityUser>("dbo.User_FindByEmail @NormalizedEmail", new { NormalizedEmail = normalizedEmail });
+				return user;
+			}
 		}
 
 		public Task<string> GetEmailAsync(IdentityUser user, CancellationToken cancellationToken)
