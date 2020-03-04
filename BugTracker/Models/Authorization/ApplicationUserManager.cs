@@ -74,5 +74,12 @@ namespace BugTracker.Models.Authorization
 
 			return await userRoleStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
 		}
+
+		public async Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, int projectId)
+		{
+			ThrowIfDisposed();
+			var userRoleStore = new UserStore();
+			return await userRoleStore.GetUsersInRoleAsync(roleName, projectId, CancellationToken);
+		}
 	}
 }
