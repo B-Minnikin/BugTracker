@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.Database
 {
-	public class UserStore : IUserStore<IdentityUser>, IUserPasswordStore<IdentityUser>
+	public class UserStore : IUserStore<IdentityUser>, IUserPasswordStore<IdentityUser>, IUserEmailStore<IdentityUser>, IUserRoleStore<IdentityUser>
 	{
 		public async Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
@@ -163,6 +163,66 @@ namespace BugTracker.Models.Database
 		{
 			user.PasswordHash = passwordHash;
 			return Task.FromResult(0);
+		}
+
+		public Task<IdentityUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<string> GetEmailAsync(IdentityUser user, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<bool> GetEmailConfirmedAsync(IdentityUser user, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<string> GetNormalizedEmailAsync(IdentityUser user, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task SetEmailAsync(IdentityUser user, string email, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task SetEmailConfirmedAsync(IdentityUser user, bool confirmed, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task SetNormalizedEmailAsync(IdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task AddToRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<bool> IsInRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task RemoveFromRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
 		}
 		#endregion
 
