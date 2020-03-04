@@ -307,6 +307,30 @@ namespace BugTracker.Models.Database
 		{
 			throw new NotImplementedException();
 		}
+
+		public async Task RemoveFromRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var normalizedName = roleName.ToUpper();
+				var roleId = await connection.ExecuteScalarAsync<int?>("dbo.Roles_FindIdByName @NormalizedName", new
+				{
+					NormalizedName = normalizedName
+				});
+
+				if (!roleId.HasValue)
+				{
+					await connection.ExecuteAsync("dbo.UserRoles_RemoveFromRole", new
+					{
+						RoleId = roleId,
+						UserId = user.Id,
+						ProjectId = projectId
+					}, commandType: CommandType.StoredProcedure);
+				}
+			}
+		}
 		#endregion
 
 	}
