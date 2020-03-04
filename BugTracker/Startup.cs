@@ -64,12 +64,13 @@ namespace BugTracker
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 
-			app.UseAuthentication();
-
 			app.UseRouting();
 
+			app.UseAuthentication();
 			app.UseAuthorization();
 			app.UseSession();
+
+			DataInitialiser.SeedRoles(app.ApplicationServices).Wait();
 
 			app.UseEndpoints(endpoints =>
 			{
