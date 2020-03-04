@@ -199,7 +199,8 @@ namespace BugTracker.Models.Database
 
 		public Task SetEmailConfirmedAsync(IdentityUser user, bool confirmed, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			user.EmailConfirmed = confirmed;
+			return Task.FromResult(0);
 		}
 
 		public Task SetNormalizedEmailAsync(IdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
