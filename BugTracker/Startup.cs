@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Models;
+using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,7 +35,8 @@ namespace BugTracker
 
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
-			services.AddIdentity<IdentityUser, IdentityRole>();
+			services.AddIdentity<IdentityUser, IdentityRole>()
+				.AddUserManager<ApplicationUserManager>();
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
