@@ -61,5 +61,18 @@ namespace BugTracker.Models.Authorization
 			await userRoleStore.RemoveFromRoleAsync(user, roleName, projectId, CancellationToken);
 			return await UpdateAsync(user);
 		}
+
+		public async Task<bool> IsInRoleAsync(int userId, string roleName, int projectId)
+		{
+			ThrowIfDisposed();
+			var userRoleStore = new UserStore();
+			var user = await FindByIdAsync(userId.ToString());
+			if(user == null)
+			{
+				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", userId));
+			}
+
+			return await userRoleStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
+		}
 	}
 }
