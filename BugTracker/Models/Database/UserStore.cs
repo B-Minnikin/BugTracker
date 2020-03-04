@@ -237,9 +237,19 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
+		public async Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var queryResults = await connection.QueryAsync<string>("dbo.UserRoles_GetRoles @UserId", new
+				{
+					UserId = user.Id
+				});
+
+				return queryResults.ToList();
+			}
 		}
 
 		public Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
