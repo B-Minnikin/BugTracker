@@ -89,6 +89,7 @@ namespace BugTracker.Models.Database
 			return Task.FromResult(0);
 		}
 
+		// REMOVE -- use overloaded method taking projectId below
 		public async Task<IdentityResult> UpdateAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
@@ -98,6 +99,24 @@ namespace BugTracker.Models.Database
 				await connection.ExecuteAsync("dbo.Roles_Update", new
 				{
 					RoleId = role.Id,
+					Name = role.Name,
+					NormalizedName = role.NormalizedName
+				}, commandType: CommandType.StoredProcedure);
+			}
+
+			return IdentityResult.Success;
+		}
+
+		public async Task<IdentityResult> UpdateAsync(IdentityRole role, int projectId, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				await connection.ExecuteAsync("dbo.Roles_Update", new
+				{
+					RoleId = role.Id,
+					ProjectId = projectId,
 					Name = role.Name,
 					NormalizedName = role.NormalizedName
 				}, commandType: CommandType.StoredProcedure);
