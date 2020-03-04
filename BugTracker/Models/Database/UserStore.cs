@@ -214,6 +214,29 @@ namespace BugTracker.Models.Database
 			throw new NotImplementedException();
 		}
 
+		public async Task AddToRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var normalizedName = roleName.ToUpper();
+				var roleId = await connection.ExecuteScalarAsync<int?>("dbo.Roles_FindIdByName @NormalizedName", new { NormalizedName = normalizedName });
+
+				if (!roleId.HasValue)
+				{
+					roleId = await connection.ExecuteAsync("dbo.Roles_Insert", new
+					{
+						Name = roleName,
+						NormalizedName = normalizedName
+					}, commandType: CommandType.StoredProcedure);
+				}
+
+				await connection.ExecuteAsync("dbo.UserRoles_Insert", new { RoleId = roleId, UserId = user.Id, ProjectId = projectId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
 		public Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
