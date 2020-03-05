@@ -171,7 +171,7 @@ namespace BugTracker.Models.Database
 
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var user = await connection.QuerySingleOrDefaultAsync<IdentityUser>("dbo.User_FindByEmail @NormalizedEmail", new { NormalizedEmail = normalizedEmail });
+				var user = await connection.QuerySingleOrDefaultAsync<IdentityUser>("dbo.Users_FindByEmail @NormalizedEmail", new { NormalizedEmail = normalizedEmail });
 				return user;
 			}
 		}
