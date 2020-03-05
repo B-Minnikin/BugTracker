@@ -12,6 +12,11 @@ namespace BugTracker.Models.Authorization
 			return GetUserInRole(userName, "Superadministrator", -1).Result;
 		}
 
+		public static bool UserIsInProjectRole(string userName, string roleName, int id)
+		{
+			return GetUserInRole(userName, roleName, id).Result;
+		}
+
 		private static async Task<bool> GetUserInRole(string userName, string roleName, int id)
 		{
 			ApplicationUserManager userManager = new ApplicationUserManager();
