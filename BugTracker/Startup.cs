@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -44,6 +45,8 @@ namespace BugTracker
 					policy.Requirements.Add(new
 					ProjectAccessRequirement()));
 			});
+
+			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
