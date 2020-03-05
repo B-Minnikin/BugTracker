@@ -61,7 +61,7 @@ namespace BugTracker.Controllers
 					Hidden = model.Hidden, // to implement
 					Severity = model.Severity,
 					Importance = model.Importance,
-					PersonReporting = "User", // to implement
+					PersonReporting = HttpContext.User.Identity.Name,
 					ProjectId = (int)HttpContext.Session.GetInt32("currentProject") // get project ID from cookie
 				};
 
