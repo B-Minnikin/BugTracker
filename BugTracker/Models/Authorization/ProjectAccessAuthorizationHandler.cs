@@ -11,6 +11,11 @@ namespace BugTracker.Models.Authorization
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectAccessRequirement requirement, int projectId)
 		{
 			string userName = context.User.Identity.Name;
+			if(userName == null)
+			{
+				return Task.CompletedTask;
+			}
+
 			bool userIsSuperadministrator = GetUserInRole(userName, Enum.GetName(typeof(Roles), Roles.Superadministrator), 0).Result;
 			bool userIsProjectAdministrator = GetUserInRole(userName, Enum.GetName(typeof(Roles), Roles.Administrator), projectId).Result;
 			bool userIsProjectMember = GetUserInRole(userName, Enum.GetName(typeof(Roles), Roles.Member), projectId).Result;
