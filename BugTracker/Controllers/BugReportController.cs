@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
 {
+	[Authorize]
 	public class BugReportController : Controller
 	{
 		private readonly ILogger<BugReportController> logger;
