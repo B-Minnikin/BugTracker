@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,12 +17,15 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<HomeController> _logger;
 		private readonly IProjectRepository projectRepository;
+		private readonly IAuthorizationService authorizationService;
 
 		public ProjectsController(ILogger<HomeController> logger,
-									IProjectRepository projectRepository)
+									IProjectRepository projectRepository,
+									IAuthorizationService authorizationService)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
+			this.authorizationService = authorizationService;
 		}
 
 		[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]
@@ -33,29 +37,35 @@ namespace BugTracker.Controllers
 		}
 
 		[Breadcrumb("Overview", FromAction = "Projects", FromController = typeof(ProjectsController))]
-		public ViewResult Overview(int id)
+		public IActionResult Overview(int id)
 		{
 			Project project = projectRepository.GetProjectById(id);
 			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
-			OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanAccessProjectPolicy");
+			if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				Project = project,
-				BugReports = projectRepository.GetAllBugReports(id).ToList(),
-				CommentCountHandler = projectRepository.GetCommentCountById
-			};
+				OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
+				{
+					Project = project,
+					BugReports = projectRepository.GetAllBugReports(id).ToList(),
+					CommentCountHandler = projectRepository.GetCommentCountById
+				};
 
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
-			{
-				RouteValues = new { id = id },
-				Parent = projectsNode
-			};
-			ViewData["BreadcrumbNode"] = overviewNode;
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+				{
+					RouteValues = new { id = id },
+					Parent = projectsNode
+				};
+				ViewData["BreadcrumbNode"] = overviewNode;
 
-			// if project NULL -- redirect to error page !!
+				// if project NULL -- redirect to error page !!
 
-			return View(overviewProjectViewModel);
+				return View(overviewProjectViewModel);
+			}
+
+			return RedirectToAction("Index", "Home");
 		}
 
 		[HttpGet]
