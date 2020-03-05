@@ -12,6 +12,16 @@ namespace BugTracker.Models.Authorization
 		{
 			throw new NotImplementedException();
 		}
+
+		protected async Task<bool> GetUserInRole(string userName, string roleName, int id)
+		{
+			ApplicationUserManager userManager = new ApplicationUserManager();
+			var user = await userManager.FindByNameAsync(userName);
+
+			bool userIsInRole = await userManager.IsInRoleAsync(Int32.Parse(user.Id), roleName, id);
+
+			return userIsInRole;
+		}
 	}
 
 	public class ProjectAccessRequirement : IAuthorizationRequirement { }
