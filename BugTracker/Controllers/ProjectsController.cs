@@ -48,7 +48,6 @@ namespace BugTracker.Controllers
 		[Breadcrumb("Overview", FromAction = "Projects", FromController = typeof(ProjectsController))]
 		public IActionResult Overview(int id)
 		{
-
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanAccessProjectPolicy");
 			if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
@@ -112,7 +111,11 @@ namespace BugTracker.Controllers
 
 		public IActionResult DeleteProject(int id)
 		{
-			projectRepository.DeleteProject(id);
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				projectRepository.DeleteProject(id);
+			}
 
 			return RedirectToAction("Projects");
 		}

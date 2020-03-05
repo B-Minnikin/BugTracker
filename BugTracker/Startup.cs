@@ -42,11 +42,13 @@ namespace BugTracker
 			services.AddAuthorization(options =>
 			{
 				options.AddPolicy("CanAccessProjectPolicy", policy =>
-					policy.Requirements.Add(new
-					ProjectAccessRequirement()));
+					policy.Requirements.Add(new	ProjectAccessRequirement()));
+				options.AddPolicy("ProjectAdministratorPolicy", policy =>
+					policy.Requirements.Add(new	ProjectAccessRequirement()));
 			});
 
 			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
+			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>();
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
