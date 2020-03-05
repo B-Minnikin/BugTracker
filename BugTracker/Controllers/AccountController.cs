@@ -67,13 +67,15 @@ namespace BugTracker.Controllers
 				var user = new IdentityUser
 				{
 					UserName = model.Email,
-					Email = model.Email
+					Email = model.Email,
+					NormalizedEmail = model.Email.ToUpper()
 				};
 				var result = await userManager.CreateAsync(user, model.Password);
 
 				if (result.Succeeded)
 				{
-					await signInManager.SignInAsync(user, isPersistent: false);
+					var createdUser = await userManager.FindByEmailAsync(user.Email);
+					await signInManager.SignInAsync(createdUser, isPersistent: false);
 					return RedirectToAction("Projects", "Projects");
 				}
 
