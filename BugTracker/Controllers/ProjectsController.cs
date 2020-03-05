@@ -48,12 +48,13 @@ namespace BugTracker.Controllers
 		[Breadcrumb("Overview", FromAction = "Projects", FromController = typeof(ProjectsController))]
 		public IActionResult Overview(int id)
 		{
-			Project project = projectRepository.GetProjectById(id);
-			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanAccessProjectPolicy");
 			if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
+				Project project = projectRepository.GetProjectById(id);
+				HttpContext.Session.SetInt32("currentProject", id); // save project id to session
+
 				OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
 				{
 					Project = project,
