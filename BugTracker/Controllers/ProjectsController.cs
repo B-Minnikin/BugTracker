@@ -31,7 +31,16 @@ namespace BugTracker.Controllers
 		[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]
 		public ViewResult Projects()
 		{
-			var model = projectRepository.GetAllProjects();
+			var model = projectRepository.GetAllProjects().Where(project =>
+					{
+						Task<AuthorizationResult> authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, project.ProjectId, "CanAccessProjectPolicy");
+						if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+						{
+							return true;
+						}
+						else { return false; }
+					}
+				);
 
 			return View(model);
 		}
