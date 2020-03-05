@@ -78,6 +78,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
+		[Authorize]
 		[Breadcrumb("Create Project", FromAction = "Projects", FromController = typeof(ProjectsController))]
 		public ViewResult CreateProject()
 		{
@@ -85,6 +86,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
+		[Authorize]
 		public IActionResult CreateProject(Project model)
 		{
 			if (ModelState.IsValid)
