@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.Authorization
 {
-	public class ProjectAccessAuthorizationHandler
+	public class ProjectAccessAuthorizationHandler : AuthorizationHandler<ProjectAccessRequirement, int>
 	{
+		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectAccessRequirement requirement, int resource)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	public class ProjectAccessRequirement : IAuthorizationRequirement { }
