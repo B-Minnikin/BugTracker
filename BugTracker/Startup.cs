@@ -38,6 +38,13 @@ namespace BugTracker
 			services.AddIdentity<IdentityUser, IdentityRole>()
 				.AddUserManager<ApplicationUserManager>();
 
+			services.AddAuthorization(options =>
+			{
+				options.AddPolicy("CanAccessProjectPolicy", policy =>
+					policy.Requirements.Add(new
+					ProjectAccessRequirement()));
+			});
+
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
 			{
