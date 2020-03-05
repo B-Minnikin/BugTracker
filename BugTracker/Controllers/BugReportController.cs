@@ -72,7 +72,7 @@ namespace BugTracker.Controllers
 				{
 					Time = DateTime.Now,
 					StateType = StateType.open,
-					Author = "User", // to implement
+					Author = HttpContext.User.Identity.Name,
 					BugReportId = addedReport.BugReportId
 				};
 				BugState addedBugState = projectRepository.CreateBugState(newBugState);
