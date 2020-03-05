@@ -18,12 +18,15 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<BugReportController> logger;
 		private readonly IProjectRepository projectRepository;
+		private readonly IAuthorizationService authorizationService;
 
 		public BugReportController(ILogger<BugReportController> logger,
-									        IProjectRepository projectRepository)
+									        IProjectRepository projectRepository,
+										  IAuthorizationService authorizationService)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
+			this.authorizationService = authorizationService;
 		}
 
 		[HttpGet]
@@ -50,34 +53,39 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public IActionResult CreateReport(CreateBugReportViewModel model)
 		{
-			if (ModelState.IsValid)
+			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				BugReport newBugReport = new BugReport
+				if (ModelState.IsValid)
 				{
-					Title = model.Title,
-					ProgramBehaviour = model.ProgramBehaviour,
-					DetailsToReproduce = model.DetailsToReproduce,
-					CreationTime = DateTime.Now,
-					Hidden = model.Hidden, // to implement
-					Severity = model.Severity,
-					Importance = model.Importance,
-					PersonReporting = HttpContext.User.Identity.Name,
-					ProjectId = (int)HttpContext.Session.GetInt32("currentProject") // get project ID from cookie
-				};
+					BugReport newBugReport = new BugReport
+					{
+						Title = model.Title,
+						ProgramBehaviour = model.ProgramBehaviour,
+						DetailsToReproduce = model.DetailsToReproduce,
+						CreationTime = DateTime.Now,
+						Hidden = model.Hidden, // to implement
+						Severity = model.Severity,
+						Importance = model.Importance,
+						PersonReporting = HttpContext.User.Identity.Name,
+						ProjectId = currentProjectId
+					};
 
-				// add bug report to current project
-				BugReport addedReport = projectRepository.AddBugReport(newBugReport);
+					// add bug report to current project
+					BugReport addedReport = projectRepository.AddBugReport(newBugReport);
 
-				BugState newBugState = new BugState
-				{
-					Time = DateTime.Now,
-					StateType = StateType.open,
-					Author = HttpContext.User.Identity.Name,
-					BugReportId = addedReport.BugReportId
-				};
-				BugState addedBugState = projectRepository.CreateBugState(newBugState);
+					BugState newBugState = new BugState
+					{
+						Time = DateTime.Now,
+						StateType = StateType.open,
+						Author = HttpContext.User.Identity.Name,
+						BugReportId = addedReport.BugReportId
+					};
+					BugState addedBugState = projectRepository.CreateBugState(newBugState);
 
-				return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });
+					return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });
+				}
 			}
 
 			return View();
