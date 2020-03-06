@@ -167,8 +167,14 @@ namespace BugTracker.Controllers
 
 		public IActionResult Delete(int bugReportId)
 		{
-			projectRepository.DeleteBugReport(bugReportId);
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
+			var bugReport = projectRepository.GetBugReportById(bugReportId);
+
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = bugReport.PersonReporting }, "CanEditReportPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				projectRepository.DeleteBugReport(bugReportId);
+			}
 
 			return RedirectToAction("Overview", "Projects", new { id = currentProjectId });
 		}
