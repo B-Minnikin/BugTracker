@@ -45,10 +45,13 @@ namespace BugTracker
 					policy.Requirements.Add(new	ProjectAccessRequirement()));
 				options.AddPolicy("ProjectAdministratorPolicy", policy =>
 					policy.Requirements.Add(new	ProjectAccessRequirement()));
+				options.AddPolicy("CanEditReportPolicy", policy =>
+					policy.Requirements.Add(new EditReportRequirement()));
 			});
 
 			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
 			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>();
+			services.AddSingleton<IAuthorizationHandler, EditReportAuthorizationHandler>();
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>

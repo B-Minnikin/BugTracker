@@ -92,7 +92,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public ViewResult Edit(int bugReportId)
+		public IActionResult Edit(int bugReportId)
 		{
 			EditBugReportViewModel reportViewModel = new EditBugReportViewModel
 			{
@@ -103,24 +103,30 @@ namespace BugTracker.Controllers
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = reportViewModel.BugReport.PersonReporting}, "CanEditReportPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				RouteValues = new { id = currentProjectId },
-				Parent = projectsNode
-			};
-			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", reportViewModel.BugReport.Title)
-			{
-				RouteValues = new { id = reportViewModel.BugReport.BugReportId},
-				Parent = overviewNode
-			};
-			var editNode = new MvcBreadcrumbNode("Edit", "BugReport", "Edit")
-			{
-				Parent = reportNode
-			};
-			ViewData["BreadcrumbNode"] = editNode;
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+				{
+					RouteValues = new { id = currentProjectId },
+					Parent = projectsNode
+				};
+				var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", reportViewModel.BugReport.Title)
+				{
+					RouteValues = new { id = reportViewModel.BugReport.BugReportId },
+					Parent = overviewNode
+				};
+				var editNode = new MvcBreadcrumbNode("Edit", "BugReport", "Edit")
+				{
+					Parent = reportNode
+				};
+				ViewData["BreadcrumbNode"] = editNode;
 
-			return View(reportViewModel);
+				return View(reportViewModel);
+			}
+
+			return RedirectToAction("Overview", "Projects", new { id = currentProjectId});
 		}
 
 		[HttpPost]
