@@ -54,6 +54,7 @@ namespace BugTracker
 			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
 			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>();
 			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>();
+			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>();
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
