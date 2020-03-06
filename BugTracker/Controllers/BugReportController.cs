@@ -179,37 +179,44 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Overview", "Projects", new { id = currentProjectId });
 		}
 
-		public ViewResult ReportOverview(int id)
+		public IActionResult ReportOverview(int id)
 		{
-			HttpContext.Session.SetInt32("currentBugReport", id);
-			BugReport bugReport = projectRepository.GetBugReportById(id);
-
-			var bugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
-
-			OverviewBugReportViewModel bugViewModel = new OverviewBugReportViewModel
-			{
-				BugReport = bugReport,
-				BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
-				BugStates = bugStates,
-				CurrentState = bugStates[0].StateType
-			};
-
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				RouteValues = new { id = currentProjectId },
-				Parent = projectsNode
-			};
-			var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", bugReport.Title)
-			{
-				Parent = overviewNode
-			};
-			ViewData["BreadcrumbNode"] = reportNode;
+				HttpContext.Session.SetInt32("currentBugReport", id);
+				BugReport bugReport = projectRepository.GetBugReportById(id);
 
-			return View(bugViewModel);
+				var bugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
+
+				OverviewBugReportViewModel bugViewModel = new OverviewBugReportViewModel
+				{
+					BugReport = bugReport,
+					BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
+					BugStates = bugStates,
+					CurrentState = bugStates[0].StateType
+				};
+
+				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+				{
+					RouteValues = new { id = currentProjectId },
+					Parent = projectsNode
+				};
+				var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", bugReport.Title)
+				{
+					Parent = overviewNode
+				};
+				ViewData["BreadcrumbNode"] = reportNode;
+
+				return View(bugViewModel);
+			}
+
+			return RedirectToAction("Index", "Home");
 		}
 	}
 }
