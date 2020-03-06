@@ -73,7 +73,7 @@ namespace BugTracker.Controllers
 			{
 				BugReportComment newComment = new BugReportComment
 				{
-					Author = "User", // WIP user profiles
+					Author = HttpContext.User.Identity.Name,
 					Date = DateTime.Now,
 					MainText = model.MainText,
 					BugReportId = model.BugReportId
