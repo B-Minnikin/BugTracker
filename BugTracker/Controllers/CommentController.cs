@@ -114,6 +114,7 @@ namespace BugTracker.Controllers
 			ViewData["BreadcrumbNode"] = commentNode;
 
 			return View(bugReportComment);
+
 		}
 
 		[HttpPost]
@@ -122,11 +123,17 @@ namespace BugTracker.Controllers
 			if (ModelState.IsValid)
 			{
 				BugReportComment comment = projectRepository.GetBugReportCommentById(model.BugReportCommentId);
-				comment.MainText = model.MainText;
-				// increment edit count
-				// update edit time
+				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 
-				projectRepository.UpdateBugReportComment(comment);
+				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = comment.Author}, "CanModifyCommentPolicy");
+				if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+				{
+					comment.MainText = model.MainText;
+					// increment edit count
+					// update edit time
+
+					projectRepository.UpdateBugReportComment(comment);
+				}
 				return RedirectToAction("ReportOverview", "BugReport", new { id = comment.BugReportId});
 			}
 

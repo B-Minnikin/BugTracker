@@ -47,6 +47,8 @@ namespace BugTracker
 					policy.Requirements.Add(new	ProjectAccessRequirement()));
 				options.AddPolicy("CanModifyReportPolicy", policy =>
 					policy.Requirements.Add(new ModifyReportRequirement()));
+				options.AddPolicy("CanModifyCommentPolicy", policy =>
+					policy.Requirements.Add(new ModifyCommentRequirement()));
 			});
 
 			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
