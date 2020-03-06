@@ -142,8 +142,15 @@ namespace BugTracker.Controllers
 
 		public IActionResult Delete(int id)
 		{
+			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			int parentBugReportId = projectRepository.GetCommentParentId(id);
-			projectRepository.DeleteComment(id);
+			string commentAuthor = projectRepository.GetBugReportCommentById(id).Author;
+
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = commentAuthor }, "CanModifyCommentPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				projectRepository.DeleteComment(id);
+			}
 
 			return RedirectToAction("ReportOverview", "BugReport", new { id = parentBugReportId });
 		}
