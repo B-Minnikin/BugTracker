@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,45 +15,55 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<CommentController> _logger;
 		private readonly IProjectRepository projectRepository;
+		private readonly IAuthorizationService authorizationService;
 
 		public CommentController(ILogger<CommentController> logger,
-									IProjectRepository projectRepository)
+									IProjectRepository projectRepository,
+									IAuthorizationService authorizationService)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
+			this.authorizationService = authorizationService;
 		}
 
 		[HttpGet]
-		public ViewResult Create(int bugReportId)
+		public IActionResult Create(int bugReportId)
 		{
-			BugReportComment newComment = new BugReportComment
-			{
-				BugReportId = bugReportId
-			};
-
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
-			var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
-			var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
 
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				RouteValues = new { id = currentProjectId },
-				Parent = projectsNode
-			};
-			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", currentBugReport.Title)
-			{
-				RouteValues = new {id = currentBugReportId},
-				Parent = overviewNode
-			};
-			var commentNode = new MvcBreadcrumbNode("Create", "Comment", "Comment")
-			{
-				Parent = reportNode
-			};
-			ViewData["BreadcrumbNode"] = commentNode;
+				BugReportComment newComment = new BugReportComment
+				{
+					BugReportId = bugReportId
+				};
 
-			return View(newComment);
+				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+				var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
+				var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
+
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+				{
+					RouteValues = new { id = currentProjectId },
+					Parent = projectsNode
+				};
+				var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", currentBugReport.Title)
+				{
+					RouteValues = new { id = currentBugReportId },
+					Parent = overviewNode
+				};
+				var commentNode = new MvcBreadcrumbNode("Create", "Comment", "Comment")
+				{
+					Parent = reportNode
+				};
+				ViewData["BreadcrumbNode"] = commentNode;
+
+				return View(newComment);
+			}
+
+			return RedirectToAction("Index", "Home");
 		}
 
 		[HttpPost]
