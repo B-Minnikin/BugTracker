@@ -103,7 +103,7 @@ namespace BugTracker.Controllers
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = reportViewModel.BugReport.PersonReporting}, "CanEditReportPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = reportViewModel.BugReport.PersonReporting}, "CanModifyReportPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
@@ -170,7 +170,7 @@ namespace BugTracker.Controllers
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
 			var bugReport = projectRepository.GetBugReportById(bugReportId);
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = bugReport.PersonReporting }, "CanEditReportPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = bugReport.PersonReporting }, "CanModifyReportPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				projectRepository.DeleteBugReport(bugReportId);

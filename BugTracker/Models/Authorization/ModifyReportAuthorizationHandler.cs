@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.Authorization
 {
-	public class EditReportAuthorizationHandler : AuthorizationHandler<EditReportRequirement, object>
+	public class ModifyReportAuthorizationHandler : AuthorizationHandler<ModifyReportRequirement, object>
 	{
-		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, EditReportRequirement requirement, dynamic resource)
+		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyReportRequirement requirement, dynamic resource)
 		{
 			string userName = context.User.Identity.Name;
 			if(userName == null)
@@ -32,5 +32,5 @@ namespace BugTracker.Models.Authorization
 		}
 	}
 
-	public class EditReportRequirement : IAuthorizationRequirement { }
+	public class ModifyReportRequirement : IAuthorizationRequirement { }
 }
