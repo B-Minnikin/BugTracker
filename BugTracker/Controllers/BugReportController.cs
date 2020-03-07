@@ -152,7 +152,7 @@ namespace BugTracker.Controllers
 					{
 						Time = DateTime.Now,
 						StateType = model.CurrentState,
-						Author = "User", // to implement
+						Author = HttpContext.User.Identity.Name,
 						BugReportId = bugReport.BugReportId
 					};
 
