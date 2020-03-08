@@ -36,7 +36,9 @@ namespace BugTracker
 
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
-			services.AddIdentity<IdentityUser, IdentityRole>()
+			services.AddIdentity<IdentityUser, IdentityRole>(options =>
+				options.SignIn.RequireConfirmedEmail = true
+			)
 				.AddUserManager<ApplicationUserManager>();
 
 			services.AddAuthorization(options =>
