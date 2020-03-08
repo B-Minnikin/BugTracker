@@ -39,7 +39,7 @@ namespace BugTracker.Controllers
 			if (ModelState.IsValid)
 			{
 				var user = await userManager.FindByEmailAsync(model.Email);
-				if (user != null && !user.EmailConfirmed)
+				if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, model.Password)))
 				{
 					ModelState.AddModelError(string.Empty, "Email not confirmed");
 					return View(model);
