@@ -50,6 +50,7 @@ namespace BugTracker.Controllers
 				if (result.Succeeded)
 				{
 					return RedirectToAction("Index", "Home");
+					//return RedirectToAction("Projects", "Projects");
 				}
 
 				ModelState.AddModelError(string.Empty, "Invalid login attempt");
@@ -82,14 +83,38 @@ namespace BugTracker.Controllers
 				if (result.Succeeded)
 				{
 					var createdUser = await userManager.FindByEmailAsync(user.Email);
-					await signInManager.SignInAsync(createdUser, isPersistent: false);
-					return RedirectToAction("Projects", "Projects");
+
+					var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+					var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = createdUser.Id, token = token }, Request.Scheme );
+					logger.Log(LogLevel.Warning, confirmationLink);
+
+					return View("RegistrationComplete");
 				}
 
 				AddErrorToModelState(result);
 			}
 
 			return View(model);
+		}
+
+		[HttpGet]
+		[AllowAnonymous]
+		public async Task<IActionResult> ConfirmEmail(string userId, string token)
+		{
+			if(userId == null || token == null)
+			{
+				return RedirectToAction("Index", "Home");
+			}
+
+			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				// generate error message
+				return View("Error");
+			}
+
+			var result = await userManager.ConfirmEmailAsync(user, token);
+			return View(result.Succeeded ? "ConfirmEmail" : "Error");
 		}
 
 		[HttpPost]

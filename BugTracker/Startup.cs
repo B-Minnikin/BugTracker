@@ -39,6 +39,7 @@ namespace BugTracker
 			services.AddIdentity<IdentityUser, IdentityRole>(options =>
 				options.SignIn.RequireConfirmedEmail = true
 			)
+				.AddDefaultTokenProviders()
 				.AddUserManager<ApplicationUserManager>();
 
 			services.AddAuthorization(options =>
