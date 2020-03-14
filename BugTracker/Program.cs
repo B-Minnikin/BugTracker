@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 namespace BugTracker
 {
@@ -21,6 +22,14 @@ namespace BugTracker
 			  .ConfigureWebHostDefaults(webBuilder =>
 			  {
 				  webBuilder.UseStartup<Startup>();
-			  });
+			  })
+			.ConfigureLogging((hostingContext, logging) =>
+			{
+				logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+				logging.AddConsole();
+				logging.AddDebug();
+				logging.AddEventSourceLogger();
+				logging.AddNLog();
+			});
 	}
 }
