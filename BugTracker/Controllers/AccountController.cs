@@ -82,6 +82,7 @@ namespace BugTracker.Controllers
 
 				if (result.Succeeded)
 				{
+					logger.LogInformation($"User registered: {user.UserName}");
 					var createdUser = await userManager.FindByEmailAsync(user.Email);
 
 					var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
