@@ -88,6 +88,7 @@ namespace BugTracker.Controllers
 					var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 					var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = createdUser.Id, token = token }, Request.Scheme );
 					logger.Log(LogLevel.Warning, confirmationLink);
+					logger.LogInformation($"New user registered. ID: {createdUser.Id}, Name: {createdUser.UserName}");
 
 					return View("RegistrationComplete");
 				}
