@@ -138,18 +138,27 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult Edit(int id)
 		{
-			var project = projectRepository.GetProjectById(id);
-			EditProjectViewModel projectViewModel = new EditProjectViewModel
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				Project = project
-			};
-			return View(projectViewModel);
+				var project = projectRepository.GetProjectById(id);
+				EditProjectViewModel projectViewModel = new EditProjectViewModel
+				{
+					Project = project
+				};
+				return View(projectViewModel);
+			}
+			return View();
 		}
 
 		[HttpPost]
 		public IActionResult Edit(EditProjectViewModel model)
 		{
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.Project.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
 
+			}
 		}
 	}
 }
