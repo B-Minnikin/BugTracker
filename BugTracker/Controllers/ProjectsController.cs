@@ -157,8 +157,21 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.Project.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
+				if (ModelState.IsValid)
+				{
+					Project project = projectRepository.GetProjectById(model.Project.ProjectId);
+					project.Name = model.Project.Name;
+					project.Description = model.Project.Description;
+					project.Hidden = model.Project.Hidden;
+					project.LastUpdateTime = DateTime.Now;
 
+					_ = projectRepository.UpdateProject(project);
+
+					return RedirectToAction("Overview", new { id = project.ProjectId });
+				}
 			}
+
+			return View();
 		}
 	}
 }
