@@ -134,5 +134,22 @@ namespace BugTracker.Controllers
 
 			return RedirectToAction("Projects");
 		}
+
+		[HttpGet]
+		public IActionResult Edit(int id)
+		{
+			var project = projectRepository.GetProjectById(id);
+			EditProjectViewModel projectViewModel = new EditProjectViewModel
+			{
+				Project = project
+			};
+			return View(projectViewModel);
+		}
+
+		[HttpPost]
+		public IActionResult Edit(EditProjectViewModel model)
+		{
+
+		}
 	}
 }
