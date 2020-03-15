@@ -129,6 +129,7 @@ namespace BugTracker.Controllers
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				projectRepository.DeleteProject(id);
+				_logger.LogInformation($"Project deleted. ID: {id}");
 			}
 
 			return RedirectToAction("Projects");
