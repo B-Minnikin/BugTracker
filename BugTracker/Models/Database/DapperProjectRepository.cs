@@ -113,8 +113,16 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var projectId = connection.Execute("dbo.Projects_Update @ProjectId @Name @Description @CreationTime @LastUpdateTime @Hidden", projectChanges);
-				var project = this.GetProjectById(projectId);
+				var projectId = connection.Execute("dbo.Projects_Update", new
+				{
+					ProjectId = projectChanges.ProjectId,
+					Name = projectChanges.Name,
+					Description = projectChanges.Description,
+					CreationTime = projectChanges.CreationTime,
+					LastUpdateTime = projectChanges.LastUpdateTime,
+					Hidden = projectChanges.Hidden
+				}, commandType: CommandType.StoredProcedure);
+				var project = this.GetProjectById(projectChanges.ProjectId);
 				return project;
 			}
 		}
