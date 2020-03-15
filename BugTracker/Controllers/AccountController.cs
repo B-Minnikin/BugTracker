@@ -105,6 +105,7 @@ namespace BugTracker.Controllers
 		{
 			if(userId == null || token == null)
 			{
+				logger.LogWarning($"Confirm email failed. Token or user ID is null");
 				return RedirectToAction("Index", "Home");
 			}
 
@@ -112,11 +113,21 @@ namespace BugTracker.Controllers
 			if (user == null)
 			{
 				// generate error message
+				logger.LogError($"Failed to find user for email confirmation: {userId}");
 				return View("Error");
 			}
 
 			var result = await userManager.ConfirmEmailAsync(user, token);
-			return View(result.Succeeded ? "ConfirmEmail" : "Error");
+			if (result.Succeeded)
+			{
+				logger.LogInformation($"User [{user.Id}, {user.UserName}] has confirmed their email successfully");
+				return View("ConfirmEmail");
+			}
+			else
+			{
+				logger.LogError($"User [{user.Id}, {user.UserName}] failed to confirm email address");
+				return View("Error");
+			}
 		}
 
 		[HttpPost]
