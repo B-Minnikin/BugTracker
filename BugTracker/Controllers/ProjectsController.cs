@@ -115,6 +115,8 @@ namespace BugTracker.Controllers
 				var user = await userManager.FindByIdAsync(userId);
 				await userManager.AddToRoleAsync(user, "Administrator", addedProject.ProjectId);
 
+				_logger.LogInformation($"New project created. ID: {addedProject.ProjectId}, Name: {addedProject.Name}");
+
 				return RedirectToAction("Overview", new { id = addedProject.ProjectId });
 			}
 
