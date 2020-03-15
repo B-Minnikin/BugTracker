@@ -108,7 +108,8 @@ namespace BugTracker.Models.Database
 					Email = user.Email,
 					NormalizedEmail = user.NormalizedEmail,
 					PhoneNumber = user.PhoneNumber,
-					PasswordHash = user.PasswordHash
+					PasswordHash = user.PasswordHash,
+					EmailConfirmed = user.EmailConfirmed
 				}, commandType: CommandType.StoredProcedure);
 			}
 
