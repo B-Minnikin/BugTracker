@@ -7,6 +7,7 @@
 <h1>Project Overview - @Model.Project.Name</h1>
 
 <a asp-controller="BugReport" asp-action="CreateReport" class="btn btn-primary">Create Bug Report</a>
+<a asp-controller="Projects" asp-action="Edit" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Edit Project</a>
 <a asp-controller="Projects" asp-action="DeleteProject" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Delete Project</a>
 
 <h3>Bug Reports</h3>
@@ -31,8 +32,8 @@
                 </div>
 
                 @*
-                Number of replies
-                Bug report state history - closed / open, etc
+                    Number of replies
+                    Bug report state history - closed / open, etc
                 *@
 
                 <a asp-controller="BugReport" asp-action="ReportOverview" asp-route-id="@bugReport.BugReportId" class="stretched-link"></a>
