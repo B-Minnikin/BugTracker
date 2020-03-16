@@ -52,12 +52,15 @@ namespace BugTracker
 					policy.Requirements.Add(new ModifyReportRequirement()));
 				options.AddPolicy("CanModifyCommentPolicy", policy =>
 					policy.Requirements.Add(new ModifyCommentRequirement()));
+				options.AddPolicy("CanModifyProfilePolicy", policy =>
+					policy.Requirements.Add(new ModifyProfileRequirement()));
 			});
 
 			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
 			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>();
 			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>();
 			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>();
+			services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>();
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
