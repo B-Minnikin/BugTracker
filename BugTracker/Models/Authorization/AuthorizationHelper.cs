@@ -17,6 +17,13 @@ namespace BugTracker.Models.Authorization
 			return GetUserInRole(userName, roleName, id).Result;
 		}
 
+		public static async Task<bool> UserIsProfileOwner(string userName, int userId)
+		{
+			ApplicationUserManager userManager = new ApplicationUserManager();
+			var currentUser = await userManager.FindByNameAsync(userName);
+			return Int32.Parse(currentUser.Id) == userId;
+		}
+
 		private static async Task<bool> GetUserInRole(string userName, string roleName, int id)
 		{
 			ApplicationUserManager userManager = new ApplicationUserManager();
