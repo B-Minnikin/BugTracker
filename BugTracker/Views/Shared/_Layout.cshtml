@@ -25,11 +25,27 @@
 
                 @if (signInManager.IsSignedIn(User))
                 {
-                    <form method="post" asp-action="Logout" asp-controller="Account">
-                        <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
-                            Logout @User.Identity.Name
+
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @User.Identity.Name
                         </button>
-                    </form>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+                            <a class="dropdown-item" asp-controller="Profile" asp-action="Edit" asp-route-id="@signInManager.UserManager.GetUserId(User)">Profile</a>
+                            <!--<form method="post" asp-action="Edit" asp-controller="Profile">
+                                <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
+                                    Edit Profile
+                                </button>
+                            </form>-->
+
+                            <form class="dropdown-item" method="post" asp-action="Logout" asp-controller="Account">
+                                <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 }
                 else
                 {
