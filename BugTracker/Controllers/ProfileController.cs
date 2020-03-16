@@ -28,13 +28,18 @@ namespace BugTracker.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public IActionResult Edit(int id)
+		public async Task<IActionResult> Edit(int id)
 		{
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanModifyProfilePolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
+				var user = await userManager.FindByIdAsync(id.ToString());
+				EditProfileViewModel profileViewModel = new EditProfileViewModel
+				{
+					User = user
+				};
 
-				return View();
+				return View(profileViewModel);
 			}
 
 			return RedirectToAction("Index", "Home");
