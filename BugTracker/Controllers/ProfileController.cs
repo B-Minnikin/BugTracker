@@ -47,18 +47,26 @@ namespace BugTracker.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public IActionResult Edit(EditProfileViewModel model)
+		public async Task<IActionResult> Edit(EditProfileViewModel model)
 		{
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.User.Id, "CanModifyProfilePolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				if (ModelState.IsValid)
 				{
+					var user = await userManager.FindByIdAsync(model.User.Id);
+					user.PhoneNumber = model.User.PhoneNumber;
 
+					var result = await userManager.UpdateAsync(user);
+					if (!result.Succeeded)
+					{
+						logger.LogError($"Failed to update user profile [{model.User.Id}]");
+						return View("Error");
+					}
 				}
 			}
 
-			return View();
+			return RedirectToAction("Index", "Home");
 		}
 	}
 }
