@@ -28,7 +28,9 @@ namespace BugTracker.Controllers
 
 		public ViewResult View(int id)
 		{
-			return View();
+			var user = userManager.FindByIdAsync(id.ToString());
+
+			return View(user);
 		}
 
 		[HttpGet]
