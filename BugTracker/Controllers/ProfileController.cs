@@ -26,6 +26,11 @@ namespace BugTracker.Controllers
 			this.userManager = new ApplicationUserManager();
 		}
 
+		public ViewResult View(int id)
+		{
+			return View();
+		}
+
 		[HttpGet]
 		[Authorize]
 		public async Task<IActionResult> Edit(int id)
