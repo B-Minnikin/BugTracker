@@ -49,7 +49,7 @@ namespace BugTracker.Controllers
 		[Authorize]
 		public async Task<IActionResult> Edit(EditProfileViewModel model)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.User.Id, "CanModifyProfilePolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, Int32.Parse(model.User.Id), "CanModifyProfilePolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				if (ModelState.IsValid)
