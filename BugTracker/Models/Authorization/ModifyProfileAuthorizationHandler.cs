@@ -10,7 +10,6 @@ namespace BugTracker.Models.Authorization
 	{
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyProfileRequirement requirement, int userId)
 		{
-			ApplicationUserManager userManager = new ApplicationUserManager();
 			string userName = context.User.Identity.Name;
 			if(userName == null)
 			{
