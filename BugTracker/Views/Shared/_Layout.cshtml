@@ -32,7 +32,7 @@
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-                            <a class="dropdown-item" asp-controller="Profile" asp-action="Edit" asp-route-id="@signInManager.UserManager.GetUserId(User)">Profile</a>
+                            <a class="dropdown-item" asp-controller="Profile" asp-action="View" asp-route-id="@signInManager.UserManager.GetUserId(User)">Profile</a>
                             <!--<form method="post" asp-action="Edit" asp-controller="Profile">
                                 <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
                                     Edit Profile

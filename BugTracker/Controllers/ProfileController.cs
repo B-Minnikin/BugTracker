@@ -26,11 +26,14 @@ namespace BugTracker.Controllers
 			this.userManager = new ApplicationUserManager();
 		}
 
-		public ViewResult View(int id)
+		public ViewResult View(string id)
 		{
-			var user = userManager.FindByIdAsync(id.ToString());
+			EditProfileViewModel profileModel = new EditProfileViewModel
+			{
+				User = userManager.FindByIdAsync(id).Result
+			};
 
-			return View(user);
+			return View(profileModel);
 		}
 
 		[HttpGet]

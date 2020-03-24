@@ -1,7 +1,29 @@
-﻿@model IdentityUser
+﻿@model EditProfileViewModel
 
 @{
     ViewBag.Title = "View Profile";
 }
 
-<h1>View Profile - @Model.UserName</h1>
+<h1>View Profile - @Model.User.UserName</h1>
+
+<div>
+
+    <p class="col-sm-2">Username: @Model.User.UserName</p>
+    <p class="col-sm-2">Email Address: @Model.User.Email</p>
+    <p class="col-sm-2">Phone Number: @Model.User.PhoneNumber</p>
+
+</div>
+
+<div>
+
+    <h2>Project Membership</h2>
+
+    @* TODO: Iterate projects which the user is a member or administrator of *@
+
+    <h2>Report Subscriptions</h2>
+
+    @* List subscriptions for the current user *@
+
+</div>
+
+<a asp-controller="Profile" asp-action="Edit" asp-route-id="@Model.User.Id" class="btn btn-primary">Edit</a>
