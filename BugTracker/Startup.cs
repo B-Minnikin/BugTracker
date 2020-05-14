@@ -32,6 +32,7 @@ namespace BugTracker
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
+			services.AddSingleton<IConfiguration>(Configuration);
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
