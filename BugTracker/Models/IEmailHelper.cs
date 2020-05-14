@@ -7,5 +7,6 @@ namespace BugTracker.Models
 {
 	public interface IEmailHelper
 	{
+		void Send(string userName, string emailAddress, string subject, string messageBody);
 	}
 }
