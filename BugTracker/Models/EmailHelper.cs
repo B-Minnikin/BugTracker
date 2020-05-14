@@ -44,7 +44,7 @@ namespace BugTracker.Models
 			SmtpClient client = new SmtpClient();
 			string smtpAddress = "smtp.gmail.com";
 			int port = 587;
-			string username = "NebBugTracker";
+			string username = configuration.GetSection("EmailSettings").GetSection("SenderName").Value;
 			string pwd = configuration.GetSection("EmailSettings").GetSection("Password").Value;
 
 			client.Connect(smtpAddress, port, MailKit.Security.SecureSocketOptions.StartTls);
