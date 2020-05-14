@@ -1,4 +1,5 @@
 ﻿using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,17 @@ namespace BugTracker.Models
 {
 	public class EmailHelper : IEmailHelper
 	{
+		private readonly IConfiguration configuration;
+
+		public EmailHelper(IConfiguration configuration)
+		{
+			this.configuration = configuration;
+		}
+
 		public void Send(string userName, string emailAddress, string subject, string messageBody)
 		{
 			MimeMessage message = new MimeMessage();
-			MailboxAddress from = new MailboxAddress("Admin", "NebBugTracker@gmail.com");
+			MailboxAddress from = new MailboxAddress("BugTracker", "NebBugTracker@gmail.com");
 			message.From.Add(from);
 
 			MailboxAddress to = new MailboxAddress(userName, emailAddress);
@@ -37,7 +45,7 @@ namespace BugTracker.Models
 			string smtpAddress = "smtp.gmail.com";
 			int port = 587;
 			string username = "NebBugTracker";
-			string pwd = "";
+			string pwd = configuration.GetSection("EmailSettings").GetSection("Password").Value;
 
 			client.Connect(smtpAddress, port, MailKit.Security.SecureSocketOptions.StartTls);
 			client.Authenticate(username, pwd);

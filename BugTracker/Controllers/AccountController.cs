@@ -111,7 +111,7 @@ namespace BugTracker.Controllers
 
 			string subject = "Verify your email address";
 			string messageBody = "To activate your account, please click on the following link:\n\n" + confirmationLink;
-			// TODO -- Send email - use IEmailHelper
+			emailHelper.Send(user.UserName, user.Email, subject, messageBody);
 		}
 
 		[HttpGet]
