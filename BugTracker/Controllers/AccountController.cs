@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -15,14 +16,17 @@ namespace BugTracker.Controllers
 		private readonly ILogger<AccountController> logger;
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly SignInManager<IdentityUser> signInManager;
+		private readonly IConfiguration configuration;
 
 		public AccountController(ILogger<AccountController> logger,
 										UserManager<IdentityUser> userManager,
-										SignInManager<IdentityUser> signInManager)
+										SignInManager<IdentityUser> signInManager,
+										IConfiguration configuration)
 		{
 			this.logger = logger;
 			this.userManager = userManager;
 			this.signInManager = signInManager;
+			this.configuration = configuration;
 		}
 
 		[HttpGet]
