@@ -1,4 +1,5 @@
-﻿using BugTracker.ViewModels;
+﻿using BugTracker.Models;
+using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +18,19 @@ namespace BugTracker.Controllers
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly SignInManager<IdentityUser> signInManager;
 		private readonly IConfiguration configuration;
+		private readonly IEmailHelper emailHelper;
 
 		public AccountController(ILogger<AccountController> logger,
 										UserManager<IdentityUser> userManager,
 										SignInManager<IdentityUser> signInManager,
-										IConfiguration configuration)
+										IConfiguration configuration,
+										IEmailHelper emailHelper)
 		{
 			this.logger = logger;
 			this.userManager = userManager;
 			this.signInManager = signInManager;
 			this.configuration = configuration;
+			this.emailHelper = emailHelper;
 		}
 
 		[HttpGet]
