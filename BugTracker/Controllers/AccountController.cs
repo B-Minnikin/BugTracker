@@ -86,13 +86,10 @@ namespace BugTracker.Controllers
 
 				if (result.Succeeded)
 				{
-					logger.LogInformation($"User registered: {user.UserName}");
 					var createdUser = await userManager.FindByEmailAsync(user.Email);
-
-					var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-					var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = createdUser.Id, token = token }, Request.Scheme );
-					logger.Log(LogLevel.Warning, confirmationLink);
 					logger.LogInformation($"New user registered. ID: {createdUser.Id}, Name: {createdUser.UserName}");
+
+					GenerateConfirmationEmail(createdUser);
 
 					return View("RegistrationComplete");
 				}
@@ -101,6 +98,16 @@ namespace BugTracker.Controllers
 			}
 
 			return View(model);
+		}
+
+		private async void GenerateConfirmationEmail(IdentityUser user)
+		{
+			var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+
+			string subject = "Verify your email address";
+			string messageBody = "To activate your account, please click on the following link:\n\n" + confirmationLink;
+			// TODO -- Send email - use IEmailHelper
 		}
 
 		[HttpGet]
