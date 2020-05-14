@@ -33,6 +33,7 @@ namespace BugTracker
 		{
 			services.AddControllersWithViews();
 			services.AddSingleton<IConfiguration>(Configuration);
+			services.AddTransient<IEmailHelper, EmailHelper>();
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
