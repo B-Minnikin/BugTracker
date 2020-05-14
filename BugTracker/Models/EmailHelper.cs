@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MailKit.Net.Smtp;
+using MimeKit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +11,40 @@ namespace BugTracker.Models
 	{
 		public void Send(string userName, string emailAddress, string subject, string messageBody)
 		{
-			throw new NotImplementedException();
+			MimeMessage message = new MimeMessage();
+			MailboxAddress from = new MailboxAddress("Admin", "NebBugTracker@gmail.com");
+			message.From.Add(from);
+
+			MailboxAddress to = new MailboxAddress(userName, emailAddress);
+			message.To.Add(to);
+
+			message.Subject = subject;
+
+			message.Body = GenerateMessageBody(messageBody);
+			SendMessage(message);
+		}
+
+		private MimeEntity GenerateMessageBody(string messageBody)
+		{
+			BodyBuilder bodyBuilder = new BodyBuilder();
+			bodyBuilder.TextBody = messageBody;
+			return bodyBuilder.ToMessageBody();
+		}
+
+		private void SendMessage(MimeMessage message)
+		{
+			SmtpClient client = new SmtpClient();
+			string smtpAddress = "smtp.gmail.com";
+			int port = 587;
+			string username = "NebBugTracker";
+			string pwd = "";
+
+			client.Connect(smtpAddress, port, MailKit.Security.SecureSocketOptions.StartTls);
+			client.Authenticate(username, pwd);
+
+			client.Send(message);
+			client.Disconnect(true);
+			client.Dispose();
 		}
 	}
 }
