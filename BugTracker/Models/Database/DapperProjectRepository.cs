@@ -295,7 +295,11 @@ namespace BugTracker.Models
 
 		public void DeleteSubscription(int userId, int bugReportId)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.UserSubscriptions_Delete", new { UserId = userId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
 		}
 	}
 }
