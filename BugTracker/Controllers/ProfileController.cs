@@ -36,6 +36,12 @@ namespace BugTracker.Controllers
 			return View(profileModel);
 		}
 
+		[Authorize]
+		public ViewResult Subscriptions()
+		{
+			return View();
+		}
+
 		[HttpGet]
 		[Authorize]
 		public async Task<IActionResult> Edit(int id)
