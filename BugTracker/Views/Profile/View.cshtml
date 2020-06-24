@@ -20,9 +20,8 @@
 
     @* TODO: Iterate projects which the user is a member or administrator of *@
 
-    <h2>Report Subscriptions</h2>
-
-    @* List subscriptions for the current user *@
+    @* Manage subscriptions for the current user *@
+    <a asp-controller="Profile" asp-action="Subscriptions" asp-route-id="@Model.User.Id" class="btn btn-primary">Manage Subscriptions</a>
 
 </div>
 
