@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,9 +35,10 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				BugReportComment newComment = new BugReportComment
+				CreateCommentViewModel createCommentViewModel = new CreateCommentViewModel
 				{
-					BugReportId = bugReportId
+					Comment = { BugReportId = bugReportId },
+					Subscribe = false
 				};
 
 				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
@@ -60,7 +62,7 @@ namespace BugTracker.Controllers
 				};
 				ViewData["BreadcrumbNode"] = commentNode;
 
-				return View(newComment);
+				return View(createCommentViewModel);
 			}
 
 			return RedirectToAction("Index", "Home");
