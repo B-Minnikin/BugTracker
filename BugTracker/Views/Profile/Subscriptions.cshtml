@@ -5,3 +5,10 @@
 *@
 
 <h1>Subscription Management</h1>
+
+@{ 
+      foreach(var report in Model.BugReports)
+      {
+          <p>@report.Title</p>
+      }
+}
