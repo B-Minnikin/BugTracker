@@ -37,5 +37,11 @@ namespace BugTracker.Models
 
 		// Attachment Paths
 		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
+
+		// User Subscriptions
+		void CreateSubscription(int userId, int bugReportId);
+		IEnumerable<BugReport> GetSubscribedReports(int userId);
+		bool IsSubscribed(int userId, int bugReportId);
+		void DeleteSubscription(int userId, int bugReportId);
 	}
 }
