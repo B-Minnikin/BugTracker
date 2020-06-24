@@ -16,6 +16,7 @@ namespace BugTracker.Controllers
 		private readonly ILogger<ProfileController> logger;
 		private readonly IAuthorizationService authorizationService;
 		private readonly ApplicationUserManager userManager;
+		private readonly IProjectRepository projectRepository;
 
 		public ProfileController(ILogger<ProfileController> logger,
 									IProjectRepository projectRepository,
@@ -24,6 +25,7 @@ namespace BugTracker.Controllers
 			this.logger = logger;
 			this.authorizationService = authorizationService;
 			this.userManager = new ApplicationUserManager();
+			this.projectRepository = projectRepository;
 		}
 
 		public ViewResult View(string id)
@@ -37,9 +39,14 @@ namespace BugTracker.Controllers
 		}
 
 		[Authorize]
-		public ViewResult Subscriptions(string id)
+		public ViewResult Subscriptions(int id)
 		{
-			return View();
+			SubscriptionsViewModel subscriptionsViewModel = new SubscriptionsViewModel
+			{
+				BugReports = projectRepository.GetSubscribedReports(id).ToList()
+			};
+
+			return View(subscriptionsViewModel);
 		}
 
 		[HttpGet]
