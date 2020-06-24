@@ -37,7 +37,7 @@ namespace BugTracker.Controllers
 		}
 
 		[Authorize]
-		public ViewResult Subscriptions()
+		public ViewResult Subscriptions(string id)
 		{
 			return View();
 		}
