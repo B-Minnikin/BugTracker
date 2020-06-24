@@ -268,7 +268,15 @@ namespace BugTracker.Models
 
 		public void CreateSubscription(int userId, int bugReportId)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var insertedBugStateId = connection.ExecuteScalar("dbo.UserSubscriptions_Insert", new
+				{
+					UserId = userId,
+					BugReportId = bugReportId
+				},
+					commandType: CommandType.StoredProcedure);
+			}
 		}
 
 		public IEnumerable<BugReport> GetSubscribedReports(int userId)
