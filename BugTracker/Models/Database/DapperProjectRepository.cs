@@ -265,5 +265,25 @@ namespace BugTracker.Models
 				return currentState;
 			}
 		}
+
+		public void CreateSubscription(int userId, int bugReportId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<BugReport> GetSubscribedReports(int userId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool IsSubscribed(int userId, int bugReportId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void DeleteSubscription(int userId, int bugReportId)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
