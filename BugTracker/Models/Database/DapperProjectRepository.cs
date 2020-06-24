@@ -281,7 +281,11 @@ namespace BugTracker.Models
 
 		public IEnumerable<BugReport> GetSubscribedReports(int userId)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugReports = connection.Query<BugReport>("dbo.UserSubscriptions_GetAll @UserId", new { UserId = userId });
+				return bugReports;
+			}
 		}
 
 		public bool IsSubscribed(int userId, int bugReportId)
