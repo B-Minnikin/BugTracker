@@ -290,7 +290,11 @@ namespace BugTracker.Models
 
 		public bool IsSubscribed(int userId, int bugReportId)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var alreadySubscribed = connection.ExecuteScalar<bool>("dbo.UserSubscriptions_GetAll @UserId", new { UserId = userId });
+				return alreadySubscribed;
+			}
 		}
 
 		public void DeleteSubscription(int userId, int bugReportId)
