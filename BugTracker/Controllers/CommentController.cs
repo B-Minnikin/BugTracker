@@ -35,11 +35,8 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				CreateCommentViewModel createCommentViewModel = new CreateCommentViewModel
-				{
-					Comment = { BugReportId = bugReportId },
-					Subscribe = false
-				};
+				CreateCommentViewModel createCommentViewModel = new CreateCommentViewModel{};
+				createCommentViewModel.Comment.BugReportId = bugReportId;
 
 				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 				var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
@@ -69,7 +66,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Create(BugReportComment model)
+		public IActionResult Create(CreateCommentViewModel model)
 		{
 			if (ModelState.IsValid)
 			{
@@ -77,9 +74,14 @@ namespace BugTracker.Controllers
 				{
 					Author = HttpContext.User.Identity.Name,
 					Date = DateTime.Now,
-					MainText = model.MainText,
-					BugReportId = model.BugReportId
+					MainText = model.Comment.MainText,
+					BugReportId = model.Comment.BugReportId
 				};
+
+				if (model.Subscribe)
+				{
+
+				}
 
 				BugReportComment addedComment = projectRepository.CreateComment(newComment);
 				return RedirectToAction("ReportOverview", "BugReport", new { id = addedComment.BugReportId});

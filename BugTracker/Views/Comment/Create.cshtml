@@ -1,4 +1,4 @@
-﻿@model BugReportComment
+﻿@model CreateCommentViewModel
 
 @{ 
       ViewBag.Title = "Create Comment";
@@ -10,15 +10,15 @@
 
     <div class="form-group row">
         <div class="col-sm-10">
-            <textarea asp-for="MainText" class="form-control" placeholder="Comment here ..." rows="5"></textarea>
-            <span asp-validation-for="MainText" class="text-danger"></span>
+            <textarea asp-for="Comment.MainText" class="form-control" placeholder="Comment here ..." rows="5"></textarea>
+            <span asp-validation-for="Comment.MainText" class="text-danger"></span>
         </div>
     </div>
 
-    <input type="hidden" asp-for="BugReportId" value="@Model.BugReportId" />
+    <input type="hidden" asp-for="Comment.BugReportId" value="@Model.Comment.BugReportId" />
 
     <div class="subscription-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <input type="checkbox" class="form-check-input" checked="checked" asp-for="@Model.Subscribe">
         <label class="form-check-label" for="exampleCheck1">Subscribe</label>
     </div>
 

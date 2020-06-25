@@ -9,6 +9,6 @@ namespace BugTracker.ViewModels
 	public class CreateCommentViewModel
 	{
 		public bool Subscribe { get; set; } = false;
-		public BugReportComment Comment { get; set; }
+		public BugReportComment Comment { get; set; } = new BugReportComment();
 	}
 }
