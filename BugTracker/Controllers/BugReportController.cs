@@ -107,6 +107,17 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
+		public IActionResult Subscribe(int bugReportId)
+		{
+			int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+			if (!subscriptionHelper.IsSubscribed(userId, bugReportId))
+			{
+				projectRepository.CreateSubscription(userId, bugReportId);
+			}
+
+			return RedirectToAction("ReportOverview", new { id = bugReportId});
+		}
+
 		[HttpGet]
 		public IActionResult Edit(int bugReportId)
 		{
@@ -214,6 +225,12 @@ namespace BugTracker.Controllers
 					BugStates = bugStates,
 					CurrentState = bugStates[0].StateType
 				};
+
+				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+				if (subscriptionHelper.IsSubscribed(userId, bugViewModel.BugReport.BugReportId))
+				{
+					bugViewModel.DisableSubscribeButton = true;
+				}
 
 				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 

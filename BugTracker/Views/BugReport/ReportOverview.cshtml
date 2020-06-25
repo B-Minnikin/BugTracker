@@ -1,7 +1,7 @@
 ﻿@model OverviewBugReportViewModel
 
 @{
-    ViewBag.Title = "Bug Report Overview";
+      ViewBag.Title = "Bug Report Overview";
 }
 
 @* Delete bug report button *@
@@ -16,7 +16,15 @@
 <p>Severity: @Model.BugReport.Severity</p>
 
 <a asp-controller="BugReport" asp-action="Edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
-<a asp-controller="BugReport" asp-action="Subscribe" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Subscribe</a>
+@{
+    string subscribeButtonClass = "btn btn-primary";
+    if (Model.DisableSubscribeButton)
+    {
+        subscribeButtonClass += " disabled";
+
+    }
+}
+<a asp-controller="BugReport" asp-action="Subscribe" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@subscribeButtonClass>Subscribe</a>
 <a asp-controller="BugReport" asp-action="Delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
 
 <hr />
