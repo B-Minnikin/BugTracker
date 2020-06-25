@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.Models.Database;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -19,16 +20,19 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly ISubscriptionHelper subscriptionHelper;
 
 		public CommentController(ILogger<CommentController> logger,
 									IProjectRepository projectRepository,
 									IAuthorizationService authorizationService,
-									IHttpContextAccessor httpContextAccessor)
+									IHttpContextAccessor httpContextAccessor,
+									ISubscriptionHelper subscriptionHelper)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
+			this.subscriptionHelper = subscriptionHelper;
 		}
 
 		[HttpGet]
@@ -85,7 +89,7 @@ namespace BugTracker.Controllers
 				BugReportComment addedComment = projectRepository.CreateComment(newComment);
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-				if (model.Subscribe && !isSubscribed(userId, addedComment.BugReportId))
+				if (model.Subscribe && !subscriptionHelper.IsSubscribed(userId, addedComment.BugReportId))
 				{
 					// add to subscriptions in the repo
 					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
@@ -95,11 +99,6 @@ namespace BugTracker.Controllers
 			}
 
 			return View();
-		}
-
-		private bool isSubscribed(int userId, int bugReportId)
-		{
-			return projectRepository.IsSubscribed(userId, bugReportId);
 		}
 
 		[HttpGet]

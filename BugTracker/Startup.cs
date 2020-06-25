@@ -36,6 +36,8 @@ namespace BugTracker
 			services.AddTransient<IEmailHelper, EmailHelper>();
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 
+			services.AddScoped<ISubscriptionHelper, SubscriptionHelper>();
+
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
 			services.AddIdentity<IdentityUser, IdentityRole>(options =>

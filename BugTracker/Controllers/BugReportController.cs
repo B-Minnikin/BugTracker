@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.Models.Database;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,16 +22,19 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly ISubscriptionHelper subscriptionHelper;
 
 		public BugReportController(ILogger<BugReportController> logger,
 									        IProjectRepository projectRepository,
 										  IAuthorizationService authorizationService,
-										  IHttpContextAccessor httpContextAccessor)
+										  IHttpContextAccessor httpContextAccessor,
+										  ISubscriptionHelper subscriptionHelper)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
+			this.subscriptionHelper = subscriptionHelper;
 		}
 
 		[HttpGet]
@@ -90,7 +94,7 @@ namespace BugTracker.Controllers
 					
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					// deal with subscriptions after bug states to prevent premature email updates
-					if (model.Subscribe && !isSubscribed(userId, addedReport.BugReportId))
+					if (model.Subscribe && !subscriptionHelper.IsSubscribed(userId, addedReport.BugReportId))
 					{
 						// add to subscriptions in the repo
 						projectRepository.CreateSubscription(userId, addedReport.BugReportId);
@@ -101,11 +105,6 @@ namespace BugTracker.Controllers
 			}
 
 			return View();
-		}
-
-		private bool isSubscribed(int userId, int bugReportId)
-		{
-			return projectRepository.IsSubscribed(userId, bugReportId);
 		}
 
 		[HttpGet]
