@@ -57,7 +57,7 @@
     @* Hidden -- checkbox *@
     <div class="form-check">
         <input type="checkbox" class="form-check-input" id="hiddenCheckbox" asp-for="Hidden">
-        <label class="form-check-label" for="hiddenCheckbox">Private</label>
+        <label class="form-check-label" for="hiddenCheckbox" style="user-select: none">Private</label>
     </div>
 
     @*  -- WIP !!
@@ -66,8 +66,8 @@
     *@
 
     <div class="subscription-check">
-        <input type="checkbox" class="form-check-input" checked="checked" asp-for="@Model.Subscribe">
-        <label class="form-check-label" for="exampleCheck1">Subscribe</label>
+        <input type="checkbox" class="form-check-input" checked="checked" id="subscribeCheckbox" asp-for="Subscribe">
+        <label class="form-check-label noselect" for="subscribeCheckbox" style="user-select: none">Subscribe</label>
     </div>
 
     <div class="form-group row">
