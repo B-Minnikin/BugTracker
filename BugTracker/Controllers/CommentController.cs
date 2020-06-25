@@ -83,11 +83,11 @@ namespace BugTracker.Controllers
 				};
 
 				BugReportComment addedComment = projectRepository.CreateComment(newComment);
+				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-				if (model.Subscribe)
+				if (model.Subscribe && !isSubscribed(userId, addedComment.BugReportId))
 				{
 					// add to subscriptions in the repo
-					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
 				}
 
@@ -95,6 +95,11 @@ namespace BugTracker.Controllers
 			}
 
 			return View();
+		}
+
+		private bool isSubscribed(int userId, int bugReportId)
+		{
+			return projectRepository.IsSubscribed(userId, bugReportId);
 		}
 
 		[HttpGet]
