@@ -8,6 +8,7 @@ using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
@@ -17,14 +18,17 @@ namespace BugTracker.Controllers
 		private readonly ILogger<CommentController> _logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
+		private readonly IHttpContextAccessor httpContextAccessor;
 
 		public CommentController(ILogger<CommentController> logger,
 									IProjectRepository projectRepository,
-									IAuthorizationService authorizationService)
+									IAuthorizationService authorizationService,
+									IHttpContextAccessor httpContextAccessor)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
+			this.httpContextAccessor = httpContextAccessor;
 		}
 
 		[HttpGet]
@@ -78,12 +82,15 @@ namespace BugTracker.Controllers
 					BugReportId = model.Comment.BugReportId
 				};
 
+				BugReportComment addedComment = projectRepository.CreateComment(newComment);
+
 				if (model.Subscribe)
 				{
-
+					// add to subscriptions in the repo
+					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
 				}
 
-				BugReportComment addedComment = projectRepository.CreateComment(newComment);
 				return RedirectToAction("ReportOverview", "BugReport", new { id = addedComment.BugReportId});
 			}
 

@@ -9,6 +9,10 @@
 @{ 
       foreach(var report in Model.BugReports)
       {
-          <p>@report.Title</p>
+          <div class="card">
+              <div class="card-body">
+                  @report.Title - @report.DetailsToReproduce
+              </div>
+          </div>
       }
 }
