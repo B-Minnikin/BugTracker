@@ -292,7 +292,8 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var alreadySubscribed = connection.ExecuteScalar<bool>("dbo.UserSubscriptions_GetAll @UserId", new { UserId = userId });
+				var alreadySubscribed = connection.ExecuteScalar<bool>("dbo.UserSubscriptions_IsSubscribed", new { UserId = userId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
 				return alreadySubscribed;
 			}
 		}
