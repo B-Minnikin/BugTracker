@@ -15,5 +15,7 @@ namespace BugTracker.ViewModels
 		public int Severity { get; set; }
 		public int Importance { get; set; }
 		public bool Hidden { get; set; }
+
+		public bool Subscribe { get; set; } = false;
 	}
 }

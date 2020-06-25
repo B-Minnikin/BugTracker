@@ -9,6 +9,7 @@ using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
@@ -19,14 +20,17 @@ namespace BugTracker.Controllers
 		private readonly ILogger<BugReportController> logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
+		private readonly IHttpContextAccessor httpContextAccessor;
 
 		public BugReportController(ILogger<BugReportController> logger,
 									        IProjectRepository projectRepository,
-										  IAuthorizationService authorizationService)
+										  IAuthorizationService authorizationService,
+										  IHttpContextAccessor httpContextAccessor)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
+			this.httpContextAccessor = httpContextAccessor;
 		}
 
 		[HttpGet]
@@ -74,7 +78,7 @@ namespace BugTracker.Controllers
 
 					// add bug report to current project
 					BugReport addedReport = projectRepository.AddBugReport(newBugReport);
-
+					
 					BugState newBugState = new BugState
 					{
 						Time = DateTime.Now,
@@ -83,12 +87,25 @@ namespace BugTracker.Controllers
 						BugReportId = addedReport.BugReportId
 					};
 					BugState addedBugState = projectRepository.CreateBugState(newBugState);
+					
+					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					// deal with subscriptions after bug states to prevent premature email updates
+					if (model.Subscribe && !isSubscribed(userId, addedReport.BugReportId))
+					{
+						// add to subscriptions in the repo
+						projectRepository.CreateSubscription(userId, addedReport.BugReportId);
+					}
 
 					return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });
 				}
 			}
 
 			return View();
+		}
+
+		private bool isSubscribed(int userId, int bugReportId)
+		{
+			return projectRepository.IsSubscribed(userId, bugReportId);
 		}
 
 		[HttpGet]
