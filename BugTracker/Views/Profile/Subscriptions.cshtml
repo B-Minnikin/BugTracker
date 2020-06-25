@@ -11,7 +11,10 @@
       {
           <div class="card">
               <div class="card-body">
-                  @report.Title - @report.DetailsToReproduce
+                  <div class="row">
+                      @report.Title - @report.DetailsToReproduce
+                      <a href="#" class="btn btn-danger ml-auto">Delete</a>
+                    </div>
               </div>
           </div>
       }
