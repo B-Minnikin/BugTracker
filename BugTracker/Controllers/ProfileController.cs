@@ -2,11 +2,13 @@
 using BugTracker.Models.Authorization;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
@@ -15,15 +17,18 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<ProfileController> logger;
 		private readonly IAuthorizationService authorizationService;
+		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ApplicationUserManager userManager;
 		private readonly IProjectRepository projectRepository;
 
 		public ProfileController(ILogger<ProfileController> logger,
 									IProjectRepository projectRepository,
-									IAuthorizationService authorizationService)
+									IAuthorizationService authorizationService,
+									IHttpContextAccessor httpContextAccessor)
 		{
 			this.logger = logger;
 			this.authorizationService = authorizationService;
+			this.httpContextAccessor = httpContextAccessor;
 			this.userManager = new ApplicationUserManager();
 			this.projectRepository = projectRepository;
 		}
@@ -47,6 +52,15 @@ namespace BugTracker.Controllers
 			};
 
 			return View(subscriptionsViewModel);
+		}
+
+		public IActionResult DeleteSubscription(int bugReportId)
+		{
+			int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+			projectRepository.DeleteSubscription(userId, bugReportId);
+			logger.LogWarning("Subscription removed");
+
+			return RedirectToAction("Subscriptions", new { id = userId});
 		}
 
 		[HttpGet]
