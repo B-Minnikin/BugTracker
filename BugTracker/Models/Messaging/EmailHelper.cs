@@ -1,5 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,13 @@ namespace BugTracker.Models
 	public class EmailHelper : IEmailHelper
 	{
 		private readonly IConfiguration configuration;
+		private readonly ILogger<EmailHelper> logger;
 
-		public EmailHelper(IConfiguration configuration)
+		public EmailHelper(IConfiguration configuration,
+								ILogger<EmailHelper> logger)
 		{
 			this.configuration = configuration;
+			this.logger = logger;
 		}
 
 		public void Send(string userName, string emailAddress, string subject, string messageBody)
@@ -44,15 +48,26 @@ namespace BugTracker.Models
 			SmtpClient client = new SmtpClient();
 			string smtpAddress = "smtp.gmail.com";
 			int port = 587;
-			string username = configuration.GetSection("EmailSettings").GetSection("SenderName").Value;
-			string pwd = configuration.GetSection("EmailSettings").GetSection("Password").Value;
 
-			client.Connect(smtpAddress, port, MailKit.Security.SecureSocketOptions.StartTls);
-			client.Authenticate(username, pwd);
+			try
+			{
+				string username = configuration.GetSection("EmailSettings").GetSection("SenderName").Value;
+				string pwd = configuration.GetSection("EmailSettings").GetSection("Password").Value;
 
-			client.Send(message);
-			client.Disconnect(true);
-			client.Dispose();
+				client.Connect(smtpAddress, port, MailKit.Security.SecureSocketOptions.StartTls);
+				client.Authenticate(username, pwd);
+
+				client.Send(message);
+			}
+			catch(MailKit.Security.AuthenticationException e)
+			{
+				logger.LogError(e.Message);
+			}
+			finally
+			{
+				client.Disconnect(true);
+				client.Dispose();
+			}
 		}
 	}
 }
