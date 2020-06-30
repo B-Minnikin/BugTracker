@@ -306,5 +306,15 @@ namespace BugTracker.Models
 					commandType: CommandType.StoredProcedure);
 			}
 		}
+
+		public IEnumerable<int> GetAllSubscribedUserIds(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var userIds = connection.Query<int>("dbo.UserSubscriptions_GetUsersForReport", new { BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+				return userIds;
+			}
+		}
 	}
 }

@@ -8,5 +8,7 @@ namespace BugTracker.Models.Database
 	public interface ISubscriptionHelper
 	{
 		bool IsSubscribed(int userId, int bugReportId);
+
+		void NotifyBugReportStateChanged(int bugReportId, BugState bugState);
 	}
 }

@@ -183,6 +183,8 @@ namespace BugTracker.Controllers
 						BugReportId = bugReport.BugReportId
 					};
 
+					subscriptionHelper.NotifyBugReportStateChanged(bugReport.BugReportId, newBugState);
+
 					projectRepository.CreateBugState(newBugState);
 				}
 

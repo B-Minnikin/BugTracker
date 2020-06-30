@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Bcpg;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,5 +44,6 @@ namespace BugTracker.Models
 		IEnumerable<BugReport> GetSubscribedReports(int userId);
 		bool IsSubscribed(int userId, int bugReportId);
 		void DeleteSubscription(int userId, int bugReportId);
+		IEnumerable<int> GetAllSubscribedUserIds(int bugReportId);
 	}
 }
