@@ -26,21 +26,14 @@ namespace BugTracker.Models.Database
 			return projectRepository.IsSubscribed(userId, bugReportId);
 		}
 
-		public void ComposeMessage()
-		{
-
-		}
-
 		public async void NotifyBugReportStateChanged(int bugReportId, BugState bugState)
 		{
-			// get list of everyone subscribed to this bug report
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportId);
 
 			foreach(var userId in subscribedUserIds)
 			{
 				IdentityUser user = await userManager.FindByIdAsync(userId.ToString());
 
-				// bug report author will not receive update
 				if (bugState.Author != user.UserName)
 				{
 					string emailSubject = ComposeEmailSubject(bugState); // TODO - LAMBDA METHOD
@@ -85,11 +78,5 @@ namespace BugTracker.Models.Database
 
 			return message;
 		}
-
-		// check database for everyone subscribing
-		// ignore authors of the changes
-		// author of comment
-		// person changing the state of a report
-		// get recipients
 	}
 }
