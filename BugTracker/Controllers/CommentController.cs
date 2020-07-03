@@ -91,7 +91,6 @@ namespace BugTracker.Controllers
 
 				if (model.Subscribe && !subscriptionHelper.IsSubscribed(userId, addedComment.BugReportId))
 				{
-					// add to subscriptions in the repo
 					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
 				}
 
