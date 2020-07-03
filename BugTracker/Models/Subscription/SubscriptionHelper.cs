@@ -51,6 +51,25 @@ namespace BugTracker.Models.Database
 			}
 		}
 
+		public async void NotifyBugReportNewComment(BugReportComment bugReportComment)
+		{
+			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
+
+			foreach(var userId in subscribedUserIds)
+			{
+				IdentityUser user = await userManager.FindByIdAsync(userId.ToString());
+
+				if(bugReportComment.Author != user.UserName)
+				{
+					var bugReport = projectRepository.GetBugReportById(bugReportComment.BugReportId);
+					string emailSubject = $"Bug report update: {bugReport.Title}";
+					string emailMessage = "New comment in bug report" + bugReport.Title + ":\n\t" + bugReportComment.MainText;
+
+					emailHelper.Send(user.UserName, user.Email, emailSubject, emailMessage);
+				}
+			}
+		}
+
 		private string ComposeEmailSubject(BugState bugState)
 		{
 			var bugReport = projectRepository.GetBugReportById(bugState.BugReportId);
