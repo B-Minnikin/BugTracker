@@ -1,6 +1,8 @@
-﻿@{
+﻿@model SearchResultsViewModel
+
+@{
     ViewBag.Title = "Search Results";
 }
 
-<h1>Search Results</h1>
+<h1>Search Results: @Model.SearchExpression.SearchText - @Model.SearchResults.Count</h1>
 
