@@ -15,4 +15,9 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Stored Procedures\" />
+    <Folder Include="Database\Tables\" />
+  </ItemGroup>
+
 </Project>
