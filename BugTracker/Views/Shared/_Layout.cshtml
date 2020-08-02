@@ -1,5 +1,4 @@
 ﻿@inject SignInManager<IdentityUser> signInManager;
-@model SearchResultsViewModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,10 +18,8 @@
             <breadcrumb></breadcrumb>
 
             <div class="navbar-nav ml-auto">
-                <form class="form-inline" asp-controller="Search" asp-action="Result" method="post">
-                    <input asp-for="@Model.SearchExpression.SearchText" id="searchString" class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+
+                @await Html.PartialAsync("~/Views/Search/_SearchBox.cshtml", new SearchResultsViewModel())
 
                 @if (signInManager.IsSignedIn(User))
                 {
@@ -35,10 +32,10 @@
 
                             <a class="dropdown-item" asp-controller="Profile" asp-action="View" asp-route-id="@signInManager.UserManager.GetUserId(User)">Profile</a>
                             <!--<form method="post" asp-action="Edit" asp-controller="Profile">
-                                <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
-                                    Edit Profile
-                                </button>
-                            </form>-->
+                    <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
+                        Edit Profile
+                    </button>
+                </form>-->
 
                             <form class="dropdown-item" method="post" asp-action="Logout" asp-controller="Account">
                                 <button type="submit" class="nav-link btn btn-link py-0" style="width:auto;color: #000000">

@@ -25,29 +25,24 @@ namespace BugTracker.Controllers
 			this.httpContextAccessor = httpContextAccessor;
 		}
 
-		[HttpGet]
-		public ViewResult Search()
-		{
-			SearchResultsViewModel searchResultsViewModel = new SearchResultsViewModel
-			{
-				SearchResults = new List<BugReport>()
-			};
-
-			return View(searchResultsViewModel);
-		}
-
 		[HttpPost]
 		public ViewResult Result(SearchResultsViewModel searchModel)
 		{
-			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
-			var bugReports = projectRepository.GetAllBugReports(currentProjectId);
-
-			if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
+			int? currentProjectId = HttpContext.Session.GetInt32("currentProject");
+			if(currentProjectId != null)
 			{
-				searchModel.SearchResults = bugReports.Where(rep => rep.Title.Contains(searchModel.SearchExpression.SearchText)).ToList();
+				logger.LogInformation("currentProjectId = " + currentProjectId);
+				var bugReports = projectRepository.GetAllBugReports(currentProjectId.Value);
+
+				if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
+				{
+					searchModel.SearchResults = bugReports.Where(rep => rep.Title.Contains(searchModel.SearchExpression.SearchText)).ToList();
+				}
+
+				return View(searchModel);
 			}
 
-			return View(searchModel);
+			return View();
 		}
 	}
 }
