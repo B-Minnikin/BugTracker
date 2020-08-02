@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,14 +16,17 @@ namespace BugTracker.Controllers
 		private readonly ILogger<SearchController> logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly IAuthorizationService authorizationService;
 
 		public SearchController(ILogger<SearchController> logger,
 									  IProjectRepository projectRepository,
-									  IHttpContextAccessor httpContextAccessor)
+									  IHttpContextAccessor httpContextAccessor,
+									  IAuthorizationService authorizationService)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.httpContextAccessor = httpContextAccessor;
+			this.authorizationService = authorizationService;
 		}
 
 		[HttpPost]
@@ -32,14 +36,19 @@ namespace BugTracker.Controllers
 			if(currentProjectId != null)
 			{
 				logger.LogInformation("currentProjectId = " + currentProjectId);
-				var bugReports = projectRepository.GetAllBugReports(currentProjectId.Value);
 
-				if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
+				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
+				if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 				{
-					searchModel.SearchResults = bugReports.Where(rep => rep.Title.Contains(searchModel.SearchExpression.SearchText)).ToList();
-				}
+					var bugReports = projectRepository.GetAllBugReports(currentProjectId.Value);
 
-				return View(searchModel);
+					if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
+					{
+						searchModel.SearchResults = bugReports.Where(rep => rep.Title.Contains(searchModel.SearchExpression.SearchText)).ToList();
+					}
+
+					return View(searchModel);
+				}
 			}
 
 			return View();
