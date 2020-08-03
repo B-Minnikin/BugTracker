@@ -4,7 +4,20 @@
     ViewBag.Title = "Search Results";
 }
 
-<h1>Search Results: @Model.SearchExpression.SearchText - @Model.SearchResults.Count</h1>
+<!-- Collapsible advanced search region -->
+<div class="advanced-search">
+    <button class="btn btn-primary" data-toggle="collapse" type="button" data-target="#advancedSearchCollapse" aria-expanded="false" aria-controls="advancedSearchCollapse">
+        Advanced Search
+    </button>
+    <div class="collapse" id="advancedSearchCollapse">
+        <div class="card card-body">
+            Example text - card body - advanced search tools go here.
+        </div>
+    </div>
+</div>
+
+
+<h3>Search Results: @Model.SearchExpression.SearchText - @Model.SearchResults.Count</h3>
 
 @{
     foreach(var result in Model.SearchResults){
