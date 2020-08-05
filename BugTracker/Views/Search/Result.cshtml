@@ -10,8 +10,30 @@
         Advanced Search
     </button>
     <div class="collapse" id="advancedSearchCollapse">
+
         <div class="card card-body">
-            Example text - card body - advanced search tools go here.
+
+            <form class="form" asp-controller="Search" asp-action="Result" method="post">
+
+                <!-- Search input -->
+                <div class="form-group row ml-1">
+                    <input asp-for="@Model.SearchExpression.SearchText" id="searchString" class="form-control mr-sm-2" type="text" placeholder="@Model.SearchExpression.SearchText" aria-label="Search" />
+                </div>
+
+                <!-- search in posts / titles -->
+                <div class="form-group row row ml-3">
+                    <div class="content-check">
+                        <input type="checkbox" id="details-check" class="form-check-input" asp-for="@Model.SearchExpression.SearchInDetails">
+                        <label class="form-check-label" for="details-check">Titles and content</label>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <div class="form-group row row ml-1">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>
