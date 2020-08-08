@@ -10,5 +10,8 @@ namespace BugTracker.Models
 		public string SearchText { get; set; }
 		public bool SearchTitles { get; set; } = true;
 		public bool SearchInDetails { get; set; } = false;
+
+		public string DateRangeBegin { get; set; }
+		public string DateRangeEnd { get; set; }
 	}
 }
