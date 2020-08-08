@@ -4,6 +4,7 @@
     ViewBag.Title = "Search Results";
 }
 
+
 <!-- Collapsible advanced search region -->
 <div class="advanced-search">
     <button class="btn btn-primary" data-toggle="collapse" type="button" data-target="#advancedSearchCollapse" aria-expanded="false" aria-controls="advancedSearchCollapse">
@@ -21,7 +22,7 @@
                 </div>
 
                 <!-- search in posts / titles -->
-                <div class="form-group row row ml-3">
+                <div class="form-group row ml-3">
                     <div class="content-check">
                         <input type="checkbox" id="details-check" class="form-check-input" asp-for="@Model.SearchExpression.SearchInDetails">
                         <label class="form-check-label" for="details-check">Titles and content</label>
@@ -42,7 +43,8 @@
 <h3>Search Results: @Model.SearchExpression.SearchText - @Model.SearchResults.Count</h3>
 
 @{
-    foreach(var result in Model.SearchResults){
+    foreach (var result in Model.SearchResults)
+    {
         <div class="row col-12">
             <div class="card m-3 w-100">
                 <div class="card-header">
