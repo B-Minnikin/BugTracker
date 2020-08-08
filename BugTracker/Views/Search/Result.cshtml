@@ -37,14 +37,14 @@
                 <div class="form-group row">
                     <p>From: </p>
                     <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" asp-for="@Model.SearchExpression.DateRangeBegin"/>
                         <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                         </div>
                     </div>
                     <p>To: </p>
                     <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" />
+                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" asp-for="@Model.SearchExpression.DateRangeEnd"/>
                         <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                         </div>
