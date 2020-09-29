@@ -44,7 +44,8 @@ namespace BugTracker.Controllers
 
 					if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
 					{
-						searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())).ToList();
+						searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
+							&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
 					}
 
 					return View(searchModel);
