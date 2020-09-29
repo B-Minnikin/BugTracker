@@ -11,7 +11,7 @@ namespace BugTracker.Models
 		public bool SearchTitles { get; set; } = true;
 		public bool SearchInDetails { get; set; } = false;
 
-		public string DateRangeBegin { get; set; } = "";
-		public string DateRangeEnd { get; set; } = "";
+		public DateTime DateRangeBegin { get; set; }
+		public DateTime DateRangeEnd { get; set; } = DateTime.Now;
 	}
 }

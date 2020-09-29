@@ -4,6 +4,8 @@
     ViewBag.Title = "Search Results";
 }
 
+<link rel="stylesheet" type="text/css" href="~/lib/datetimepicker/jquery.datetimepicker.min.css" />
+<script src="~/lib/datetimepicker/jquery.datetimepicker.full.min.js"></script>
 
 <!-- Collapsible advanced search region -->
 <div class="advanced-search">
@@ -31,27 +33,14 @@
 
                 <!-- Date range picker -->
                 <div class="form-group row">
-                    <p>From: </p>
-                    <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" asp-for="@Model.SearchExpression.DateRangeBegin"/>
-                        <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
-                    <p>To: </p>
-                    <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
-                        <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" asp-for="@Model.SearchExpression.DateRangeEnd"/>
-                        <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
-                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                        </div>
-                    </div>
+                    <label>From: </label>
+                    <input id="datetimepickerRangeBegin" type="text" asp-for="@Model.SearchExpression.DateRangeBegin" />
                 </div>
-                <script type="text/javascript">
-                    $(function () {
-                        $('#datetimepicker1').datetimepicker();
-                        $('#datetimepicker2').datetimepicker();
-                    });
-                </script>
+
+                <div class="form-group row">
+                    <label>To: </label>
+                    <input id="datetimepickerRangeEnd" type="text" asp-for="@Model.SearchExpression.DateRangeEnd"/>
+                </div>
 
                 <!-- Submit button -->
                 <div class="form-group row row ml-1">
@@ -87,3 +76,7 @@
     }
 }
 
+<script type="text/javascript">
+    jQuery('#datetimepickerRangeBegin').datetimepicker();
+    jQuery('#datetimepickerRangeEnd').datetimepicker();
+</script>
