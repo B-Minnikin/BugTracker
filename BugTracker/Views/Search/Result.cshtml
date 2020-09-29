@@ -4,9 +4,6 @@
     ViewBag.Title = "Search Results";
 }
 
-<link rel="stylesheet" type="text/css" href="~/lib/datetimepicker/jquery.datetimepicker.min.css" />
-<script src="~/lib/datetimepicker/jquery.datetimepicker.full.min.js"></script>
-
 <!-- Collapsible advanced search region -->
 <div class="advanced-search">
     <button class="btn btn-primary" data-toggle="collapse" type="button" data-target="#advancedSearchCollapse" aria-expanded="false" aria-controls="advancedSearchCollapse">
@@ -34,12 +31,12 @@
                 <!-- Date range picker -->
                 <div class="form-group row">
                     <label>From: </label>
-                    <input id="datetimepickerRangeBegin" type="text" asp-for="@Model.SearchExpression.DateRangeBegin" />
+                    <input id="datetimepickerRangeBegin" type="date" asp-for="@Model.SearchExpression.DateRangeBegin" />
                 </div>
 
                 <div class="form-group row">
                     <label>To: </label>
-                    <input id="datetimepickerRangeEnd" type="text" asp-for="@Model.SearchExpression.DateRangeEnd"/>
+                    <input id="datetimepickerRangeEnd" type="date" asp-for="@Model.SearchExpression.DateRangeEnd"/>
                 </div>
 
                 <!-- Submit button -->
@@ -75,8 +72,3 @@
         </div>
     }
 }
-
-<script type="text/javascript">
-    jQuery('#datetimepickerRangeBegin').datetimepicker({ format: 'd/m/Y'});
-    jQuery('#datetimepickerRangeEnd').datetimepicker({ format: 'd/m/Y' });
-</script>
