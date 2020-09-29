@@ -42,6 +42,11 @@ namespace BugTracker.Controllers
 				{
 					var bugReports = projectRepository.GetAllBugReports(currentProjectId.Value);
 
+					// set default start date to the project's creation date - if user has not entered more recent date
+					DateTime projectCreationTime = GetProjectCreationTime((int)currentProjectId);
+					if (searchModel.SearchExpression.DateRangeBegin < projectCreationTime)
+						searchModel.SearchExpression.DateRangeBegin = projectCreationTime;
+
 					if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
 					{
 						searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
@@ -53,6 +58,12 @@ namespace BugTracker.Controllers
 			}
 
 			return View();
+		}
+
+		private DateTime GetProjectCreationTime(int projectId)
+		{
+			Project currentProject = projectRepository.GetProjectById(projectId);
+			return currentProject.CreationTime;
 		}
 	}
 }
