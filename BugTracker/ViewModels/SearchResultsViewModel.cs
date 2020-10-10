@@ -8,6 +8,7 @@ namespace BugTracker.ViewModels
 {
 	public class SearchResultsViewModel
 	{
+		public bool AdvancedSearchResultsBeginCollapsed { get; set; } = true;
 		public SearchExpression SearchExpression { get; set; } = new SearchExpression
 		{
 			SearchText = "",

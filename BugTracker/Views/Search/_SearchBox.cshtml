@@ -3,4 +3,7 @@
 <form class="form-inline" asp-controller="Search" asp-action="Result" method="post">
     <input asp-for="@Model.SearchExpression.SearchText" id="searchString" class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+
+    <!-- Keep the default collapsed state of advanced search when running a search from the navbar -->
+    <input type="hidden" asp-for="@Model.AdvancedSearchResultsBeginCollapsed" value="@true" />
 </form>
