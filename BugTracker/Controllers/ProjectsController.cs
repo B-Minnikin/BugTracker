@@ -52,7 +52,6 @@ namespace BugTracker.Controllers
 			return View(model);
 		}
 
-		[Breadcrumb("Overview", FromAction = "Projects", FromController = typeof(ProjectsController))]
 		public IActionResult Overview(int id)
 		{
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanAccessProjectPolicy");
@@ -68,13 +67,15 @@ namespace BugTracker.Controllers
 					CommentCountHandler = projectRepository.GetCommentCountById
 				};
 
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
 				{
-					RouteValues = new { id = id },
+					RouteValues = new { id },
 					Parent = projectsNode
 				};
 				ViewData["BreadcrumbNode"] = overviewNode;
+				// --------------------------------------------------------------------------------------------
 
 				// if project NULL -- redirect to error page !!
 
@@ -86,7 +87,7 @@ namespace BugTracker.Controllers
 
 		[HttpGet]
 		[Authorize]
-		[Breadcrumb("Create Project", FromAction = "Projects", FromController = typeof(ProjectsController))]
+		[Breadcrumb("Create Project", FromAction = "Projects")]
 		public ViewResult CreateProject()
 		{
 			return View();
@@ -146,6 +147,21 @@ namespace BugTracker.Controllers
 				{
 					Project = project
 				};
+
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+				{
+					RouteValues = new { id },
+					Parent = projectsNode
+				};
+				var editProjectNode = new MvcBreadcrumbNode("Edit", "Projects", "Edit")
+				{
+					Parent = overviewNode
+				};
+				ViewData["BreadcrumbNode"] = editProjectNode;
+				// --------------------------------------------------------------------------------------------
+
 				return View(projectViewModel);
 			}
 			return View();
