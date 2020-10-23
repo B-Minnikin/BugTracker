@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +53,21 @@ namespace BugTracker.Controllers
 						searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
 							&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
 					}
+
+					// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+					string currentProjectName = projectRepository.GetProjectById(currentProjectId.Value).Name;
+					var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+					var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProjectName)
+					{
+						RouteValues = new { id = currentProjectId.Value },
+						Parent = projectsNode
+					};
+					var searchNode = new MvcBreadcrumbNode("Result", "SearchController", "Search")
+					{
+						Parent = overviewNode
+					};
+					ViewData["BreadcrumbNode"] = searchNode;
+					// --------------------------------------------------------------------------------------------
 
 					return View(searchModel);
 				}
