@@ -50,6 +50,7 @@ namespace BugTracker.Controllers
 				var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
 				var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
 
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 				{
@@ -66,6 +67,7 @@ namespace BugTracker.Controllers
 					Parent = reportNode
 				};
 				ViewData["BreadcrumbNode"] = commentNode;
+				// --------------------------------------------------------------------------------------------
 
 				return View(createCommentViewModel);
 			}
@@ -112,6 +114,7 @@ namespace BugTracker.Controllers
 			var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
 			var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
 
+			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 			{
@@ -128,6 +131,7 @@ namespace BugTracker.Controllers
 				Parent = reportNode
 			};
 			ViewData["BreadcrumbNode"] = commentNode;
+			// --------------------------------------------------------------------------------------------
 
 			return View(bugReportComment);
 
