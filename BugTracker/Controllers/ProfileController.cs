@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +35,7 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 		}
 
+		[Breadcrumb("My Profile", FromController = typeof(HomeController))]
 		public ViewResult View(string id)
 		{
 			EditProfileViewModel profileModel = new EditProfileViewModel
@@ -50,6 +53,17 @@ namespace BugTracker.Controllers
 			{
 				BugReports = projectRepository.GetSubscribedReports(id).ToList()
 			};
+
+			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+			var profileNode = new MvcBreadcrumbNode("View", "Profile", "My Profile")
+			{
+				RouteValues = new { id = id }
+			};
+			var subscriptionsNode = new MvcBreadcrumbNode("Subscriptions", "Profile", "Subscriptions")
+			{
+				Parent = profileNode
+			};
+			ViewData["BreadcrumbNode"] = subscriptionsNode;
 
 			return View(subscriptionsViewModel);
 		}
@@ -75,6 +89,17 @@ namespace BugTracker.Controllers
 				{
 					User = user
 				};
+
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var profileNode = new MvcBreadcrumbNode("View", "Profile", "My Profile")
+				{
+					RouteValues = new { id = id }
+				};
+				var editNode = new MvcBreadcrumbNode("Edit", "Profile", "Edit")
+				{
+					Parent = profileNode
+				};
+				ViewData["BreadcrumbNode"] = editNode;
 
 				return View(profileViewModel);
 			}
