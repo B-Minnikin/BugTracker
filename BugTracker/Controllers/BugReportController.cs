@@ -43,6 +43,7 @@ namespace BugTracker.Controllers
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 
+			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 			{
@@ -54,6 +55,7 @@ namespace BugTracker.Controllers
 				Parent = overviewNode
 			};
 			ViewData["BreadcrumbNode"] = reportNode;
+			// --------------------------------------------------------------------------------------------
 
 			return View();
 		}
@@ -133,6 +135,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = reportViewModel.BugReport.PersonReporting}, "CanModifyReportPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 				{
@@ -149,6 +152,7 @@ namespace BugTracker.Controllers
 					Parent = reportNode
 				};
 				ViewData["BreadcrumbNode"] = editNode;
+				// --------------------------------------------------------------------------------------------
 
 				return View(reportViewModel);
 			}
@@ -236,6 +240,7 @@ namespace BugTracker.Controllers
 
 				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 				{
@@ -247,6 +252,7 @@ namespace BugTracker.Controllers
 					Parent = overviewNode
 				};
 				ViewData["BreadcrumbNode"] = reportNode;
+				// --------------------------------------------------------------------------------------------
 
 				return View(bugViewModel);
 			}
