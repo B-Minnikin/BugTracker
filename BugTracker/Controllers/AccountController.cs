@@ -167,6 +167,49 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
+		[HttpGet]
+		[AllowAnonymous]
+		public IActionResult ForgotPassword()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		[AllowAnonymous]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				var user = await userManager.FindByEmailAsync(model.Email);
+				if (user == null)
+					return RedirectToAction("ForgotPasswordConfirmation");
+
+				GenerateForgotPasswordEmail(user);
+
+				return RedirectToAction("ForgotPasswordConfirmation");
+			}
+
+			return View(model);
+		}
+
+		public IActionResult ForgotPasswordConfirmation()
+		{
+			return View();
+		}
+
+		private async void GenerateForgotPasswordEmail(IdentityUser user)
+		{
+			var token = await userManager.GeneratePasswordResetTokenAsync(user);
+			var passwordResetLink = Url.Action("ResetPassword", "Account", new { email = user.Email, token }, Request.Scheme);
+
+			string subject = "Reset your password request";
+			string messageBody = $"Hi {user.UserName}," +
+				$"\n\nSomeone recently requested that the password for your BugTracker account be reset. " +
+				$"If you didn't request this, then ignore this message. Please click the following link to reset your password:\n\n" + passwordResetLink;
+			emailHelper.Send(user.UserName, user.Email, subject, messageBody);
+		}
+
 		private void AddErrorToModelState(IdentityResult result)
 		{
 			foreach(var error in result.Errors)

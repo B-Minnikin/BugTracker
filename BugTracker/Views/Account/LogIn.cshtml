@@ -23,7 +23,9 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
-            <a class="row" asp-action="ForgotPassword">Forgot Password</a>
+            <div class="form-group">
+                <a asp-action="ForgotPassword" asp-controller="Account">Forgot Password</a>
+            </div>
 
             <button type="submit" class="btn btn-primary">Login</button>
 
