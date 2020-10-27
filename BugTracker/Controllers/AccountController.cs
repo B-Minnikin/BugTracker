@@ -198,6 +198,45 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
+		[HttpGet]
+		[AllowAnonymous]
+		public IActionResult ResetPassword(string token, string email)
+		{
+			if(token == null || email == null)
+			{
+				ModelState.AddModelError("", "Invalid password reset token");
+				return View();
+			}
+			var model = new ResetPasswordViewModel { Token = token, Email = email };
+			return View(model);
+		}
+
+		[HttpPost]
+		[AllowAnonymous]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+		{
+			var user = await userManager.FindByEmailAsync(model.Email);
+
+			if(user != null)
+			{
+				var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+				if (result.Succeeded)
+				{
+					return View("ResetPasswordConfirmation");
+				}
+
+				foreach(var error in result.Errors)
+				{
+					ModelState.AddModelError("", error.Description);
+				}
+				return View(model);
+			}
+
+			return View("ResetPasswordConfirmation");
+		}
+
 		private async void GenerateForgotPasswordEmail(IdentityUser user)
 		{
 			var token = await userManager.GeneratePasswordResetTokenAsync(user);
