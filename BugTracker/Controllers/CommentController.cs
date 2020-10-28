@@ -26,13 +26,13 @@ namespace BugTracker.Controllers
 									IProjectRepository projectRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
-									ISubscriptions subscriptionHelper)
+									ISubscriptions subscriptions)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
-			this.subscriptions = subscriptionHelper;
+			this.subscriptions = subscriptions;
 		}
 
 		[HttpGet]
