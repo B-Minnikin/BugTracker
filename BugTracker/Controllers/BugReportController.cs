@@ -22,19 +22,19 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
-		private readonly ISubscriptionHelper subscriptionHelper;
+		private readonly ISubscriptions subscriptions;
 
 		public BugReportController(ILogger<BugReportController> logger,
 									        IProjectRepository projectRepository,
 										  IAuthorizationService authorizationService,
 										  IHttpContextAccessor httpContextAccessor,
-										  ISubscriptionHelper subscriptionHelper)
+										  ISubscriptions subscriptionHelper)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
-			this.subscriptionHelper = subscriptionHelper;
+			this.subscriptions = subscriptionHelper;
 		}
 
 		[HttpGet]
@@ -96,7 +96,7 @@ namespace BugTracker.Controllers
 					
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					// deal with subscriptions after bug states to prevent premature email updates
-					if (model.Subscribe && !subscriptionHelper.IsSubscribed(userId, addedReport.BugReportId))
+					if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedReport.BugReportId))
 					{
 						// add to subscriptions in the repo
 						projectRepository.CreateSubscription(userId, addedReport.BugReportId);
@@ -112,7 +112,7 @@ namespace BugTracker.Controllers
 		public IActionResult Subscribe(int bugReportId)
 		{
 			int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-			if (!subscriptionHelper.IsSubscribed(userId, bugReportId))
+			if (!subscriptions.IsSubscribed(userId, bugReportId))
 			{
 				projectRepository.CreateSubscription(userId, bugReportId);
 			}
@@ -187,7 +187,7 @@ namespace BugTracker.Controllers
 						BugReportId = bugReport.BugReportId
 					};
 
-					subscriptionHelper.NotifyBugReportStateChanged(bugReport.BugReportId, newBugState);
+					subscriptions.NotifyBugReportStateChanged(bugReport.BugReportId, newBugState);
 
 					projectRepository.CreateBugState(newBugState);
 				}
@@ -233,7 +233,7 @@ namespace BugTracker.Controllers
 				};
 
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-				if (subscriptionHelper.IsSubscribed(userId, bugViewModel.BugReport.BugReportId))
+				if (subscriptions.IsSubscribed(userId, bugViewModel.BugReport.BugReportId))
 				{
 					bugViewModel.DisableSubscribeButton = true;
 				}

@@ -20,19 +20,19 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
-		private readonly ISubscriptionHelper subscriptionHelper;
+		private readonly ISubscriptions subscriptions;
 
 		public CommentController(ILogger<CommentController> logger,
 									IProjectRepository projectRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
-									ISubscriptionHelper subscriptionHelper)
+									ISubscriptions subscriptionHelper)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
-			this.subscriptionHelper = subscriptionHelper;
+			this.subscriptions = subscriptionHelper;
 		}
 
 		[HttpGet]
@@ -91,12 +91,12 @@ namespace BugTracker.Controllers
 				BugReportComment addedComment = projectRepository.CreateComment(newComment);
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-				if (model.Subscribe && !subscriptionHelper.IsSubscribed(userId, addedComment.BugReportId))
+				if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedComment.BugReportId))
 				{
 					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
 				}
 
-				subscriptionHelper.NotifyBugReportNewComment(addedComment);
+				subscriptions.NotifyBugReportNewComment(addedComment);
 
 				return RedirectToAction("ReportOverview", "BugReport", new { id = addedComment.BugReportId});
 			}

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.Database
 {
-	public interface ISubscriptionHelper
+	public interface ISubscriptions
 	{
 		bool IsSubscribed(int userId, int bugReportId);
 

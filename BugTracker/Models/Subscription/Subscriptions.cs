@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.Database
 {
-	public class SubscriptionHelper : ISubscriptionHelper
+	public class Subscriptions : ISubscriptions
 	{
 		private readonly IProjectRepository projectRepository;
 		private readonly IEmailHelper emailHelper;
 		private readonly ApplicationUserManager userManager;
 
-		public SubscriptionHelper(IProjectRepository projectRepository,
+		public Subscriptions(IProjectRepository projectRepository,
 			IEmailHelper emailHelper)
 		{
 			this.projectRepository = projectRepository;
