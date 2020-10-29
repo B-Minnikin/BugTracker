@@ -18,7 +18,7 @@ namespace BugTracker.Models.Database
 		{
 			this.projectRepository = projectRepository;
 			this.emailHelper = emailHelper;
-			this.userManager = new ApplicationUserManager();
+			userManager = new ApplicationUserManager();
 		}
 
 		public bool IsSubscribed(int userId, int bugReportId)
@@ -44,8 +44,8 @@ namespace BugTracker.Models.Database
 
 				if (bugState.Author != user.UserName)
 				{
-					string emailSubject = ComposeEmailSubject(bugState); // TODO - LAMBDA METHOD
-					string emailMessage = ComposeEmailMessage(bugState); // move out of loop
+					string emailSubject = ComposeBugStateEmailSubject(bugState); // TODO - LAMBDA METHOD
+					string emailMessage = ComposeBugStateEmailMessage(bugState); // move out of loop
 
 					emailHelper.Send(user.UserName, user.Email, emailSubject, emailMessage);
 				}
@@ -71,7 +71,7 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		private string ComposeEmailSubject(BugState bugState)
+		private string ComposeBugStateEmailSubject(BugState bugState)
 		{
 			var bugReport = projectRepository.GetBugReportById(bugState.BugReportId);
 			string message = $"Bug report update: {bugReport.Title}";
@@ -79,7 +79,7 @@ namespace BugTracker.Models.Database
 			return message;
 		}
 
-		private string ComposeEmailMessage(BugState bugState)
+		private string ComposeBugStateEmailMessage(BugState bugState)
 		{
 			var bugReport = projectRepository.GetBugReportById(bugState.BugReportId);
 			string message = $"Bug state updated: {bugReport.Title}\n\t{bugState.StateType.ToString()}";
