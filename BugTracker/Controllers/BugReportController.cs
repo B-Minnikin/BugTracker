@@ -112,10 +112,8 @@ namespace BugTracker.Controllers
 		public IActionResult Subscribe(int bugReportId)
 		{
 			int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-			if (!subscriptions.IsSubscribed(userId, bugReportId))
-			{
-				projectRepository.CreateSubscription(userId, bugReportId);
-			}
+
+			subscriptions.CreateSubscriptionIfNotSubscribed(userId, bugReportId);
 
 			return RedirectToAction("ReportOverview", new { id = bugReportId});
 		}
