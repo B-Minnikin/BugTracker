@@ -26,6 +26,14 @@ namespace BugTracker.Models.Database
 			return projectRepository.IsSubscribed(userId, bugReportId);
 		}
 
+		public void CreateSubscriptionIfNotSubscribed(int userId, int bugReportId)
+		{
+			if(!IsSubscribed(userId, bugReportId))
+			{
+				projectRepository.CreateSubscription(userId, bugReportId);
+			}
+		}
+
 		public async void NotifyBugReportStateChanged(int bugReportId, BugState bugState)
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportId);
