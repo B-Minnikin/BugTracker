@@ -10,7 +10,7 @@ namespace BugTracker.Models.Database
 		bool IsSubscribed(int userId, int bugReportId);
 		void CreateSubscriptionIfNotSubscribed(int userId, int bugReportId);
 
-		void NotifyBugReportStateChanged(int bugReportId, BugState bugState);
+		void NotifyBugReportStateChanged(BugState bugState);
 		void NotifyBugReportNewComment(BugReportComment bugReportComment);
 	}
 }

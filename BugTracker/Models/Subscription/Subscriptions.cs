@@ -34,9 +34,9 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public async void NotifyBugReportStateChanged(int bugReportId, BugState bugState)
+		public async void NotifyBugReportStateChanged(BugState bugState)
 		{
-			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportId);
+			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
 			foreach(var userId in subscribedUserIds)
 			{

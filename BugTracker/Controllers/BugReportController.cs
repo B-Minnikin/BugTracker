@@ -185,9 +185,8 @@ namespace BugTracker.Controllers
 						BugReportId = bugReport.BugReportId
 					};
 
-					subscriptions.NotifyBugReportStateChanged(bugReport.BugReportId, newBugState);
-
 					projectRepository.CreateBugState(newBugState);
+					subscriptions.NotifyBugReportStateChanged(newBugState);
 				}
 
 				return RedirectToAction("ReportOverview", new { id = bugReport.BugReportId});
