@@ -34,6 +34,14 @@ namespace BugTracker.Models.Database
 			}
 		}
 
+		public void DeleteSubscription(int userId, int bugReportId)
+		{
+			if(IsSubscribed(userId, bugReportId))
+			{
+				projectRepository.DeleteSubscription(userId, bugReportId);
+			}
+		}
+
 		public async void NotifyBugReportStateChanged(BugState bugState)
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugState.BugReportId);
