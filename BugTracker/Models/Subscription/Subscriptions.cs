@@ -46,14 +46,15 @@ namespace BugTracker.Models.Database
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
-			foreach(var userId in subscribedUserIds)
+			string emailSubject = ComposeBugStateEmailSubject(bugState);
+			string emailMessage = ComposeBugStateEmailMessage(bugState);
+
+			foreach (var userId in subscribedUserIds)
 			{
 				IdentityUser user = await userManager.FindByIdAsync(userId.ToString());
 
 				if (bugState.Author != user.UserName)
 				{
-					string emailSubject = ComposeBugStateEmailSubject(bugState); // TODO - LAMBDA METHOD
-					string emailMessage = ComposeBugStateEmailMessage(bugState); // move out of loop
 
 					emailHelper.Send(user.UserName, user.Email, emailSubject, emailMessage);
 				}
