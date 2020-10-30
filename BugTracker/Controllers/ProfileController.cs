@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Authorization;
+using BugTracker.Models.Database;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +20,7 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<ProfileController> logger;
 		private readonly IAuthorizationService authorizationService;
+		private readonly ISubscriptions subscriptions;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ApplicationUserManager userManager;
 		private readonly IProjectRepository projectRepository;
@@ -26,10 +28,12 @@ namespace BugTracker.Controllers
 		public ProfileController(ILogger<ProfileController> logger,
 									IProjectRepository projectRepository,
 									IAuthorizationService authorizationService,
+									ISubscriptions subscriptions,
 									IHttpContextAccessor httpContextAccessor)
 		{
 			this.logger = logger;
 			this.authorizationService = authorizationService;
+			this.subscriptions = subscriptions;
 			this.httpContextAccessor = httpContextAccessor;
 			this.userManager = new ApplicationUserManager();
 			this.projectRepository = projectRepository;
@@ -71,7 +75,7 @@ namespace BugTracker.Controllers
 		public IActionResult DeleteSubscription(int bugReportId)
 		{
 			int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-			projectRepository.DeleteSubscription(userId, bugReportId);
+			subscriptions.DeleteSubscription(userId, bugReportId);
 			logger.LogWarning("Subscription removed");
 
 			return RedirectToAction("Subscriptions", new { id = userId});
