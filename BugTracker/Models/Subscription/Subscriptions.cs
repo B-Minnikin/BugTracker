@@ -61,13 +61,15 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public async void NotifyBugReportNewComment(BugReportComment bugReportComment)
+		public async void NotifyBugReportNewComment(BugReportComment bugReportComment, string bugReportUrl)
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
 
 			var bugReport = projectRepository.GetBugReportById(bugReportComment.BugReportId);
-			string emailSubject = $"Bug report update: {bugReport.Title}";
-			string emailMessage = "New comment in bug report" + bugReport.Title + ":\n\t" + bugReportComment.MainText;
+			string projectName = projectRepository.GetProjectById(bugReport.ProjectId).Name;
+			string emailSubject = $"Bug report updated: {bugReport.Title}";
+			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {bugReportComment.Author}.\n" +
+				$"Please <a href=\"{ bugReportUrl}\">click here</a> to review new content.";
 
 			foreach (var userId in subscribedUserIds)
 			{

@@ -96,7 +96,8 @@ namespace BugTracker.Controllers
 					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
 				}
 
-				subscriptions.NotifyBugReportNewComment(addedComment);
+				string bugReportUrl = Url.Action("ReportOverview", "BugReport", new { id = addedComment.BugReportId}, Request.Scheme);
+				subscriptions.NotifyBugReportNewComment(addedComment, bugReportUrl);
 
 				return RedirectToAction("ReportOverview", "BugReport", new { id = addedComment.BugReportId});
 			}
