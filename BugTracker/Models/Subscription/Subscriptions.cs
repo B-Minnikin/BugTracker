@@ -42,12 +42,12 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public async void NotifyBugReportStateChanged(BugState bugState)
+		public async void NotifyBugReportStateChanged(BugState bugState, string bugReportUrl)
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
 			string emailSubject = ComposeBugStateEmailSubject(bugState);
-			string emailMessage = ComposeBugStateEmailMessage(bugState);
+			string emailMessage = ComposeBugStateEmailMessage(bugState, bugReportUrl);
 
 			foreach (var userId in subscribedUserIds)
 			{
@@ -55,7 +55,6 @@ namespace BugTracker.Models.Database
 
 				if (bugState.Author != user.UserName)
 				{
-
 					emailHelper.Send(user.UserName, user.Email, emailSubject, emailMessage);
 				}
 			}
@@ -85,15 +84,19 @@ namespace BugTracker.Models.Database
 		private string ComposeBugStateEmailSubject(BugState bugState)
 		{
 			var bugReport = projectRepository.GetBugReportById(bugState.BugReportId);
-			string message = $"Bug report update: {bugReport.Title}";
+			string message = $"Bug report updated: {bugReport.Title}";
 
 			return message;
 		}
 
-		private string ComposeBugStateEmailMessage(BugState bugState)
+		private string ComposeBugStateEmailMessage(BugState bugState, string bugReportUrl)
 		{
 			var bugReport = projectRepository.GetBugReportById(bugState.BugReportId);
-			string message = $"Bug state updated: {bugReport.Title}\n\t{bugState.StateType.ToString()}";
+			string projectName = projectRepository.GetProjectById(bugReport.ProjectId).Name;
+			string stateName = bugState.StateType.ToString().First().ToString().ToUpper() + bugState.StateType.ToString().Substring(1);
+
+			string message = $"Project: {projectName}\n{bugReport.Title} state updated to {stateName}\n" +
+				$"Please <a href=\"{bugReportUrl}\">click here</a> to review new content.";
 
 			return message;
 		}
