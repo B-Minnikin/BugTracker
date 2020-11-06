@@ -189,5 +189,41 @@ namespace BugTracker.Controllers
 
 			return View();
 		}
+
+		[HttpGet]
+		public IActionResult Invites(int id)
+		{
+			var project = projectRepository.GetProjectById(id);
+			InvitesViewModel invitesViewModel = new InvitesViewModel
+			{
+				ProjectId = id
+			};
+
+			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id },
+				Parent = projectsNode
+			};
+			var invitesProjectNode = new MvcBreadcrumbNode("Invites", "Projects", "Invites")
+			{
+				Parent = overviewNode
+			};
+			ViewData["BreadcrumbNode"] = invitesProjectNode;
+			// --------------------------------------------------------------------------------------------
+
+			return View(invitesViewModel);
+		}
+
+		[HttpPost]
+		public IActionResult Invites(InvitesViewModel model)
+		{
+			if(ModelState.IsValid)
+			{
+			}
+
+			return View(model);
+		}
 	}
 }
