@@ -335,11 +335,11 @@ namespace BugTracker.Models
 			}
 		}
 
-		public bool IsEmailAddressPendingRegistration(string emailAddress)
+		public bool IsEmailAddressPendingRegistration(string emailAddress, int projectId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var pendingRegistration = connection.ExecuteScalar<bool>("dbo.ProjectInvitations_IsPendingRegistration", new { EmailAddress = emailAddress },
+				var pendingRegistration = connection.ExecuteScalar<bool>("dbo.ProjectInvitations_IsPendingRegistration", new { EmailAddress = emailAddress, ProjectId = projectId },
 					commandType: CommandType.StoredProcedure);
 				return pendingRegistration;
 			}
