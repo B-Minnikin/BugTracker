@@ -45,5 +45,10 @@ namespace BugTracker.Models
 		bool IsSubscribed(int userId, int bugReportId);
 		void DeleteSubscription(int userId, int bugReportId);
 		IEnumerable<int> GetAllSubscribedUserIds(int bugReportId);
+
+		// Project Invitations
+		void CreatePendingProjectInvitation(string emailAddress, int projectId);
+		void RemovePendingProjectInvitation(string emailAddress, int projectId);
+		bool IsEmailAddressPendingRegistration(string emailAddress);
 	}
 }
