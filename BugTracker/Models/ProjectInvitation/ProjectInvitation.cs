@@ -37,7 +37,7 @@ namespace BugTracker.Models.ProjectInvitation
 
 		public void AddProjectInvitation(string emailAddress, int projectId)
 		{
-			bool emailAddressIsPendingRegistration = EmailAddressPendingRegistration(emailAddress);
+			bool emailAddressIsPendingRegistration = EmailAddressPendingRegistration(emailAddress, projectId;
 			bool userAlreadyExists = UserAlreadyExists(emailAddress).Result;
 
 			if (!userAlreadyExists)
@@ -67,7 +67,7 @@ namespace BugTracker.Models.ProjectInvitation
 
 		public void RemovePendingProjectInvitation(string emailAddress, int projectId)
 		{
-			if(EmailAddressPendingRegistration(emailAddress))
+			if(EmailAddressPendingRegistration(emailAddress, projectId))
 			{
 				projectRepository.RemovePendingProjectInvitation(emailAddress, projectId);
 			}
@@ -85,9 +85,9 @@ namespace BugTracker.Models.ProjectInvitation
 			return (user != null);
 		}
 
-		private bool EmailAddressPendingRegistration(string emailAddress)
+		private bool EmailAddressPendingRegistration(string emailAddress, int projectId)
 		{
-			return projectRepository.IsEmailAddressPendingRegistration(emailAddress);
+			return projectRepository.IsEmailAddressPendingRegistration(emailAddress, projectId);
 		}
 
 		private async Task<bool> UserHasProjectAuthorization(string emailAddress, int projectId)
