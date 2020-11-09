@@ -37,7 +37,7 @@ namespace BugTracker.Models.ProjectInvitation
 
 		public void AddProjectInvitation(string emailAddress, int projectId)
 		{
-			bool emailAddressIsPendingRegistration = EmailAddressPendingRegistration(emailAddress, projectId;
+			bool emailAddressIsPendingRegistration = EmailAddressPendingRegistration(emailAddress, projectId);
 			bool userAlreadyExists = UserAlreadyExists(emailAddress).Result;
 
 			if (!userAlreadyExists)
