@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.ProjectInvitation
 {
-	interface IProjectInvitation
+	public interface IProjectInvitation
 	{
 		void AddProjectInvitation(string emailAddress, int projectId);
 		void RemovePendingProjectInvitation(string emailAddress, int projectId);
