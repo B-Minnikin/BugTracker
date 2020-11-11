@@ -78,6 +78,20 @@ namespace BugTracker.Models.ProjectInvitation
 			}
 		}
 
+		public async void AddUserToProjectMemberRoleForAllPendingInvitations(string emailAddress)
+		{
+			var user = await userManager.FindByEmailAsync(emailAddress);
+
+			if(user != null)
+			{
+				List<int> projectIds = projectRepository.GetProjectInvitationsForEmailAddress(emailAddress).ToList();
+				foreach (int projectId in projectIds)
+				{
+					await userManager.AddToRoleAsync(user, "Member", projectId);
+				}
+			}
+		}
+
 		private async Task<bool> UserAlreadyExists(string emailAddress)
 		{
 			var user = await userManager.FindByEmailAsync(emailAddress);

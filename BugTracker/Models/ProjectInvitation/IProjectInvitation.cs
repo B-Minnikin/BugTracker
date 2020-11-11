@@ -9,5 +9,7 @@ namespace BugTracker.Models.ProjectInvitation
 	{
 		void AddProjectInvitation(string emailAddress, int projectId);
 		void RemovePendingProjectInvitation(string emailAddress, int projectId);
+
+		void AddUserToProjectMemberRoleForAllPendingInvitations(string emailAddress);
 	}
 }

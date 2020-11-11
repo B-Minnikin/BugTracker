@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.Models.ProjectInvitation;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,18 +19,21 @@ namespace BugTracker.Controllers
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly SignInManager<IdentityUser> signInManager;
 		private readonly IConfiguration configuration;
+		private readonly IProjectInvitation projectInvitation;
 		private readonly IEmailHelper emailHelper;
 
 		public AccountController(ILogger<AccountController> logger,
 										UserManager<IdentityUser> userManager,
 										SignInManager<IdentityUser> signInManager,
 										IConfiguration configuration,
+										IProjectInvitation projectInvitation,
 										IEmailHelper emailHelper)
 		{
 			this.logger = logger;
 			this.userManager = userManager;
 			this.signInManager = signInManager;
 			this.configuration = configuration;
+			this.projectInvitation = projectInvitation;
 			this.emailHelper = emailHelper;
 		}
 
@@ -94,6 +98,10 @@ namespace BugTracker.Controllers
 					logger.LogInformation($"New user registered. ID: {createdUser.Id}, Name: {createdUser.UserName}");
 
 					GenerateConfirmationEmail(createdUser);
+
+					// ---- fulfil stored project invitations if they exist
+					projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);
+					projectInvitation.RemovePendingProjectInvitation(createdUser.Email);
 
 					return View("RegistrationComplete");
 				}
