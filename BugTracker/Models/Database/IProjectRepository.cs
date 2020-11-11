@@ -50,5 +50,6 @@ namespace BugTracker.Models
 		void CreatePendingProjectInvitation(string emailAddress, int projectId);
 		void RemovePendingProjectInvitation(string emailAddress, int projectId);
 		bool IsEmailAddressPendingRegistration(string emailAddress, int projectId);
+		IEnumerable<int> GetProjectInvitationsForEmailAddress(string emailAddress);
 	}
 }

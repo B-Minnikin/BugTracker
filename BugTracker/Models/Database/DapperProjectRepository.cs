@@ -344,5 +344,15 @@ namespace BugTracker.Models
 				return pendingRegistration;
 			}
 		}
+
+		public IEnumerable<int> GetProjectInvitationsForEmailAddress(string emailAddress)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var projectIds = connection.Query<int>("dbo.ProjectInvitations_GetInvitationsForEmailAddress", new { EmailAddress = emailAddress },
+					commandType: CommandType.StoredProcedure);
+				return projectIds;
+			}
+		}
 	}
 }
