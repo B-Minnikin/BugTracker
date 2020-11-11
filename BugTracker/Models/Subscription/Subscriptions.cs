@@ -42,7 +42,7 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public async void NotifyBugReportStateChanged(BugState bugState, string bugReportUrl)
+		public async Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl)
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
@@ -60,7 +60,7 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public async void NotifyBugReportNewComment(BugReportComment bugReportComment, string bugReportUrl)
+		public async Task NotifyBugReportNewComment(BugReportComment bugReportComment, string bugReportUrl)
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
 

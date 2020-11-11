@@ -104,7 +104,7 @@ namespace BugTracker.Controllers
 			return View(model);
 		}
 
-		private async void GenerateConfirmationEmail(IdentityUser user)
+		private async Task GenerateConfirmationEmail(IdentityUser user)
 		{
 			var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
@@ -237,7 +237,7 @@ namespace BugTracker.Controllers
 			return View("ResetPasswordConfirmation");
 		}
 
-		private async void GenerateForgotPasswordEmail(IdentityUser user)
+		private async Task GenerateForgotPasswordEmail(IdentityUser user)
 		{
 			var token = await userManager.GeneratePasswordResetTokenAsync(user);
 			var passwordResetLink = Url.Action("ResetPassword", "Account", new { email = user.Email, token }, Request.Scheme);

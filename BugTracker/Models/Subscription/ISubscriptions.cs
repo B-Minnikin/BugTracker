@@ -11,7 +11,7 @@ namespace BugTracker.Models.Database
 		void CreateSubscriptionIfNotSubscribed(int userId, int bugReportId);
 		void DeleteSubscription(int userId, int bugReportId);
 
-		void NotifyBugReportStateChanged(BugState bugState, string bugReportUrl);
-		void NotifyBugReportNewComment(BugReportComment bugReportComment, string bugReportUrl);
+		Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl);
+		Task NotifyBugReportNewComment(BugReportComment bugReportComment, string bugReportUrl);
 	}
 }
