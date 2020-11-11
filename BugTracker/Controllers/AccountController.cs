@@ -2,9 +2,11 @@
 using BugTracker.Models.ProjectInvitation;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,7 @@ namespace BugTracker.Controllers
 		private readonly SignInManager<IdentityUser> signInManager;
 		private readonly IConfiguration configuration;
 		private readonly IProjectInvitation projectInvitation;
+		private readonly IWebHostEnvironment webHostEnvironment;
 		private readonly IEmailHelper emailHelper;
 
 		public AccountController(ILogger<AccountController> logger,
@@ -27,6 +30,7 @@ namespace BugTracker.Controllers
 										SignInManager<IdentityUser> signInManager,
 										IConfiguration configuration,
 										IProjectInvitation projectInvitation,
+										IWebHostEnvironment webHostEnvironment,
 										IEmailHelper emailHelper)
 		{
 			this.logger = logger;
@@ -34,6 +38,7 @@ namespace BugTracker.Controllers
 			this.signInManager = signInManager;
 			this.configuration = configuration;
 			this.projectInvitation = projectInvitation;
+			this.webHostEnvironment = webHostEnvironment;
 			this.emailHelper = emailHelper;
 		}
 
@@ -115,6 +120,11 @@ namespace BugTracker.Controllers
 		{
 			var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+
+			if (webHostEnvironment.IsDevelopment())
+			{
+				logger.LogInformation($"Email confirmation link >>{confirmationLink}");
+			}
 
 			string subject = "Verify your email address";
 			string messageBody = "To activate your account, please click on the following link:\n\n" + confirmationLink;
