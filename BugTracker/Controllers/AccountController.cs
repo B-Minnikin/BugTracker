@@ -101,7 +101,6 @@ namespace BugTracker.Controllers
 
 					// ---- fulfil stored project invitations if they exist
 					projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);
-					projectInvitation.RemovePendingProjectInvitation(createdUser.Email);
 
 					return View("RegistrationComplete");
 				}

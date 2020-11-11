@@ -88,6 +88,7 @@ namespace BugTracker.Models.ProjectInvitation
 				foreach (int projectId in projectIds)
 				{
 					await userManager.AddToRoleAsync(user, "Member", projectId);
+					RemovePendingProjectInvitation(emailAddress, projectId);
 				}
 			}
 		}
