@@ -44,9 +44,6 @@ namespace BugTracker.Models.ProjectInvitation
 			{
 				if(!emailAddressIsPendingRegistration)
 				{
-					// when user registers, check the list for matches + then add to project
-
-					// add to project invitation repository
 					projectRepository.CreatePendingProjectInvitation(emailAddress, projectId);
 					SendProjectInvitationEmail(emailAddress);
 				}
