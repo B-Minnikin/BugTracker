@@ -18,14 +18,14 @@ namespace BugTracker.Models.ProjectInvitation
 		private readonly IAuthorizationService authorizationService;
 		private readonly IEmailHelper emailHelper;
 		private readonly IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory;
-		private readonly ILogger logger;
+		private readonly ILogger<ProjectInvitation> logger;
 		private readonly ApplicationUserManager userManager;
 
 		public ProjectInvitation(IProjectRepository projectRepository,
 			IAuthorizationService authorizationService,
 			IEmailHelper emailHelper,
 			IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory,
-			ILogger logger)
+			ILogger<ProjectInvitation> logger)
 		{
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
