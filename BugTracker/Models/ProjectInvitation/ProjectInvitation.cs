@@ -50,10 +50,8 @@ namespace BugTracker.Models.ProjectInvitation
 			}
 			else // email already registered
 			{
-				// check that user not already in the specified role
 				if(!UserHasProjectAuthorization(emailAddress, projectId).Result)
 				{
-					// if not then add to it and send notification email
 					AddUserToProjectMemberRole(emailAddress, projectId);
 					SendProjectRoleNotificationEmail(emailAddress);
 				}
@@ -123,28 +121,22 @@ namespace BugTracker.Models.ProjectInvitation
 		{
 			var user = await userManager.FindByEmailAsync(emailAddress);
 
-			// check user not already in role
-
 			await userManager.AddToRoleAsync(user, "Member", projectId);
 		}
 
 		private void SendProjectInvitationEmail(string emailAddress)
 		{
-			// compose invitation email
 			string emailSubject = $"Invitation to project PLACEHOLDER";
 			string emailMessage = $"Invitation to project PLACEHOLDER: Message body";
 
-			// send invitation email
 			emailHelper.Send(emailAddress, emailAddress, emailSubject, emailMessage);
 		}
 
 		private void SendProjectRoleNotificationEmail(string emailAddress)
 		{
-			// compose notification email
 			string emailSubject = $"Added to project notification PLACEHOLDER";
 			string emailMessage = $"Added to project notification PLACEHOLDER: Message body";
 
-			// send notification email
 			emailHelper.Send(emailAddress, emailAddress, emailSubject, emailMessage);
 		}
 	}
