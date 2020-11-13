@@ -90,13 +90,6 @@ namespace BugTracker.Models.ProjectInvitation
 			}
 		}
 
-		private async Task<bool> UserAlreadyExists(string emailAddress)
-		{
-			var user = await userManager.FindByEmailAsync(emailAddress);
-
-			return (user != null);
-		}
-
 		private bool EmailAddressPendingRegistration(string emailAddress, int projectId)
 		{
 			return projectRepository.IsEmailAddressPendingRegistration(emailAddress, projectId);
