@@ -121,16 +121,17 @@ namespace BugTracker.Models.ProjectInvitation
 
 		private void SendProjectInvitationEmail(ProjectInvitation invitation)
 		{
-			string emailSubject = $"Invitation to project PLACEHOLDER";
-			string emailMessage = $"Invitation to project PLACEHOLDER: Message body";
+			string emailSubject = $"Invitation to join project: { invitation.Project.Name }";
+			string emailMessage = $"You have been invited by { invitation.FromUser.UserName } to join the project { invitation.Project.Name } as a member.";
 
 			emailHelper.Send(invitation.EmailAddress, invitation.EmailAddress, emailSubject, emailMessage);
 		}
 
 		private void SendProjectRoleNotificationEmail(ProjectInvitation invitation)
 		{
-			string emailSubject = $"Added to project notification PLACEHOLDER";
-			string emailMessage = $"Added to project notification PLACEHOLDER: Message body";
+			string emailSubject = $"Membership added to project: { invitation.Project.Name }";
+			string emailMessage = $"Dear { invitation.ToUser.UserName},\n" +
+				$"You have been added as a member to the project { invitation.Project.Name } by { invitation.FromUser.UserName }.";
 
 			emailHelper.Send(invitation.EmailAddress, invitation.EmailAddress, emailSubject, emailMessage);
 		}
