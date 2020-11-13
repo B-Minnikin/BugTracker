@@ -38,7 +38,7 @@ namespace BugTracker
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
-			services.AddScoped<IProjectInvitation, ProjectInvitation>();
+			services.AddScoped<IProjectInviter, ProjectInviter>();
 
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();

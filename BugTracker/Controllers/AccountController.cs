@@ -21,7 +21,7 @@ namespace BugTracker.Controllers
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly SignInManager<IdentityUser> signInManager;
 		private readonly IConfiguration configuration;
-		private readonly IProjectInvitation projectInvitation;
+		private readonly IProjectInviter projectInvitation;
 		private readonly IWebHostEnvironment webHostEnvironment;
 		private readonly IEmailHelper emailHelper;
 
@@ -29,7 +29,7 @@ namespace BugTracker.Controllers
 										UserManager<IdentityUser> userManager,
 										SignInManager<IdentityUser> signInManager,
 										IConfiguration configuration,
-										IProjectInvitation projectInvitation,
+										IProjectInviter projectInvitation,
 										IWebHostEnvironment webHostEnvironment,
 										IEmailHelper emailHelper)
 		{

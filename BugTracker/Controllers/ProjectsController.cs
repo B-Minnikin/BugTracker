@@ -22,20 +22,20 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
-		private readonly IProjectInvitation projectInvitation;
+		private readonly IProjectInviter projectInviter;
 		private readonly ApplicationUserManager userManager;
 
 		public ProjectsController(ILogger<HomeController> logger,
 									IProjectRepository projectRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
-									IProjectInvitation projectInvitation)
+									IProjectInviter projectInvitation)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
-			this.projectInvitation = projectInvitation;
+			this.projectInviter = projectInvitation;
 			this.userManager = new ApplicationUserManager();
 		}
 
@@ -225,7 +225,7 @@ namespace BugTracker.Controllers
 		{
 			if(ModelState.IsValid)
 			{
-				projectInvitation.AddProjectInvitation(model.EmailAddress, model.ProjectId);
+				projectInviter.AddProjectInvitation(model.EmailAddress, model.ProjectId);
 				return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
 			}
 

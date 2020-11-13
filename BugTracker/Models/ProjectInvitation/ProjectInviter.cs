@@ -12,20 +12,20 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.ProjectInvitation
 {
-	public class ProjectInvitation : IProjectInvitation
+	public class ProjectInviter : IProjectInviter
 	{
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IEmailHelper emailHelper;
 		private readonly IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory;
-		private readonly ILogger<ProjectInvitation> logger;
+		private readonly ILogger<ProjectInviter> logger;
 		private readonly ApplicationUserManager userManager;
 
-		public ProjectInvitation(IProjectRepository projectRepository,
+		public ProjectInviter(IProjectRepository projectRepository,
 			IAuthorizationService authorizationService,
 			IEmailHelper emailHelper,
 			IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory,
-			ILogger<ProjectInvitation> logger)
+			ILogger<ProjectInviter> logger)
 		{
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
