@@ -35,28 +35,30 @@ namespace BugTracker.Models.ProjectInvitation
 			userManager = new ApplicationUserManager();
 		}
 
-		public void AddProjectInvitation(string emailAddress, int projectId)
+		public async Task AddProjectInvitation(ProjectInvitation invitation)
 		{
-			bool emailAddressIsPendingRegistration = EmailAddressPendingRegistration(emailAddress, projectId);
-			bool userAlreadyExists = UserAlreadyExists(emailAddress).Result;
+			invitation.ToUser = await userManager.FindByEmailAsync(invitation.EmailAddress);
+
+			bool userAlreadyExists = invitation.ToUser != null;
+			bool emailAddressIsPendingRegistration = EmailAddressPendingRegistration(invitation.EmailAddress, invitation.Project.ProjectId);
 
 			if (!userAlreadyExists)
 			{
 				if(!emailAddressIsPendingRegistration)
 				{
-					projectRepository.CreatePendingProjectInvitation(emailAddress, projectId);
-					SendProjectInvitationEmail(emailAddress);
+					projectRepository.CreatePendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
+					SendProjectInvitationEmail(invitation);
 				}
 			}
 			else // email already registered
 			{
-				if(!UserHasProjectAuthorization(emailAddress, projectId).Result)
+				if(!UserHasProjectAuthorization(invitation.EmailAddress, invitation.Project.ProjectId).Result)
 				{
-					AddUserToProjectMemberRole(emailAddress, projectId);
-					SendProjectRoleNotificationEmail(emailAddress);
+					AddUserToProjectMemberRole(invitation.EmailAddress, invitation.Project.ProjectId);
+					SendProjectRoleNotificationEmail(invitation);
 				}
 
-				RemovePendingProjectInvitation(emailAddress, projectId);
+				RemovePendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
 			}
 		}
 
@@ -124,20 +126,20 @@ namespace BugTracker.Models.ProjectInvitation
 			await userManager.AddToRoleAsync(user, "Member", projectId);
 		}
 
-		private void SendProjectInvitationEmail(string emailAddress)
+		private void SendProjectInvitationEmail(ProjectInvitation invitation)
 		{
 			string emailSubject = $"Invitation to project PLACEHOLDER";
 			string emailMessage = $"Invitation to project PLACEHOLDER: Message body";
 
-			emailHelper.Send(emailAddress, emailAddress, emailSubject, emailMessage);
+			emailHelper.Send(invitation.EmailAddress, invitation.EmailAddress, emailSubject, emailMessage);
 		}
 
-		private void SendProjectRoleNotificationEmail(string emailAddress)
+		private void SendProjectRoleNotificationEmail(ProjectInvitation invitation)
 		{
 			string emailSubject = $"Added to project notification PLACEHOLDER";
 			string emailMessage = $"Added to project notification PLACEHOLDER: Message body";
 
-			emailHelper.Send(emailAddress, emailAddress, emailSubject, emailMessage);
+			emailHelper.Send(invitation.EmailAddress, invitation.EmailAddress, emailSubject, emailMessage);
 		}
 	}
 }

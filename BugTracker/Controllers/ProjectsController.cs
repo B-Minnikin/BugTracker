@@ -221,11 +221,19 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Invites(InvitesViewModel model)
+		public async Task<IActionResult> Invites(InvitesViewModel model)
 		{
 			if(ModelState.IsValid)
 			{
-				projectInviter.AddProjectInvitation(model.EmailAddress, model.ProjectId);
+				ProjectInvitation invitation = new ProjectInvitation
+				{
+					EmailAddress = model.EmailAddress,
+					Project = projectRepository.GetProjectById(model.ProjectId),
+					ToUser = null,
+					FromUser = await userManager.GetUserAsync(HttpContext.User)
+				};
+
+				await projectInviter.AddProjectInvitation(invitation);
 				return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
 			}
 
