@@ -33,8 +33,8 @@ namespace BugTracker.Models.Authorization
 				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", user.Id));
 			}
 
-			var userRoles = await userRoleStore.GetRolesAsync(user, CancellationToken);
-			if (userRoles.Contains(roleName))
+			bool isAlreadyInRole = await userRoleStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
+			if (isAlreadyInRole)
 			{
 				IdentityError error = new IdentityError();
 				error.Description = "User already in role";

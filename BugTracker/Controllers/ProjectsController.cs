@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Authorization;
+using BugTracker.Models.ProjectInvitation;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,17 +22,20 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly IProjectInviter projectInviter;
 		private readonly ApplicationUserManager userManager;
 
 		public ProjectsController(ILogger<HomeController> logger,
 									IProjectRepository projectRepository,
 									IAuthorizationService authorizationService,
-									IHttpContextAccessor httpContextAccessor)
+									IHttpContextAccessor httpContextAccessor,
+									IProjectInviter projectInvitation)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
+			this.projectInviter = projectInvitation;
 			this.userManager = new ApplicationUserManager();
 		}
 
@@ -188,6 +192,62 @@ namespace BugTracker.Controllers
 			}
 
 			return View();
+		}
+
+		[HttpGet]
+		public IActionResult Invites(int id)
+		{
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				var project = projectRepository.GetProjectById(id);
+				InvitesViewModel invitesViewModel = new InvitesViewModel
+				{
+					ProjectId = id
+				};
+
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+				{
+					RouteValues = new { id },
+					Parent = projectsNode
+				};
+				var invitesProjectNode = new MvcBreadcrumbNode("Invites", "Projects", "Invites")
+				{
+					Parent = overviewNode
+				};
+				ViewData["BreadcrumbNode"] = invitesProjectNode;
+				// --------------------------------------------------------------------------------------------
+
+				return View(invitesViewModel);
+			}
+
+			return RedirectToAction("Overview", id);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Invites(InvitesViewModel model)
+		{
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				if (ModelState.IsValid)
+				{
+					ProjectInvitation invitation = new ProjectInvitation
+					{
+						EmailAddress = model.EmailAddress,
+						Project = projectRepository.GetProjectById(model.ProjectId),
+						ToUser = null,
+						FromUser = await userManager.GetUserAsync(HttpContext.User)
+					};
+
+					await projectInviter.AddProjectInvitation(invitation);
+					return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+				}
+			}
+
+			return View(model);
 		}
 	}
 }

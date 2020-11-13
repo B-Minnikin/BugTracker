@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
+using BugTracker.Models.ProjectInvitation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +38,7 @@ namespace BugTracker
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
+			services.AddScoped<IProjectInviter, ProjectInviter>();
 
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
