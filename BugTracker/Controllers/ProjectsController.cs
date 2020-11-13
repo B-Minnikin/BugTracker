@@ -197,44 +197,54 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult Invites(int id)
 		{
-			var project = projectRepository.GetProjectById(id);
-			InvitesViewModel invitesViewModel = new InvitesViewModel
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				ProjectId = id
-			};
+				var project = projectRepository.GetProjectById(id);
+				InvitesViewModel invitesViewModel = new InvitesViewModel
+				{
+					ProjectId = id
+				};
 
-			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
-			{
-				RouteValues = new { id },
-				Parent = projectsNode
-			};
-			var invitesProjectNode = new MvcBreadcrumbNode("Invites", "Projects", "Invites")
-			{
-				Parent = overviewNode
-			};
-			ViewData["BreadcrumbNode"] = invitesProjectNode;
-			// --------------------------------------------------------------------------------------------
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+				{
+					RouteValues = new { id },
+					Parent = projectsNode
+				};
+				var invitesProjectNode = new MvcBreadcrumbNode("Invites", "Projects", "Invites")
+				{
+					Parent = overviewNode
+				};
+				ViewData["BreadcrumbNode"] = invitesProjectNode;
+				// --------------------------------------------------------------------------------------------
 
-			return View(invitesViewModel);
+				return View(invitesViewModel);
+			}
+
+			return RedirectToAction("Overview", id);
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> Invites(InvitesViewModel model)
 		{
-			if(ModelState.IsValid)
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				ProjectInvitation invitation = new ProjectInvitation
+				if (ModelState.IsValid)
 				{
-					EmailAddress = model.EmailAddress,
-					Project = projectRepository.GetProjectById(model.ProjectId),
-					ToUser = null,
-					FromUser = await userManager.GetUserAsync(HttpContext.User)
-				};
+					ProjectInvitation invitation = new ProjectInvitation
+					{
+						EmailAddress = model.EmailAddress,
+						Project = projectRepository.GetProjectById(model.ProjectId),
+						ToUser = null,
+						FromUser = await userManager.GetUserAsync(HttpContext.User)
+					};
 
-				await projectInviter.AddProjectInvitation(invitation);
-				return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+					await projectInviter.AddProjectInvitation(invitation);
+					return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+				}
 			}
 
 			return View(model);
