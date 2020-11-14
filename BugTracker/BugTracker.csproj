@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Database\Stored Procedures\" />
     <Folder Include="Database\Tables\" />
   </ItemGroup>
 
