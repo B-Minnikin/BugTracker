@@ -53,7 +53,7 @@ namespace BugTracker
 				options.AddPolicy("CanAccessProjectPolicy", policy =>
 					policy.Requirements.Add(new	ProjectAccessRequirement()));
 				options.AddPolicy("ProjectAdministratorPolicy", policy =>
-					policy.Requirements.Add(new	ProjectAccessRequirement()));
+					policy.Requirements.Add(new	ProjectAdministratorRequirement()));
 				options.AddPolicy("CanModifyReportPolicy", policy =>
 					policy.Requirements.Add(new ModifyReportRequirement()));
 				options.AddPolicy("CanModifyCommentPolicy", policy =>

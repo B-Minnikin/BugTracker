@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models.Authorization
 {
-	public class ProjectAdministratorAuthorizationHandler : AuthorizationHandler<ProjectAccessRequirement, int>
+	public class ProjectAdministratorAuthorizationHandler : AuthorizationHandler<ProjectAdministratorRequirement, int>
 	{
-		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectAccessRequirement requirement, int projectId)
+		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectAdministratorRequirement requirement, int projectId)
 		{
 			string userName = context.User.Identity.Name;
 			if (userName == null)
@@ -27,4 +27,6 @@ namespace BugTracker.Models.Authorization
 			return Task.CompletedTask;
 		}
 	}
+
+	public class ProjectAdministratorRequirement : IAuthorizationRequirement { }
 }
