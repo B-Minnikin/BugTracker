@@ -168,7 +168,7 @@ namespace BugTracker.Controllers
 
 				return View(projectViewModel);
 			}
-			return View();
+			return RedirectToAction("Overview", new { id });
 		}
 
 		[HttpPost]
