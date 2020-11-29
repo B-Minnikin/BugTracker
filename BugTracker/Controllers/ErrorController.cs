@@ -23,7 +23,7 @@ namespace BugTracker.Controllers
 			switch (statusCode)
 			{
 				case 404:
-					ViewBag.ErrorMessage = "Requested resource could not be found";
+					ViewBag.ErrorMessage = "404: Requested resource could not be found";
 					break;
 			}
 
