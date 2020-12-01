@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,6 +29,18 @@ namespace BugTracker.Controllers
 			}
 
 			return View("NotFound");
+		}
+
+		[Route("Error")]
+		[AllowAnonymous]
+		public IActionResult Error()
+		{
+			var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+
+			logger.LogError($"Exception in path: {exceptionHandlerFeature.Path} - " +
+				$"{exceptionHandlerFeature.Error}");
+
+			return View("Error");
 		}
 	}
 }
