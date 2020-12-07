@@ -10,6 +10,7 @@ namespace BugTracker.Models
 	{
 		[Key]
 		public int BugReportId { get; set; }
+		public int LocalBugReportId { get; set; }
 		public bool Hidden { get; set; }
 		public DateTime CreationTime { get; set; }
 		public int Severity { get; set; }

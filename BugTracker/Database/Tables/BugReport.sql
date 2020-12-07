@@ -10,6 +10,7 @@ GO
 
 CREATE TABLE [dbo].[BugReport](
 	[BugReportId] [int] IDENTITY(1,1) NOT NULL,
+	[LocalBugReportId] [int] NOT NULL,
 	[Hidden] [bit] NOT NULL,
 	[CreationTime] [datetime2](7) NOT NULL,
 	[Severity] [int] NOT NULL,
