@@ -26,8 +26,8 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var nextFreeId = connection.ExecuteScalar("dbo.LocalProjectBugReportIds_GetNextFreeId", new { ProjectId = bugReport.ProjectId });
-				connection.Execute("dbo.LocalProjectBugReportIds_IncrementNextFreeId");
+				var nextFreeId = connection.ExecuteScalar("dbo.LocalProjectBugReportIds_GetNextFreeId @ProjectId", new { ProjectId = bugReport.ProjectId });
+				connection.Execute("dbo.LocalProjectBugReportIds_IncrementNextFreeId @ProjectId", new { ProjectId = bugReport.ProjectId });
 
 				var insertedBugReportId = connection.ExecuteScalar("dbo.BugReports_Insert", new {
 					Title = bugReport.Title, ProgramBehaviour = bugReport.ProgramBehaviour, DetailsToReproduce = bugReport.DetailsToReproduce, 
