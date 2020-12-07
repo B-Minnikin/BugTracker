@@ -26,10 +26,14 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
+				var nextFreeId = connection.ExecuteScalar("dbo.LocalProjectBugReportIds_GetNextFreeId", new { ProjectId = bugReport.ProjectId });
+				connection.Execute("dbo.LocalProjectBugReportIds_IncrementNextFreeId");
+
 				var insertedBugReportId = connection.ExecuteScalar("dbo.BugReports_Insert", new {
 					Title = bugReport.Title, ProgramBehaviour = bugReport.ProgramBehaviour, DetailsToReproduce = bugReport.DetailsToReproduce, 
 					CreationTime = bugReport.CreationTime, Severity = bugReport.Severity, Importance = bugReport.Importance, 
-					PersonReporting = bugReport.PersonReporting, Hidden = bugReport.Hidden, ProjectId = bugReport.ProjectId },
+					PersonReporting = bugReport.PersonReporting, Hidden = bugReport.Hidden, ProjectId = bugReport.ProjectId,
+					LocalBugReportId = nextFreeId },
 					commandType: CommandType.StoredProcedure);
 				BugReport insertedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = insertedBugReportId });
 				return insertedBugReport;

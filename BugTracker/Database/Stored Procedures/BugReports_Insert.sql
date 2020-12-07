@@ -9,7 +9,9 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 -- =============================================
--- Description:	Creates a BugReport entry and returns the result.
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
 -- =============================================
 CREATE PROCEDURE [dbo].[BugReports_Insert]
 	@Title nvarchar(max),
@@ -20,7 +22,8 @@ CREATE PROCEDURE [dbo].[BugReports_Insert]
 	@Importance int,
 	@PersonReporting nvarchar(max),
 	@Hidden bit,
-	@ProjectId int
+	@ProjectId int,
+	@LocalBugReportId int
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -28,9 +31,10 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	INSERT INTO dbo.BugReport (Title, DetailsToReproduce, ProgramBehaviour, CreationTime, Severity, Importance, PersonReporting, Hidden, ProjectId)
+	INSERT INTO dbo.BugReport (Title, DetailsToReproduce, ProgramBehaviour, CreationTime, Severity, Importance, PersonReporting, Hidden, ProjectId, LocalBugReportId)
 	OUTPUT inserted.BugReportId
-	VALUES (@Title, @DetailsToReproduce, @ProgramBehaviour, @CreationTime, @Severity, @Importance, @PersonReporting, @Hidden, @ProjectId)
+	VALUES (@Title, @DetailsToReproduce, @ProgramBehaviour, @CreationTime, @Severity, @Importance, @PersonReporting, @Hidden, @ProjectId, @LocalBugReportId)
 END
 GO
+
 
