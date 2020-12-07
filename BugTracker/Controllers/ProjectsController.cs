@@ -114,6 +114,7 @@ namespace BugTracker.Controllers
 				};
 
 				Project addedProject = projectRepository.CreateProject(newProject);
+				projectRepository.CreateLocalBugReportId(addedProject.ProjectId);
 
 				// Add the user who created the project to its administrator role
 				string userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
