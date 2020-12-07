@@ -15,6 +15,9 @@ namespace BugTracker.Models
 		Project UpdateProject(Project projectChanges);
 		Project DeleteProject(int id);
 
+		// Bug Reports - Local IDs
+		void CreateLocalBugReportId(int bugReportId);
+
 		// Bug Reports
 		BugReport AddBugReport(BugReport bugReport);
 		IEnumerable<BugReport> GetAllBugReports(int projectId);
