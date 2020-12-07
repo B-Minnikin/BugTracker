@@ -358,5 +358,14 @@ namespace BugTracker.Models
 				return projectIds;
 			}
 		}
+
+		public void CreateLocalBugReportId(int projectId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.LocalProjectBugReportIds_Insert", new { ProjectId = projectId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
 	}
 }
