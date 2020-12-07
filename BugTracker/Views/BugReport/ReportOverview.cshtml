@@ -6,7 +6,7 @@
 
 @* Delete bug report button *@
 
-<h1>Title: @Model.BugReport.Title</h1>
+<h1><strong>#@Model.BugReport.LocalBugReportId</strong>: @Model.BugReport.Title</h1>
 <p>Reporter: @Model.BugReport.PersonReporting</p>
 <p>Report Time: @Model.BugReport.CreationTime</p>
 <pre>Program Behaviour: @Model.BugReport.ProgramBehaviour</pre>
