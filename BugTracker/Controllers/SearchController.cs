@@ -76,6 +76,17 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
+		[HttpGet]
+		public IActionResult GetProjectMembersTypeahead(string query, int projectId)
+		{
+			List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
+
+			if(!string.IsNullOrEmpty(query) && projectId > 0)
+				userSearchResults = projectRepository.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId).ToList();
+
+			return Json(userSearchResults);
+		}
+
 		private DateTime GetProjectCreationTime(int projectId)
 		{
 			Project currentProject = projectRepository.GetProjectById(projectId);

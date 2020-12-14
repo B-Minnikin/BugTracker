@@ -367,5 +367,10 @@ namespace BugTracker.Models
 					commandType: CommandType.StoredProcedure);
 			}
 		}
+
+		public IEnumerable<UserTypeaheadSearchResult> GetMatchingProjectMembersBySearchQuery(string query, int projectId)
+		{
+			return new List<UserTypeaheadSearchResult>();
+		}
 	}
 }
