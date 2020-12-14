@@ -370,7 +370,12 @@ namespace BugTracker.Models
 
 		public IEnumerable<UserTypeaheadSearchResult> GetMatchingProjectMembersBySearchQuery(string query, int projectId)
 		{
-			return new List<UserTypeaheadSearchResult>();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var searchResults = connection.Query<UserTypeaheadSearchResult>("dbo.Users_MatchByQueryAndProject", new { Query = query, ProjectId = projectId },
+					commandType: CommandType.StoredProcedure);
+				return searchResults;
+			}
 		}
 	}
 }
