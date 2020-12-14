@@ -211,6 +211,36 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Overview", "Projects", new { id = currentProjectId });
 		}
 
+		[HttpGet]
+		public IActionResult AssignMember(int bugReportId)
+		{
+			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
+			var bugReport = projectRepository.GetBugReportById(bugReportId);
+
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = bugReport.PersonReporting }, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				return View(new AssignMemberViewModel() { BugReportId = bugReportId});
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpPost]
+		public IActionResult AssignMember(AssignMemberViewModel model)
+		{
+			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
+			var bugReport = projectRepository.GetBugReportById(model.BugReportId);
+
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = bugReport.PersonReporting }, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				return RedirectToAction("ReportOverview", model.BugReportId);
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
 		public IActionResult ReportOverview(int id)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
