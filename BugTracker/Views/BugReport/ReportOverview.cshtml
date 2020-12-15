@@ -1,7 +1,7 @@
 ﻿@model OverviewBugReportViewModel
 
 @{
-      ViewBag.Title = "Bug Report Overview";
+    ViewBag.Title = "Bug Report Overview";
 }
 
 @* Delete bug report button *@
@@ -26,6 +26,8 @@
 }
 <a asp-controller="BugReport" asp-action="Subscribe" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@subscribeButtonClass>Subscribe</a>
 <a asp-controller="BugReport" asp-action="Delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
+
+<a asp-controller="BugReport" asp-action="AssignMember" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Assign Report</a>
 
 <hr />
 <h3>State History -- <span class="badge badge-success">@Model.CurrentState</span></h3>
