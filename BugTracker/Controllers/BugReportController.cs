@@ -266,6 +266,11 @@ namespace BugTracker.Controllers
 				{
 					bugViewModel.DisableSubscribeButton = true;
 				}
+				var adminAuthorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
+				if (adminAuthorizationResult.IsCompletedSuccessfully && adminAuthorizationResult.Result.Succeeded)
+				{
+					bugViewModel.DisableAssignMembersButton = false;
+				}
 
 				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 

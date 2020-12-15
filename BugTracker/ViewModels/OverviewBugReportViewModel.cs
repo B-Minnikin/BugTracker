@@ -16,5 +16,6 @@ namespace BugTracker.ViewModels
 		public List<AttachmentPath> AttachmentPaths { get; set; }
 
 		public bool DisableSubscribeButton { get; set; }
+		public bool DisableAssignMembersButton { get; set; } = true;
 	}
 }

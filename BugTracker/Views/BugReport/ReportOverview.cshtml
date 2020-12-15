@@ -15,19 +15,19 @@
 <p>Importance: @Model.BugReport.Importance</p>
 <p>Severity: @Model.BugReport.Severity</p>
 
-<a asp-controller="BugReport" asp-action="Edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
-@{
-    string subscribeButtonClass = "btn btn-primary";
-    if (Model.DisableSubscribeButton)
-    {
-        subscribeButtonClass = "btn btn-secondary disabled";
+@* Disable button classes *@
+@{ 
+      string disabledButtonClass = "btn btn-secondary disabled";
+      string enabledButtonClass = "btn btn-primary";
 
-    }
+      string subscribeButtonClass = Model.DisableSubscribeButton ? disabledButtonClass : enabledButtonClass;
+      string assignMembersButtonClass = Model.DisableAssignMembersButton ? disabledButtonClass : enabledButtonClass;
 }
+
+<a asp-controller="BugReport" asp-action="Edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
 <a asp-controller="BugReport" asp-action="Subscribe" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@subscribeButtonClass>Subscribe</a>
 <a asp-controller="BugReport" asp-action="Delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
-
-<a asp-controller="BugReport" asp-action="AssignMember" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Assign Report</a>
+<a asp-controller="BugReport" asp-action="AssignMember" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@assignMembersButtonClass>Assign Report</a>
 
 <hr />
 <h3>State History -- <span class="badge badge-success">@Model.CurrentState</span></h3>
