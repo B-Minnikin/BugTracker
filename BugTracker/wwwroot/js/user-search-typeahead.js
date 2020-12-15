@@ -1,6 +1,9 @@
 
 $(document).ready(function () {
 
+    // REQUIRES an element with id=project-id to hold the current project ID
+    var projectId = document.getElementById("project-id").value;
+
     var userSuggestions = new Bloodhound({
 
         datumTokenizer: Bloodhound.tokenizers.whitespace,

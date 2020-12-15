@@ -10,6 +10,9 @@
 
 <h1>Assign members to bug report</h1>
 
+@* Hidden input to make project ID accessbile inside script *@
+<input id="project-id" type="hidden" asp-for="@Model.ProjectId"/>
+
 <div>
     <input id="Search" type="text" class="typeahead" placeholder="Add User" autocomplete="off" spellcheck="false" />
 </div>
