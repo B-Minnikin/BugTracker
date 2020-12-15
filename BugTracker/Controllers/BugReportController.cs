@@ -220,6 +220,25 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var currentProject = projectRepository.GetProjectById(currentProjectId);
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+				{
+					RouteValues = new { id = currentProjectId },
+					Parent = projectsNode
+				};
+				var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", bugReport.Title)
+				{
+					Parent = overviewNode
+				};
+				var assignMembersNode = new MvcBreadcrumbNode("AssignMember", "BugReport", "Assign Members")
+				{
+					Parent = reportNode
+				};
+				ViewData["BreadcrumbNode"] = assignMembersNode;
+				// --------------------------------------------------------------------------------------------
+
 				return View(new AssignMemberViewModel() { BugReportId = bugReportId});
 			}
 
