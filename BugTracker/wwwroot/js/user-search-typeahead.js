@@ -15,7 +15,7 @@ $(document).ready(function () {
                 return $.map(userSuggestions, function (suggestion) {
                     return {
                         user_email: suggestion.email,
-                        user_name: suggestion.name
+                        user_name: suggestion.userName
                     }
                 })
             },
