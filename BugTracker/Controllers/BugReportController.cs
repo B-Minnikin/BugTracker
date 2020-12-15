@@ -217,7 +217,7 @@ namespace BugTracker.Controllers
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
 			var bugReport = projectRepository.GetBugReportById(bugReportId);
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = bugReport.PersonReporting }, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				return View(new AssignMemberViewModel() { BugReportId = bugReportId});
@@ -232,7 +232,7 @@ namespace BugTracker.Controllers
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
 			var bugReport = projectRepository.GetBugReportById(model.BugReportId);
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = bugReport.PersonReporting }, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				return RedirectToAction("ReportOverview", model.BugReportId);
