@@ -77,7 +77,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetProjectMembersTypeahead(string query, int projectId)
+		public IActionResult GetProjectMembers(string query, int projectId)
 		{
 			List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
 

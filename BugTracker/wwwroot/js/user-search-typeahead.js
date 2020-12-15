@@ -9,7 +9,7 @@ $(document).ready(function () {
         datumTokenizer: Bloodhound.tokenizers.whitespace,
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: 'ActionMethod?query=%QUERY%',
+            url: '/Search/GetProjectMembers?query=%QUERY%&projectId=' + projectId,
             wildcard: "%QUERY%",
             filter: function (userSuggestions) {
                 return $.map(userSuggestions, function (suggestion) {
