@@ -9,6 +9,6 @@ namespace BugTracker.ViewModels
 	{
 		public int ProjectId { get; set; }
 		public int BugReportId { get; set; }
-		public List<string> MemberEmails { get; set; } = new List<string>();
+		public string MemberEmail { get; set; }
 	}
 }

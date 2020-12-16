@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,7 @@ namespace BugTracker.Controllers
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
+		private readonly ApplicationUserManager userManager;
 
 		public BugReportController(ILogger<BugReportController> logger,
 									        IProjectRepository projectRepository,
@@ -35,6 +37,7 @@ namespace BugTracker.Controllers
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
+			this.userManager = new ApplicationUserManager();
 		}
 
 		[HttpGet]
@@ -248,13 +251,14 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public IActionResult AssignMember(AssignMemberViewModel model)
 		{
-			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
-			var bugReport = projectRepository.GetBugReportById(model.BugReportId);
-
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				return RedirectToAction("ReportOverview", model.BugReportId);
+				var user = userManager.FindByEmailAsync(model.MemberEmail);
+
+				// assign user in repository
+
+				return View(model);
 			}
 
 			return RedirectToAction("Index", "Home");

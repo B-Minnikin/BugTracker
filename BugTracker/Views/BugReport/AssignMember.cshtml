@@ -11,17 +11,23 @@
 <h1>Assign members to bug report</h1>
 
 @* Hidden input to make project ID accessbile inside script *@
-<input id="project-id" type="hidden" asp-for="@Model.ProjectId"/>
+<input id="project-id" type="hidden" asp-for="@Model.ProjectId" />
 
-<div>
-    <input id="Search" type="text" class="typeahead" placeholder="Add User" autocomplete="off" spellcheck="false" />
-</div>
+<form asp-controller="BugReport" asp-action="AssignMember" method="post" class="mt-3">
+    <input id="Search" type="text" class="typeahead form-control" asp-for="@Model.MemberEmail" placeholder="Type User's Name" autocomplete="off" spellcheck="false" />
 
-<hr />
+    @* Hidden member variables -- pass back to POST action method *@
+    <input type="hidden" asp-for="@Model.ProjectId" />
+    <input type="hidden" asp-for="@Model.BugReportId" />
 
-<h3><strong>Assigned Members</strong></h3>
+    <button type="submit" class="btn btn-secondary">Assign</button>
+</form>
 
-<h4>WIP - PLACEHOLDER</h4>
+    <hr />
 
-@* Typeahead script *@
-<script src="@Url.Content("~/js/user-search-typeahead.js")"></script>
+    <h3><strong>Assigned Members</strong></h3>
+
+    <h4>WIP - PLACEHOLDER</h4>
+
+    @* Typeahead script *@
+    <script src="@Url.Content("~/js/user-search-typeahead.js")"></script>
