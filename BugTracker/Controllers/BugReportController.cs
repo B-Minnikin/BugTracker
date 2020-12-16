@@ -231,8 +231,9 @@ namespace BugTracker.Controllers
 					RouteValues = new { id = currentProjectId },
 					Parent = projectsNode
 				};
-				var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", bugReport.Title)
+				var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
 				{
+					RouteValues = new {id = bugReportId},
 					Parent = overviewNode
 				};
 				var assignMembersNode = new MvcBreadcrumbNode("AssignMember", "BugReport", "Assign Members")
