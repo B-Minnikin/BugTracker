@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -375,6 +376,44 @@ namespace BugTracker.Models
 				var searchResults = connection.Query<UserTypeaheadSearchResult>("dbo.Users_MatchByQueryAndProject", new { Query = query, ProjectId = projectId },
 					commandType: CommandType.StoredProcedure);
 				return searchResults;
+			}
+		}
+
+		public void AddUserAssignedToBugReport(int userId, int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.UsersAssignedToBugReport_Insert", new { UserId = userId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public void RemoveUserAssignedToBugReport(int userId, int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.UsersAssignedToBugReport_Delete", new { UserId = userId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public IEnumerable<BugReport> GetBugReportsForAssignedUser(int userId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugReports = connection.Query<BugReport>("dbo.UsersAssignedToBugReport_GetReportsForUser", new { UserId = userId },
+					commandType: CommandType.StoredProcedure);
+				return bugReports;
+			}
+		}
+
+		public IEnumerable<IdentityUser> GetAssignedUsersForBugReport(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var users = connection.Query<IdentityUser>("dbo.UsersAssignedToBugReport_GetUsersForReport", new { BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+				return users;
 			}
 		}
 	}
