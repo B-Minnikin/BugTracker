@@ -249,14 +249,14 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult AssignMember(AssignMemberViewModel model)
+		public async Task<IActionResult> AssignMember(AssignMemberViewModel model)
 		{
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var user = userManager.FindByEmailAsync(model.MemberEmail);
+				var user = await userManager.FindByEmailAsync(model.MemberEmail);
 
-				// assign user in repository
+				projectRepository.AddUserAssignedToBugReport(Int32.Parse(user.Id), model.BugReportId);
 
 				return View(model);
 			}
