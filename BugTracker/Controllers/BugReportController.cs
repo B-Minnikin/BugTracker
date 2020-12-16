@@ -264,6 +264,22 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+		[HttpPost]
+		public async Task<IActionResult> RemoveAssignedMember(AssignMemberViewModel model)
+		{
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				var user = await userManager.FindByEmailAsync(model.MemberEmail);
+
+				projectRepository.RemoveUserAssignedToBugReport(Int32.Parse(user.Id), model.BugReportId);
+
+				return View(model);
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
 		public IActionResult ReportOverview(int id)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
