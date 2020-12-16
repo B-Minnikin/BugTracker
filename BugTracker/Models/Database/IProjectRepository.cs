@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Bcpg;
+﻿using Microsoft.AspNetCore.Identity;
+using Org.BouncyCastle.Bcpg;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,12 @@ namespace BugTracker.Models
 		BugReport UpdateBugReport(BugReport reportChanges);
 		BugReport DeleteBugReport(int id);
 		int GetCommentCountById(int bugReportId);
+
+		// Users assigned to bug reports
+		void AddUserAssignedToBugReport(int userId, int bugReportId);
+		void RemoveUserAssignedToBugReport(int userId, int bugReportId);
+		IEnumerable<BugReport> GetBugReportsForAssignedUser(int userId);
+		IEnumerable<IdentityUser> GetAssignedUsersForBugReport(int bugReportId);
 
 		// Bug Report Comments
 		BugReportComment CreateComment(BugReportComment bugReportComment);
