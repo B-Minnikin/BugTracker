@@ -23,11 +23,24 @@
     <button type="submit" class="btn btn-secondary">Assign</button>
 </form>
 
-    <hr />
+<hr />
 
-    <h3><strong>Assigned Members</strong></h3>
+<h3><strong>Assigned Members</strong></h3>
 
-    <h4>WIP - PLACEHOLDER</h4>
+@{
+    foreach (var user in Model.AssignedUsers)
+    {
+        <form asp-controller="BugReport" asp-action="RemoveAssignedMember" method="post" class="form-group row m-3">
+            <p>@user.UserName - @user.Email</p>
+            <input type="hidden" asp-for="@user.Email" />
+            <button type="submit" class="btn btn-danger">Remove</button>
 
-    @* Typeahead script *@
-    <script src="@Url.Content("~/js/user-search-typeahead.js")"></script>
+            @* Hidden member variables -- pass back to POST action method *@
+            <input type="hidden" asp-for="@Model.ProjectId" />
+            <input type="hidden" asp-for="@Model.BugReportId" />
+        </form>
+    }
+}
+
+@* Typeahead script *@
+<script src="@Url.Content("~/js/user-search-typeahead.js")"></script>

@@ -12,6 +12,6 @@ namespace BugTracker.ViewModels
 		public int BugReportId { get; set; }
 		public string MemberEmail { get; set; }
 
-		public List<IdentityUser> AssignedUsers { get; set; }
+		public List<IdentityUser> AssignedUsers { get; set; } = new List<IdentityUser>();
 	}
 }
