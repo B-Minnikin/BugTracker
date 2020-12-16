@@ -242,7 +242,14 @@ namespace BugTracker.Controllers
 				ViewData["BreadcrumbNode"] = assignMembersNode;
 				// --------------------------------------------------------------------------------------------
 
-				return View(new AssignMemberViewModel() { BugReportId = bugReportId, ProjectId = currentProjectId });
+				AssignMemberViewModel viewModel = new AssignMemberViewModel()
+				{
+					BugReportId = bugReportId,
+					ProjectId = currentProjectId,
+					AssignedUsers = projectRepository.GetAssignedUsersForBugReport(bugReportId).ToList()
+				};
+
+				return View(viewModel);
 			}
 
 			return RedirectToAction("Index", "Home");
