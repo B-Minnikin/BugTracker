@@ -266,7 +266,7 @@ namespace BugTracker.Controllers
 
 				projectRepository.AddUserAssignedToBugReport(Int32.Parse(user.Id), model.BugReportId);
 
-				return View(model);
+				return RedirectToAction("AssignMember", new { model.BugReportId });
 			}
 
 			return RedirectToAction("Index", "Home");
