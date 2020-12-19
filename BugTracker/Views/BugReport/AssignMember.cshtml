@@ -32,7 +32,7 @@
     {
         <form asp-controller="BugReport" asp-action="RemoveAssignedMember" method="post" class="form-group row m-3">
             <p>@user.UserName - @user.Email</p>
-            <input type="hidden" asp-for="@user.Email" />
+            <input type="hidden" asp-for="@Model.MemberEmail" value="@user.Email" />
             <button type="submit" class="btn btn-danger">Remove</button>
 
             @* Hidden member variables -- pass back to POST action method *@

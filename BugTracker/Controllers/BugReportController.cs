@@ -273,16 +273,16 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> RemoveAssignedMember(AssignMemberViewModel model)
+		public async Task<IActionResult> RemoveAssignedMember(int projectId, int bugReportId, string memberEmail)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var user = await userManager.FindByEmailAsync(model.MemberEmail);
+				var user = await userManager.FindByEmailAsync(memberEmail);
 
-				projectRepository.RemoveUserAssignedToBugReport(Int32.Parse(user.Id), model.BugReportId);
+				projectRepository.RemoveUserAssignedToBugReport(Int32.Parse(user.Id), bugReportId);
 
-				return View(model);
+				return RedirectToAction("AssignMember", new { bugReportId });
 			}
 
 			return RedirectToAction("Index", "Home");
