@@ -300,12 +300,21 @@ namespace BugTracker.Controllers
 
 				var bugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
 
+				var assignedMembers = projectRepository.GetAssignedUsersForBugReport(id)
+					.Select(x => new string(x.UserName)).ToList();
+				string assignedMembersDisplay = "";
+				if (assignedMembers.Count > 0)
+					assignedMembersDisplay = string.Join(", ", assignedMembers);
+				else
+					assignedMembersDisplay = "Unassigned";
+
 				OverviewBugReportViewModel bugViewModel = new OverviewBugReportViewModel
 				{
 					BugReport = bugReport,
 					BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
 					BugStates = bugStates,
-					CurrentState = bugStates[0].StateType
+					CurrentState = bugStates[0].StateType,
+					AssignedMembersDisplay = assignedMembersDisplay
 				};
 
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);

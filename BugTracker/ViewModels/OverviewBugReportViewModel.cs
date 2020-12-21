@@ -14,6 +14,7 @@ namespace BugTracker.ViewModels
 		public List<BugReportComment> BugReportComments { get; set; }
 		public List<BugState> BugStates { get; set; }
 		public List<AttachmentPath> AttachmentPaths { get; set; }
+		public string AssignedMembersDisplay { get; set; }
 
 		public bool DisableSubscribeButton { get; set; }
 		public bool DisableAssignMembersButton { get; set; } = true;
