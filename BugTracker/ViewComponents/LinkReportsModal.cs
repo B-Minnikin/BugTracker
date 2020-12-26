@@ -9,7 +9,7 @@ namespace BugTracker.ViewComponents
 {
 	public class LinkReportsModal : ViewComponent
 	{
-		public async Task<IViewComponentResult> InvokeAsync(int bugReportId)
+		public IViewComponentResult Invoke(int bugReportId)
 		{
 			LinkReportsViewModel model = new LinkReportsViewModel
 			{
