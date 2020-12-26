@@ -29,6 +29,11 @@
 <a asp-controller="BugReport" asp-action="Subscribe" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@subscribeButtonClass>Subscribe</a>
 <a asp-controller="BugReport" asp-action="Delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
 <a asp-controller="BugReport" asp-action="AssignMember" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@assignMembersButtonClass>Assign Report</a>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#linkReportsModal">
+    Link Reports
+</button>
+
+@await Component.InvokeAsync("LinkReportsModal", new { bugReportId = Model.BugReport.BugReportId })
 
 <hr />
 <h3>State History -- <span class="badge badge-success">@Model.CurrentState</span></h3>

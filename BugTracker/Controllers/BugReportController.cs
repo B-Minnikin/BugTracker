@@ -288,6 +288,12 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+		[HttpPost]
+		public IActionResult LinkReports(LinkReportsViewModel model)
+		{
+			return RedirectToAction("ReportOverview", new { id = model.BugReportId});
+		}
+
 		public IActionResult ReportOverview(int id)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
