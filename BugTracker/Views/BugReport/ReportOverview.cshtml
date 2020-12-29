@@ -4,6 +4,10 @@
     ViewBag.Title = "Bug Report Overview";
 }
 
+@section Styles {
+    <link href="@Url.Content("~/css/typeahead-style.css")" rel="stylesheet" type="text/css" />
+}
+
 @* Delete bug report button *@
 
 <h1><strong>#@Model.BugReport.LocalBugReportId</strong>: @Model.BugReport.Title</h1>
@@ -17,12 +21,12 @@
 <p>Severity: @Model.BugReport.Severity</p>
 
 @* Disable button classes *@
-@{ 
-      string disabledButtonClass = "btn btn-secondary disabled";
-      string enabledButtonClass = "btn btn-primary";
+@{
+    string disabledButtonClass = "btn btn-secondary disabled";
+    string enabledButtonClass = "btn btn-primary";
 
-      string subscribeButtonClass = Model.DisableSubscribeButton ? disabledButtonClass : enabledButtonClass;
-      string assignMembersButtonClass = Model.DisableAssignMembersButton ? disabledButtonClass : enabledButtonClass;
+    string subscribeButtonClass = Model.DisableSubscribeButton ? disabledButtonClass : enabledButtonClass;
+    string assignMembersButtonClass = Model.DisableAssignMembersButton ? disabledButtonClass : enabledButtonClass;
 }
 
 <a asp-controller="BugReport" asp-action="Edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>
@@ -33,7 +37,7 @@
     Link Reports
 </button>
 
-@await Component.InvokeAsync("LinkReportsModal", new { bugReportId = Model.BugReport.BugReportId })
+@await Component.InvokeAsync("LinkReportsModal", new { projectId = Model.BugReport.ProjectId, bugReportId = Model.BugReport.BugReportId })
 
 <hr />
 <h3>State History -- <span class="badge badge-success">@Model.CurrentState</span></h3>

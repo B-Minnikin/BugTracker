@@ -87,6 +87,26 @@ namespace BugTracker.Controllers
 			return Json(userSearchResults);
 		}
 
+		[HttpGet]
+		public IActionResult GetBugReports(string query, int projectId)
+		{
+			List<BugReportTypeaheadSearchResult> bugReportSearchResults = new List<BugReportTypeaheadSearchResult>();
+
+			if (!string.IsNullOrEmpty(query) && projectId > 0)
+			{
+				query = query.TrimStart('#'); // remove leading # for local report ID queries
+				int localBugReportId;
+				bool intParseSuccess = Int32.TryParse(query, out localBugReportId);
+
+				if(intParseSuccess)
+					bugReportSearchResults = projectRepository.GetMatchingBugReportsByLocalIdSearchQuery(localBugReportId, projectId).ToList();
+				else
+					bugReportSearchResults = projectRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId).ToList();
+			}
+
+			return Json(bugReportSearchResults);
+		}
+
 		private DateTime GetProjectCreationTime(int projectId)
 		{
 			Project currentProject = projectRepository.GetProjectById(projectId);
