@@ -445,5 +445,14 @@ namespace BugTracker.Models
 					commandType: CommandType.StoredProcedure);
 			}
 		}
+
+		public void RemoveBugReportLink(int bugReportId, int linkToBugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.BugReports_DeleteLink", new { BugReportId = bugReportId, LinkToBugReportId = linkToBugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
 	}
 }

@@ -48,6 +48,7 @@ namespace BugTracker.Models
 
 		// Bug Report Linking
 		void AddBugReportLink(int bugReportId, int linkToBugReportId);
+		void RemoveBugReportLink(int bugReportId, int linkToBugReportId);
 
 		// Attachment Paths
 		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
