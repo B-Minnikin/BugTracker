@@ -436,5 +436,14 @@ namespace BugTracker.Models
 				return users;
 			}
 		}
+
+		public void AddBugReportLink(int bugReportId, int linkToBugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.BugReports_InsertLink", new { BugReportId = bugReportId, LinkToBugReportId = linkToBugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
 	}
 }

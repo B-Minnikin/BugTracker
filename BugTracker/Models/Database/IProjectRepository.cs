@@ -46,6 +46,9 @@ namespace BugTracker.Models
 		BugState GetLatestState(int bugReportId);
 		BugState CreateBugState(BugState bugState);
 
+		// Bug Report Linking
+		void AddBugReportLink(int bugReportId, int linkToBugReportId);
+
 		// Attachment Paths
 		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
 
