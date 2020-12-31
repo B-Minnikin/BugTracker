@@ -291,7 +291,16 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public IActionResult LinkReports(LinkReportsViewModel model)
 		{
-			return RedirectToAction("ReportOverview", new { id = model.BugReportId});
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				var linkToReport = projectRepository.GetBugReportByLocalId(model.LinkToBugReportLocalId, model.ProjectId);
+				projectRepository.AddBugReportLink(model.BugReportId, linkToReport.BugReportId);
+
+				return RedirectToAction("ReportOverview", new { id = model.BugReportId });
+			}
+
+			return RedirectToAction("Index", "Home");
 		}
 
 		public IActionResult ReportOverview(int id)
