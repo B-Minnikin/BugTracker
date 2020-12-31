@@ -87,6 +87,16 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugReport GetBugReportByLocalId(int localBugReportId, int projectId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetByLocalId", new { LocalBugReportId = localBugReportId, ProjectId = projectId },
+					commandType: CommandType.StoredProcedure);
+				return bugReport;
+			}
+		}
+
 		public IEnumerable<Project> GetAllProjects()
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
