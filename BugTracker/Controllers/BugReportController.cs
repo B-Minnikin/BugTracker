@@ -303,6 +303,21 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+		[HttpPost]
+		public IActionResult DeleteLink(LinkReportsViewModel model)
+		{
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				var linkToReport = projectRepository.GetBugReportByLocalId(model.LinkToBugReportLocalId, model.ProjectId);
+				projectRepository.RemoveBugReportLink(model.BugReportId, linkToReport.BugReportId);
+
+				return RedirectToAction("ReportOverview", new { id = model.BugReportId });
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
 		public IActionResult ReportOverview(int id)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
