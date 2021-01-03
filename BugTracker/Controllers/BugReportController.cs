@@ -289,7 +289,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult ManageLinks(int  bugReportId)
+		public IActionResult ManageLinks(int bugReportId)
 		{
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
 			var bugReport = projectRepository.GetBugReportById(bugReportId);

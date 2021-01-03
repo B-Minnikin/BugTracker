@@ -4,10 +4,6 @@
     ViewBag.Title = "Bug Report Overview";
 }
 
-@section Styles {
-    <link href="@Url.Content("~/css/typeahead-style.css")" rel="stylesheet" type="text/css" />
-}
-
 @* Delete bug report button *@
 
 <h1><strong>#@Model.BugReport.LocalBugReportId</strong>: @Model.BugReport.Title</h1>
@@ -33,11 +29,7 @@
 <a asp-controller="BugReport" asp-action="Subscribe" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@subscribeButtonClass>Subscribe</a>
 <a asp-controller="BugReport" asp-action="Delete" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Delete Bug Report</a>
 <a asp-controller="BugReport" asp-action="AssignMember" asp-route-bugReportId="@Model.BugReport.BugReportId" class=@assignMembersButtonClass>Assign Report</a>
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#linkReportsModal">
-    Link Reports
-</button>
-
-@await Component.InvokeAsync("LinkReportsModal", new { projectId = Model.BugReport.ProjectId, bugReportId = Model.BugReport.BugReportId })
+<a asp-controller="BugReport" asp-action="ManageLinks" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Manage Links</a>
 
 <hr />
 <h3>State History -- <span class="badge badge-success">@Model.CurrentState</span></h3>
