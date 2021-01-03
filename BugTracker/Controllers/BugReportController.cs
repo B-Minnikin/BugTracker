@@ -288,6 +288,46 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+		[HttpGet]
+		public IActionResult ManageLinks(int  bugReportId)
+		{
+			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
+			var bugReport = projectRepository.GetBugReportById(bugReportId);
+
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var currentProject = projectRepository.GetProjectById(currentProjectId);
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+				{
+					RouteValues = new { id = currentProjectId },
+					Parent = projectsNode
+				};
+				var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
+				{
+					RouteValues = new { id = bugReportId },
+					Parent = overviewNode
+				};
+				var manageLinksNode = new MvcBreadcrumbNode("ManageLinks", "BugReport", "Manage Links")
+				{
+					Parent = reportNode
+				};
+				ViewData["BreadcrumbNode"] = manageLinksNode;
+				// --------------------------------------------------------------------------------------------
+
+				ManageLinksViewModel model = new ManageLinksViewModel {
+					ProjectId = currentProjectId,
+					BugReportId = bugReportId
+				};
+
+				return View(model);
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
 		[HttpPost]
 		public IActionResult LinkReports(LinkReportsViewModel model)
 		{
@@ -304,15 +344,15 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult DeleteLink(LinkReportsViewModel model)
+		public IActionResult DeleteLink(int projectId, int bugReportId, int linkToBugReportId)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var linkToReport = projectRepository.GetBugReportByLocalId(model.LinkToBugReportLocalId, model.ProjectId);
-				projectRepository.RemoveBugReportLink(model.BugReportId, linkToReport.BugReportId);
+				var linkToReport = projectRepository.GetBugReportByLocalId(linkToBugReportId, projectId);
+				projectRepository.RemoveBugReportLink(bugReportId, linkToReport.BugReportId);
 
-				return RedirectToAction("ReportOverview", new { id = model.BugReportId });
+				return RedirectToAction("ReportOverview", new { id = bugReportId });
 			}
 
 			return RedirectToAction("Index", "Home");
