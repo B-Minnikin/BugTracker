@@ -350,8 +350,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var linkToReport = projectRepository.GetBugReportByLocalId(linkToBugReportId, projectId);
-				projectRepository.RemoveBugReportLink(bugReportId, linkToReport.BugReportId);
+				projectRepository.RemoveBugReportLink(bugReportId, linkToBugReportId);
 
 				return RedirectToAction("ReportOverview", new { id = bugReportId });
 			}
