@@ -10,7 +10,7 @@ namespace BugTracker.ViewModels
 	{
 		public int ProjectId { get; set; }
 		public int BugReportId { get; set; }
-		public int LinkToBugReportId { get; set; }
+		public int LinkToBugReportLocalId { get; set; }
 
 		public List<BugReport> LinkedReports { get; set; } = new List<BugReport>();
 	}
