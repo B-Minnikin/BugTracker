@@ -464,5 +464,15 @@ namespace BugTracker.Models
 					commandType: CommandType.StoredProcedure);
 			}
 		}
+
+		public IEnumerable<BugReport> GetLinkedReports(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetLinkedReports", new { BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+				return bugReports;
+			}
+		}
 	}
 }

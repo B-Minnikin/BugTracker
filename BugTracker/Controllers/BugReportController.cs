@@ -319,7 +319,8 @@ namespace BugTracker.Controllers
 
 				ManageLinksViewModel model = new ManageLinksViewModel {
 					ProjectId = currentProjectId,
-					BugReportId = bugReportId
+					BugReportId = bugReportId,
+					LinkedReports = projectRepository.GetLinkedReports(bugReportId).ToList()
 				};
 
 				return View(model);
