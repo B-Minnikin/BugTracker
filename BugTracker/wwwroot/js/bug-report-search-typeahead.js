@@ -32,17 +32,21 @@ $(document).ready(function () {
         {
             name: "reports",
             source: reportSuggestions.ttAdapter(),
-            displayKey: 'report_localId',
+            displayKey: 'report_title',
             templates: {
                 suggestion: function (data) {
                     return `
                     <div>
-                        <strong>` + data.report_localId + `</strong>
+                        <strong>#` + data.report_localId + `</strong>
                         <p>` + data.report_title + `</p>
                     </div>
                 `
                 }
             }
         });
+
+    $('#Search').bind('typeahead:select', function (ev, suggestion) {
+        document.getElementById('local-bug-report-id').value = suggestion.report_localId;
+    });
 
 });

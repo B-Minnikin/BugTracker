@@ -12,9 +12,10 @@
 
 <!-- Typeahead search for bug report link selection -->
 <form asp-controller="BugReport" asp-action="LinkReports" method="post" class="mt-3">
-    <input id="Search" type="text" class="typeahead form-control" asp-for="@Model.LinkToBugReportLocalId" placeholder="Type bug report title / ID" autocomplete="off" spellcheck="false" />
+    <input id="Search" type="text" class="typeahead form-control" placeholder="Type bug report title / ID" autocomplete="off" spellcheck="false" />
 
     @* Hidden member variables -- pass back to POST action method *@
+    <input id="local-bug-report-id" type="hidden" asp-for="@Model.LinkToBugReportLocalId"/>
     <input id="project-id" type="hidden" asp-for="@Model.ProjectId" />
     <input type="hidden" asp-for="@Model.BugReportId" />
 
