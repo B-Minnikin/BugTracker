@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
+	public enum Severity
+	{
+		Low,
+		Medium,
+		High,
+		Critical
+	}
+
 	public class BugReport
 	{
 		[Key]
@@ -13,7 +21,7 @@ namespace BugTracker.Models
 		public int LocalBugReportId { get; set; }
 		public bool Hidden { get; set; }
 		public DateTime CreationTime { get; set; }
-		public int Severity { get; set; }
+		public Severity Severity { get; set; } = Severity.Medium;
 		public int Importance { get; set; }
 		public string Title { get; set; }
 		public string ProgramBehaviour { get; set; }
