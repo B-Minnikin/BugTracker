@@ -12,7 +12,7 @@ namespace BugTracker.ViewModels
 		public string Title { get; set; }
 		public string ProgramBehaviour { get; set; }
 		public string DetailsToReproduce {get; set;}
-		public Severity Severity { get; set; }
+		public Severity Severity { get; set; } = Severity.Medium;
 		public int Importance { get; set; }
 		public bool Hidden { get; set; }
 
