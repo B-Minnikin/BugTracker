@@ -14,6 +14,14 @@ namespace BugTracker.Models
 		Critical
 	}
 
+	public enum Importance
+	{
+		Low,
+		Medium,
+		High,
+		Immediate
+	}
+
 	public class BugReport
 	{
 		[Key]
@@ -22,7 +30,7 @@ namespace BugTracker.Models
 		public bool Hidden { get; set; }
 		public DateTime CreationTime { get; set; }
 		public Severity Severity { get; set; } = Severity.Medium;
-		public int Importance { get; set; }
+		public Importance Importance { get; set; } = Importance.Medium;
 		public string Title { get; set; }
 		public string ProgramBehaviour { get; set; }
 		public string DetailsToReproduce { get; set; }

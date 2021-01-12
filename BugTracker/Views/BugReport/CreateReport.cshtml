@@ -42,11 +42,7 @@
     <div class="form-group row">
         <label asp-for="Importance" class="col-sm-2 col-form-label"></label>
         <div class="input-group col-sm-10">
-            <select class="custom-select" id="dropdownImportance" asp-for="Importance">
-                <option selected>1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-            </select>
+            <select asp-for="Importance" asp-items="@Html.GetEnumSelectList<Importance>()"></select>
         </div>
     </div>
 
