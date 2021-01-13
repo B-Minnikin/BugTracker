@@ -487,7 +487,7 @@ namespace BugTracker.Models
 					CreationDate = milestone.CreationTime,
 					DueDate = milestone.DueDate
 				},
-					commandType: CommandType.StoredProcedure); ;
+					commandType: CommandType.StoredProcedure);
 				Milestone insertedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_GetById @MilestoneId", new { MilestoneId = insertedMilestoneId });
 				return insertedMilestone;
 			}
@@ -501,6 +501,24 @@ namespace BugTracker.Models
 					commandType: CommandType.StoredProcedure);
 
 				return deletedMilestone;
+			}
+		}
+
+		public Milestone UpdateMilestone(Milestone milestone)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var projectId = connection.Execute("dbo.Milestones_Update", new
+				{
+					ProjectId = milestone.ProjectId,
+					Title = milestone.Title,
+					Description = milestone.Description,
+					CreationDate = milestone.CreationTime,
+					DueDate = milestone.DueDate
+				}, commandType: CommandType.StoredProcedure);
+
+				Milestone insertedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_GetById @MilestoneId", new { MilestoneId = milestone.MilestoneId });
+				return insertedMilestone;
 			}
 		}
 	}

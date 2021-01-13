@@ -19,6 +19,7 @@ namespace BugTracker.Models
 		// Milestones
 		Milestone AddMilestone(Milestone milestone);
 		Milestone DeleteMilestone(int milestoneId);
+		Milestone UpdateMilestone(Milestone milestone);
 
 		// Bug Reports - Local IDs
 		void CreateLocalBugReportId(int projectId);
