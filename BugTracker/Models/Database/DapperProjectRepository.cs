@@ -517,8 +517,8 @@ namespace BugTracker.Models
 					DueDate = milestone.DueDate
 				}, commandType: CommandType.StoredProcedure);
 
-				Milestone insertedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_GetById @MilestoneId", new { MilestoneId = milestone.MilestoneId });
-				return insertedMilestone;
+				Milestone updatedMilestone = this.GetMilestoneById(milestone.MilestoneId);
+				return updatedMilestone;
 			}
 		}
 
