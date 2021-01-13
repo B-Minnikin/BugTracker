@@ -479,7 +479,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var insertedMilestoneId = connection.ExecuteScalar("dbo.Milestones_Insert", new
+				var insertedMilestoneId = connection.Execute("dbo.Milestones_Insert", new
 				{
 					ProjectId = milestone.ProjectId,
 					Title = milestone.Title,
@@ -488,7 +488,7 @@ namespace BugTracker.Models
 					DueDate = milestone.DueDate
 				},
 					commandType: CommandType.StoredProcedure);
-				Milestone insertedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_GetById @MilestoneId", new { MilestoneId = insertedMilestoneId });
+				Milestone insertedMilestone = this.GetMilestoneById(insertedMilestoneId);
 				return insertedMilestone;
 			}
 		}
