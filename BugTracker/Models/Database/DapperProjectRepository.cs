@@ -492,5 +492,16 @@ namespace BugTracker.Models
 				return insertedMilestone;
 			}
 		}
+
+		public Milestone DeleteMilestone(int milestoneId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var deletedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_DeleteById", new { MilestoneId = milestoneId },
+					commandType: CommandType.StoredProcedure);
+
+				return deletedMilestone;
+			}
+		}
 	}
 }
