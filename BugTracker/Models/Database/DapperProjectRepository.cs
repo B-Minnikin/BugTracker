@@ -531,5 +531,14 @@ namespace BugTracker.Models
 				return milestones;
 			}
 		}
+
+		public Milestone GetMilestoneById(int id)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var milestone = connection.QueryFirst<Milestone>("dbo.Milestones_GetById @MilestoneId", new { MilestoneId = id });
+				return milestone;
+			}
+		}
 	}
 }
