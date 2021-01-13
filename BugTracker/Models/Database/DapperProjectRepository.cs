@@ -521,5 +521,15 @@ namespace BugTracker.Models
 				return insertedMilestone;
 			}
 		}
+
+		public IEnumerable<Milestone> GetAllMilestones(int projectId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var milestones = connection.Query<Milestone>("dbo.Milestones_GetAll", new { ProjectId = projectId },
+					commandType: CommandType.StoredProcedure);
+				return milestones;
+			}
+		}
 	}
 }
