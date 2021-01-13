@@ -474,5 +474,23 @@ namespace BugTracker.Models
 				return bugReports;
 			}
 		}
+
+		public Milestone AddMilestone(Milestone milestone)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var insertedMilestoneId = connection.ExecuteScalar("dbo.Milestones_Insert", new
+				{
+					ProjectId = milestone.ProjectId,
+					Title = milestone.Title,
+					Description = milestone.Description,
+					CreationDate = milestone.CreationTime,
+					DueDate = milestone.DueDate
+				},
+					commandType: CommandType.StoredProcedure); ;
+				Milestone insertedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_GetById @MilestoneId", new { MilestoneId = insertedMilestoneId });
+				return insertedMilestone;
+			}
+		}
 	}
 }
