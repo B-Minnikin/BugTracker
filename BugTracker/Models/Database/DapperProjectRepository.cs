@@ -479,7 +479,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var insertedMilestoneId = connection.Execute("dbo.Milestones_Insert", new
+				int insertedMilestoneId = (Int32)connection.ExecuteScalar("dbo.Milestones_Insert", new
 				{
 					ProjectId = milestone.ProjectId,
 					Title = milestone.Title,
@@ -508,7 +508,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var projectId = connection.Execute("dbo.Milestones_Update", new
+				var projectId = connection.ExecuteScalar("dbo.Milestones_Update", new
 				{
 					ProjectId = milestone.ProjectId,
 					Title = milestone.Title,
