@@ -1,0 +1,34 @@
+﻿@model MilestonesViewModel
+
+@{ 
+      ViewBag.Title = "Milestones";
+}
+
+<h1>Milestones</h1>
+
+<a asp-controller="Milestone" asp-action="New" asp-route-projectId="@Model.ProjectId" class="btn btn-primary">New</a>
+
+<div class="card-deck">
+    @{
+        foreach (var milestone in Model.ProjectMilestones)
+        {
+            <div class="row col-12">
+                <div class="card m-3">
+
+                    <div class="card-header">
+                        <h3>@milestone.Title</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <p>@milestone.Description</p>
+                        <p>@milestone.DueDate</p>
+
+                        <!-- Whole card links to overview -->
+                        <a asp-controller="Milestone" asp-action="Overview" asp-route-id="@milestone.MilestoneId" class="stretched-link"></a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+</div>

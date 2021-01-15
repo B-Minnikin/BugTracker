@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,18 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
+		}
+
+		[HttpGet]
+		public IActionResult Milestones(int projectId)
+		{
+			MilestonesViewModel model = new MilestonesViewModel()
+			{
+				ProjectId = projectId,
+				ProjectMilestones = projectRepository.GetAllMilestones(projectId).ToList()
+			};
+
+			return View(model);
 		}
 
 		[HttpGet]
