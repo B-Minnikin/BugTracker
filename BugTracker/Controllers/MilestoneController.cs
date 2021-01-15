@@ -62,6 +62,25 @@ namespace BugTracker.Controllers
 		{
 			Milestone model = projectRepository.GetMilestoneById(milestoneId);
 
+			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+			var currentProject = projectRepository.GetProjectById(model.ProjectId);
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			{
+				RouteValues = new { id = currentProject.ProjectId },
+				Parent = projectsNode
+			};
+			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+			{
+				Parent = overviewNode
+			};
+			var chosenMilestoneNode = new MvcBreadcrumbNode("Overview", "Milestone", model.Title)
+			{
+				Parent = milestonesNode
+			};
+			ViewData["BreadcrumbNode"] = chosenMilestoneNode;
+			// --------------------------------------------------------------------------------------------
+
 			return View(model);
 		}
 
