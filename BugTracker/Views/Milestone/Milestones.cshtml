@@ -1,12 +1,15 @@
 ﻿@model MilestonesViewModel
 
-@{ 
-      ViewBag.Title = "Milestones";
+@{
+    ViewBag.Title = "Milestones";
 }
 
 <h1>Milestones</h1>
 
-<a asp-controller="Milestone" asp-action="New" asp-route-projectId="@Model.ProjectId" class="btn btn-primary">New</a>
+@if (Model.ShowNewButton)
+{
+    <a asp-controller="Milestone" asp-action="New" asp-route-projectId="@Model.ProjectId" class="btn btn-primary">New</a>
+}
 
 <div class="card-deck">
     @{

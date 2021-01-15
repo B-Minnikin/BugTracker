@@ -9,6 +9,8 @@ namespace BugTracker.ViewModels
 	public class MilestonesViewModel
 	{
 		public int ProjectId { get; set; }
+		public bool ShowNewButton { get; set; } = false;
+
 		public List<Milestone> ProjectMilestones { get; set; }
 	}
 }

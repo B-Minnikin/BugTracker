@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
 {
+	[Authorize]
 	public class MilestoneController : Controller
 	{
 		private readonly ILogger<MilestoneController> logger;
@@ -49,9 +50,13 @@ namespace BugTracker.Controllers
 			ViewData["BreadcrumbNode"] = milestonesNode;
 			// --------------------------------------------------------------------------------------------
 
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
+			bool isAuthorized = authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded;
+
 			MilestonesViewModel model = new MilestonesViewModel()
 			{
 				ProjectId = projectId,
+				ShowNewButton = isAuthorized,
 				ProjectMilestones = projectRepository.GetAllMilestones(projectId).ToList()
 			};
 
