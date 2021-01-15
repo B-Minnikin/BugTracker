@@ -12,6 +12,6 @@ namespace BugTracker.Models
 		public string Title { get; set; }
 		public string Description { get; set; }
 		public DateTime CreationTime { get; set; } = DateTime.Now;
-		public DateTime DueDate { get; set; }
+		public DateTime DueDate { get; set; } = DateTime.Now.AddDays(7);
 	}
 }
