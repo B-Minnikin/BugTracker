@@ -158,7 +158,7 @@ namespace BugTracker.Controllers
 			{
 				projectRepository.DeleteMilestone(milestoneId);
 
-				return RedirectToAction("Overview", "Projects", new { id = currentProjectId});
+				return RedirectToAction("Milestones", "Milestone", new { projectId = currentProjectId});
 			}
 
 			return RedirectToAction("Index", "Home");
