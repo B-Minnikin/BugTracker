@@ -43,6 +43,7 @@ namespace BugTracker.Controllers
 			};
 			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
 			{
+				RouteValues = new { projectId = projectId },
 				Parent = overviewNode
 			};
 			ViewData["BreadcrumbNode"] = milestonesNode;
@@ -75,6 +76,7 @@ namespace BugTracker.Controllers
 				};
 				var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
 				{
+					RouteValues = new { projectId = currentProject.ProjectId },
 					Parent = overviewNode
 				};
 				var chosenMilestoneNode = new MvcBreadcrumbNode("Overview", "Milestone", model.Title)
@@ -93,12 +95,39 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult New(int projectId)
 		{
-			Milestone model = new Milestone()
-			{
-				ProjectId = projectId
-			};
+			var currentProject = projectRepository.GetProjectById(projectId);
 
-			return View(model);
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+				{
+					RouteValues = new { id = currentProject.ProjectId },
+					Parent = projectsNode
+				};
+				var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+				{
+					RouteValues = new { projectId = currentProject.ProjectId },
+					Parent = overviewNode
+				};
+				var newMilestoneNode = new MvcBreadcrumbNode("New", "Milestone", "New")
+				{
+					Parent = milestonesNode
+				};
+				ViewData["BreadcrumbNode"] = newMilestoneNode;
+				// --------------------------------------------------------------------------------------------
+
+				Milestone model = new Milestone()
+				{
+					ProjectId = projectId
+				};
+
+				return View(model);
+			}
+
+			return RedirectToAction("Index", "Home");
 		}
 
 		[HttpPost]
