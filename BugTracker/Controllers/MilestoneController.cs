@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,21 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult Milestones(int projectId)
 		{
+			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+			var currentProject = projectRepository.GetProjectById(projectId);
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+			{
+				RouteValues = new { id = projectId },
+				Parent = projectsNode
+			};
+			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+			{
+				Parent = overviewNode
+			};
+			ViewData["BreadcrumbNode"] = milestonesNode;
+			// --------------------------------------------------------------------------------------------
+
 			MilestonesViewModel model = new MilestonesViewModel()
 			{
 				ProjectId = projectId,
