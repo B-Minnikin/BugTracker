@@ -42,6 +42,14 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
+		public IActionResult Overview(int milestoneId)
+		{
+			Milestone model = projectRepository.GetMilestoneById(milestoneId);
+
+			return View(model);
+		}
+
+		[HttpGet]
 		public IActionResult New(int projectId)
 		{
 			Milestone model = new Milestone()
