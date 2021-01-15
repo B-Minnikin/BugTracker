@@ -138,9 +138,9 @@ namespace BugTracker.Controllers
 			{
 				if (ModelState.IsValid)
 				{
-					projectRepository.AddMilestone(model);
+					var createdMilestone = projectRepository.AddMilestone(model);
 
-					return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+					return RedirectToAction("Overview", "Milestone", new { milestoneId = createdMilestone.MilestoneId });
 				}
 
 				logger.LogWarning($"Invalid Milestone model state");
