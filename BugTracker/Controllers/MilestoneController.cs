@@ -133,15 +133,21 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public IActionResult New(Milestone model)
 		{
-			if (ModelState.IsValid)
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				projectRepository.AddMilestone(model);
+				if (ModelState.IsValid)
+				{
+					projectRepository.AddMilestone(model);
 
-				return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+					return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+				}
+
+				logger.LogWarning($"Invalid Milestone model state");
+				return View(model);
 			}
 
-			logger.LogWarning($"Invalid Milestone model state");
-			return View(model);
+			return RedirectToAction("Index", "Home");
 		}
 
 		public IActionResult Delete(int milestoneId)
