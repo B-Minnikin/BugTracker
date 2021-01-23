@@ -124,7 +124,7 @@ namespace BugTracker.Controllers
 				ViewData["BreadcrumbNode"] = newMilestoneNode;
 				// --------------------------------------------------------------------------------------------
 
-				Milestone model = new Milestone()
+				NewMilestoneViewModel model = new NewMilestoneViewModel()
 				{
 					ProjectId = projectId
 				};
@@ -136,14 +136,23 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult New(Milestone model)
+		public IActionResult New(NewMilestoneViewModel model)
 		{
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				if (ModelState.IsValid)
 				{
-					var createdMilestone = projectRepository.AddMilestone(model);
+					var newMilestone = new Milestone()
+					{
+						ProjectId = model.ProjectId,
+						Title = model.Title,
+						Description = model.Description,
+						CreationTime = model.CreationTime,
+						DueDate = model.DueDate
+					};
+
+					var createdMilestone = projectRepository.AddMilestone(newMilestone);
 
 					return RedirectToAction("Overview", "Milestone", new { milestoneId = createdMilestone.MilestoneId });
 				}
