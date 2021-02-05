@@ -9,44 +9,106 @@
 <div>
     <form asp-controller="Milestone" asp-action="New" method="post" class="m-3">
 
-        <div class="form-group row">
-            <label asp-for="Title" class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <input asp-for="Title" class="form-control" placeholder="Title" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+        <fieldset>
+            <legend>New Milestone</legend>
+
+            <!-- Title -->
+            <div class="form-group">
+                <label asp-for="Title" class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Title" class="form-control" placeholder="Title" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group row">
-            <label asp-for="Description" class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <input asp-for="Description" class="form-control" placeholder="Title" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+            <!-- Description -->
+            <div class="form-group">
+                <label asp-for="Description" class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Description" class="form-control" placeholder="Title" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
             </div>
-        </div>
 
-        <!-- Date picker -->
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Due Date: </label>
-            <input id="datetimepickerRangeBegin" type="date" asp-for="@Model.DueDate" />
-        </div>
-
-        <!-- Hidden input fields -->
-        <input type="hidden" asp-for="@Model.CreationTime" />
-        <input type="hidden" asp-for="@Model.ProjectId"/>
-
-        <!-- Buttons -->
-        <div class="form-group row">
-            <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary">Create</button>
+            <!-- Date picker -->
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Due Date: </label>
+                <input id="datetimepickerRangeBegin" type="date" asp-for="@Model.DueDate" />
             </div>
-        </div>
 
-        <div class="form-group row">
-            <div class="col-sm-10">
-                <a class="btn btn-primary" href='javascript:history.go(-1)'>Cancel</a>
+            <!-- Hidden input fields -->
+            <input type="hidden" asp-for="@Model.ProjectId" />
+            <input type="hidden" asp-for="@Model.CreationTime" />
+
+            <hr />
+
+            <h2>Bug Reports</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <td>Local ID</td>
+                        <td>Title</td>
+                    </tr>
+                </thead>
+
+                <tbody id="tbEntries">
+
+                </tbody>
+            </table>
+
+            <div>
+                <input id="btnAddBugReportEntry" type="button" onclick="addRow();" value="Add Bug Report" class="btn btn-primary" />
             </div>
-        </div>
 
+            <hr />
+
+            <!-- Buttons -->
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <a class="btn btn-primary" href='javascript:history.go(-1)'>Cancel</a>
+                </div>
+            </div>
+
+        </fieldset>
     </form>
 </div>
+
+<script language="javascript" type="text/javascript">
+
+    function addRow() {
+        @{ 
+              Model.MilestoneBugReportEntries.Add(new MilestoneBugReportEntry());
+        }
+
+        var index = $("#tbEntries").children("tr").length;
+
+        var indexCell = `<td style='display:none'><input name='MilestoneBugReportEntries.Index'
+            type='hidden' value='${index}' /></td>`;
+        var localIdCell = `<td><input id='MilestoneBugReportEntries_${index}_LocalId'
+            name='MilestoneBugReportEntries[${index}].LocalId' type='text' value='' /></td>`;
+        var titleCell = `<td><input id='MilestoneBugReportEntries_${index}_Title'
+            name='MilestoneBugReportEntries[${index}].Title' type='text' value='' /></td>`;
+
+        var removeCell = `<td><input id='btnRemoveEntry' type='button'
+            value='Remove' onclick=removeRow(${index});' /></td>`;
+
+        var newRow = `<tr id='trEntry${index}'>
+            ${indexCell}${localIdCell}${titleCell}${removeCell}</tr>`;
+        $("#tbEntries").append(newRow);
+    }
+
+    function removeRow(id) {
+        var controlToBeRemoved = `#trEntry${id}`
+        $(controlToBeRemoved).remove();
+    }
+
+    addRow(); // Add a default single row
+
+</script>

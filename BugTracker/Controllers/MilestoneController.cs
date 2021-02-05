@@ -154,6 +154,15 @@ namespace BugTracker.Controllers
 
 					var createdMilestone = projectRepository.AddMilestone(newMilestone);
 
+					// handle bug report ids
+					foreach(var reportEntry in model.MilestoneBugReportEntries)
+					{
+						BugReport report = projectRepository.GetBugReportByLocalId(reportEntry.LocalId, newMilestone.ProjectId);
+						
+						// add report to milestone
+						projectRepository.AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
+					}
+
 					return RedirectToAction("Overview", "Milestone", new { milestoneId = createdMilestone.MilestoneId });
 				}
 

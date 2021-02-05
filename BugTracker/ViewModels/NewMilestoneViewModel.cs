@@ -14,6 +14,6 @@ namespace BugTracker.ViewModels
 		public DateTime CreationTime { get; set; } = DateTime.Now;
 		public DateTime DueDate { get; set; } = DateTime.Now.AddDays(7);
 
-		public List<int> MilestoneBugReportLocalIds { get; set; } = new List<int>();
+		public List<MilestoneBugReportEntry> MilestoneBugReportEntries { get; set; } = new List<MilestoneBugReportEntry>();
 	}
 }
