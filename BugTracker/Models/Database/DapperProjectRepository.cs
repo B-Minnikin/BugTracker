@@ -549,5 +549,14 @@ namespace BugTracker.Models
 					commandType: CommandType.StoredProcedure);
 			}
 		}
+
+		public void RemoveMilestoneBugReport(int milestoneId, int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.MilestoneBugReports_Delete", new { MilestoneId = milestoneId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
 	}
 }
