@@ -22,6 +22,7 @@ namespace BugTracker.Models
 		Milestone UpdateMilestone(Milestone milestone);
 		IEnumerable<Milestone> GetAllMilestones(int projectId);
 		Milestone GetMilestoneById(int id);
+		void AddMilestoneBugReport(int milestoneId, int bugReportId);
 
 		// Bug Reports - Local IDs
 		void CreateLocalBugReportId(int projectId);

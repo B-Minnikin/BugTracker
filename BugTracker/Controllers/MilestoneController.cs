@@ -159,7 +159,6 @@ namespace BugTracker.Controllers
 					{
 						BugReport report = projectRepository.GetBugReportByLocalId(reportEntry.LocalId, newMilestone.ProjectId);
 						
-						// add report to milestone
 						projectRepository.AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
 					}
 

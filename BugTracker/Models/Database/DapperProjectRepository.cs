@@ -540,5 +540,14 @@ namespace BugTracker.Models
 				return milestone;
 			}
 		}
+
+		public void AddMilestoneBugReport(int milestoneId, int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.MilestoneBugReports_Insert", new { MilestoneId = milestoneId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
 	}
 }
