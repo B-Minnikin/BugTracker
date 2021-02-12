@@ -1,7 +1,11 @@
 ﻿@model NewMilestoneViewModel
 
-@{ 
-      ViewBag.Title = "New Milestone";
+@{
+    ViewBag.Title = "New Milestone";
+}
+
+@section Styles {
+    <link href="@Url.Content("~/css/typeahead-style.css")" rel="stylesheet" type="text/css" />
 }
 
 <h1>New Milestone</h1>
@@ -37,13 +41,21 @@
             </div>
 
             <!-- Hidden input fields -->
-            <input type="hidden" asp-for="@Model.ProjectId" />
+            <input id="project-id" type="hidden" asp-for="@Model.ProjectId" />
+            <input id="local-bug-report-id" type="hidden" asp-for="@Model.LocalBugReportId"/>
             <input type="hidden" asp-for="@Model.CreationTime" />
 
             <hr />
 
             <h2>Bug Reports</h2>
 
+            <!-- Typeahead input field for adding bug reports -->
+            <div class="row m-3">
+                <input id="Search" type="text" class="typeahead form-control" placeholder="Type bug report title / ID" autocomplete="off" spellcheck="false" />
+                <input id="btnAddBugReportEntry" type="button" onclick="addRow();" value="Add Bug Report" class="btn btn-primary" />
+            </div>
+
+            <!-- Display bug reports -->
             <table>
                 <thead>
                     <tr>
@@ -53,26 +65,23 @@
                 </thead>
 
                 <tbody id="tbEntries">
-
                 </tbody>
             </table>
 
-            <div>
-                <input id="btnAddBugReportEntry" type="button" onclick="addRow();" value="Add Bug Report" class="btn btn-primary" />
-            </div>
-
             <hr />
 
-            <!-- Buttons -->
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <button type="submit" class="btn btn-primary">Create</button>
+            <!-- Submitting form & Cancel -->
+            <div class="row mr-3">
+                <div class="form-group row mr-1">
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <a class="btn btn-primary" href='javascript:history.go(-1)'>Cancel</a>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <a class="btn btn-primary" href='javascript:history.go(-1)'>Cancel</a>
+                    </div>
                 </div>
             </div>
 
@@ -83,32 +92,40 @@
 <script language="javascript" type="text/javascript">
 
     function addRow() {
-        @{ 
+        @{
               Model.MilestoneBugReportEntries.Add(new MilestoneBugReportEntry());
         }
 
         var index = $("#tbEntries").children("tr").length;
+        var localBugReportId = $("#local-bug-report-id").val();
+        var bugReportTitle = $("#Search").val();
 
         var indexCell = `<td style='display:none'><input name='MilestoneBugReportEntries.Index'
             type='hidden' value='${index}' /></td>`;
-        var localIdCell = `<td><input id='MilestoneBugReportEntries_${index}_LocalId'
-            name='MilestoneBugReportEntries[${index}].LocalId' type='text' value='' /></td>`;
-        var titleCell = `<td><input id='MilestoneBugReportEntries_${index}_Title'
-            name='MilestoneBugReportEntries[${index}].Title' type='text' value='' /></td>`;
 
-        var removeCell = `<td><input id='btnRemoveEntry' type='button'
-            value='Remove' onclick=removeRow(${index});' /></td>`;
+        var removeCell = `<input id='btnRemoveEntry' type='button'
+            class="btn btn-danger m-1" value='Remove' onclick='removeRow(${index});' />`;
+
+        var text = `<p class='m-1'><strong>${localBugReportId}</strong> - ${bugReportTitle}</p>`
+        var bugReportCard = `<td><div class="card"><div class="card-body">
+            <div class='row'>${text}${removeCell}</div>
+        </div></div>`
+
+        var localIdCell = `<td><input id='MilestoneBugReportEntries_${index}_LocalId'
+            name='MilestoneBugReportEntries[${index}].LocalId' type='hidden' value='${localBugReportId}' /></td>`;
+        var titleCell = `<td><input id='MilestoneBugReportEntries_${index}_Title'
+            name='MilestoneBugReportEntries[${index}].Title' type='hidden' value='${bugReportTitle}' /></td>`;
 
         var newRow = `<tr id='trEntry${index}'>
-            ${indexCell}${localIdCell}${titleCell}${removeCell}</tr>`;
+            ${indexCell}${localIdCell}${titleCell}${bugReportCard}</tr>`;
         $("#tbEntries").append(newRow);
     }
 
     function removeRow(id) {
-        var controlToBeRemoved = `#trEntry${id}`
+        var controlToBeRemoved = `#trEntry${id}`;
         $(controlToBeRemoved).remove();
     }
-
-    addRow(); // Add a default single row
-
 </script>
+
+@* Typeahead script *@
+<script src="@Url.Content("~/js/bug-report-search-typeahead.js")"></script>

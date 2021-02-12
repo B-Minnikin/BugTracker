@@ -10,6 +10,7 @@ namespace BugTracker.ViewModels
 	public class NewMilestoneViewModel
 	{
 		public int ProjectId { get; set; }
+		public int LocalBugReportId { get; set; }
 		[Required(ErrorMessage = "Please enter a title")]
 		public string Title { get; set; }
 		public string Description { get; set; }
