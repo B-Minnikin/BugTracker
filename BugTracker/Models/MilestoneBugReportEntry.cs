@@ -7,7 +7,7 @@ namespace BugTracker.Models
 {
 	public class MilestoneBugReportEntry
 	{
-		public int LocalId { get; set; }
+		public int LocalBugReportId { get; set; }
 		public string Title { get; set; }
 	}
 }

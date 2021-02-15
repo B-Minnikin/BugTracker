@@ -510,6 +510,7 @@ namespace BugTracker.Models
 			{
 				var projectId = connection.ExecuteScalar("dbo.Milestones_Update", new
 				{
+					MilestoneId = milestone.MilestoneId,
 					ProjectId = milestone.ProjectId,
 					Title = milestone.Title,
 					Description = milestone.Description,
@@ -556,6 +557,16 @@ namespace BugTracker.Models
 			{
 				connection.Execute("dbo.MilestoneBugReports_Delete", new { MilestoneId = milestoneId, BugReportId = bugReportId },
 					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public IEnumerable<MilestoneBugReportEntry> GetMilestoneBugReportEntries(int milestoneId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var milestoneBugReportIds = connection.Query<MilestoneBugReportEntry>("dbo.MilestoneBugReports_GetAllReportEntries", new { MilestoneId = milestoneId },
+					commandType: CommandType.StoredProcedure);
+				return milestoneBugReportIds;
 			}
 		}
 	}

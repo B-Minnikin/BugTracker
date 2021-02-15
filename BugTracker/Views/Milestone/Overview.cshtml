@@ -7,3 +7,5 @@
 <h1>Milestone: @Model.Title</h1>
 <h2>Due: @Model.DueDate</h2>
 <h2>@Model.Description</h2>
+
+<a asp-controller="Milestone" asp-action="Edit" asp-route-milestoneId="@Model.MilestoneId">Edit</a>

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BugTracker.Helpers;
 
 namespace BugTracker.Controllers
 {
@@ -157,7 +158,7 @@ namespace BugTracker.Controllers
 					// handle bug report ids
 					foreach(var reportEntry in model.MilestoneBugReportEntries)
 					{
-						BugReport report = projectRepository.GetBugReportByLocalId(reportEntry.LocalId, newMilestone.ProjectId);
+						BugReport report = projectRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
 						
 						projectRepository.AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
 					}
@@ -170,6 +171,89 @@ namespace BugTracker.Controllers
 			}
 
 			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpGet]
+		public IActionResult Edit(int milestoneId)
+		{
+			var currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
+			var currentProject = projectRepository.GetProjectById(currentProjectId);
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
+				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
+				{
+					RouteValues = new { id = currentProject.ProjectId },
+					Parent = projectsNode
+				};
+				var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+				{
+					RouteValues = new { projectId = currentProject.ProjectId },
+					Parent = overviewNode
+				};
+				var editMilestoneNode = new MvcBreadcrumbNode("Edit", "Milestone", "Edit")
+				{
+					Parent = milestonesNode
+				};
+				ViewData["BreadcrumbNode"] = editMilestoneNode;
+				// --------------------------------------------------------------------------------------------
+
+				var viewModel = new EditMilestoneViewModel
+				{
+					Milestone = projectRepository.GetMilestoneById(milestoneId),
+					ProjectId = currentProjectId,
+					MilestoneBugReportEntries = projectRepository.GetMilestoneBugReportEntries(milestoneId).ToList()
+				};
+
+				return View(viewModel);
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpPost]
+		public IActionResult Edit(EditMilestoneViewModel model)
+		{
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				if (ModelState.IsValid)
+				{
+					projectRepository.UpdateMilestone(model.Milestone);
+					UpdateEditedMilestoneBugReports(model.Milestone, model.MilestoneBugReportEntries);
+
+					return RedirectToAction("Overview", "Milestone", new { milestoneId = model.Milestone.MilestoneId });
+				}
+
+				return View(model);
+			}
+
+			return RedirectToAction("Index", "Home");
+		}
+
+		private void UpdateEditedMilestoneBugReports(Milestone milestone, List<MilestoneBugReportEntry> editedBugReports)
+		{
+			List<MilestoneBugReportEntry> existingBugReports = projectRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
+
+			// if bug report only present in entries - add to repo
+			IEnumerable<MilestoneBugReportEntry> toAdd = editedBugReports.Except(existingBugReports, new MilestoneBugReportEntryEqualityComparer());
+
+			// if bug report missing from entries, but exists in repo - delete in repo
+			IEnumerable<MilestoneBugReportEntry> toDelete = existingBugReports.Except(editedBugReports, new MilestoneBugReportEntryEqualityComparer());
+
+			foreach (var entry in toAdd)
+			{
+				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				projectRepository.AddMilestoneBugReport(milestone.MilestoneId, bugReportId);
+			}
+
+			foreach(var entry in toDelete)
+			{
+				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				projectRepository.RemoveMilestoneBugReport(milestone.MilestoneId, bugReportId);
+			}
 		}
 
 		public IActionResult Delete(int milestoneId)
