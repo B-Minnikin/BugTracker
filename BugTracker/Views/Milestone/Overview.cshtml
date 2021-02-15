@@ -1,11 +1,73 @@
-﻿@model Milestone
+﻿@model MilestoneOverviewViewModel
 
-@{ 
-      ViewBag.Title = "Milestone Overview";
+@{
+    ViewBag.Title = "Milestone Overview";
 }
 
-<h1>Milestone: @Model.Title</h1>
-<h2>Due: @Model.DueDate</h2>
-<h2>@Model.Description</h2>
+<h1>Milestone: @Model.Milestone.Title</h1>
+<h2>Due: @Model.Milestone.DueDate</h2>
+<h2>@Model.Milestone.Description</h2>
 
-<a asp-controller="Milestone" asp-action="Edit" asp-route-milestoneId="@Model.MilestoneId">Edit</a>
+<a asp-controller="Milestone" asp-action="Edit" asp-route-milestoneId="@Model.Milestone.MilestoneId" class="btn btn-primary">Edit</a>
+
+<hr />
+
+<h3>Bug Reports</h3>
+
+<!-- Display bug reports -->
+<table>
+    <tbody id="tbEntries">
+    </tbody>
+</table>
+
+<!-- Hidden fields -->
+<input id="local-bug-report-id" type="hidden"/>
+<input id="report-title" type="hidden" />
+
+<script language="javascript" type="text/javascript">
+
+    function addRow() {
+        @{
+              Model.MilestoneBugReportEntries.Add(new MilestoneBugReportEntry());
+        }
+
+        var index = $("#tbEntries").children("tr").length;
+        var localBugReportId = $("#local-bug-report-id").val();
+        var bugReportTitle = $("#report-title").val();
+
+        var indexCell = `<td style='display:none'><input name='MilestoneBugReportEntries.Index'
+            type='hidden' value='${index}' /></td>`;
+
+        var text = `<p class='m-1'><strong>${localBugReportId}</strong> - ${bugReportTitle}</p>`
+        var bugReportCard = `<td><div class="card"><div class="card-body">
+            <div class='row'>${text}</div>
+        </div></div>`
+
+        var localIdCell = `<td><input id='MilestoneBugReportEntries_${index}_LocalBugReportId'
+            name='MilestoneBugReportEntries[${index}].LocalBugReportId' type='hidden' value='${localBugReportId}' /></td>`;
+        var titleCell = `<td><input id='MilestoneBugReportEntries_${index}_Title'
+            name='MilestoneBugReportEntries[${index}].Title' type='hidden' value='${bugReportTitle}' /></td>`;
+
+        var newRow = `<tr id='trEntry${index}'>
+            ${indexCell}${localIdCell}${titleCell}${bugReportCard}</tr>`;
+        $("#tbEntries").append(newRow);
+    }
+
+    function populateRows() {
+
+        var bugReportEntries = @Json.Serialize(Model.MilestoneBugReportEntries);
+
+        for (var i = 0; i < bugReportEntries.length; i++)
+        {
+            var bugReportEntry = bugReportEntries[i];
+            document.getElementById("local-bug-report-id").value = bugReportEntry.localBugReportId;
+            document.getElementById("report-title").value = bugReportEntry.title;
+
+            if (bugReportEntry.localBugReportId > 0) {
+                addRow();
+            }
+        }
+    }
+
+    populateRows();
+</script>

@@ -92,7 +92,13 @@ namespace BugTracker.Controllers
 				ViewData["BreadcrumbNode"] = chosenMilestoneNode;
 				// --------------------------------------------------------------------------------------------
 
-				return View(model);
+				MilestoneOverviewViewModel viewModel = new MilestoneOverviewViewModel
+				{
+					Milestone = model,
+					MilestoneBugReportEntries = projectRepository.GetMilestoneBugReportEntries(milestoneId).ToList()
+				};
+
+				return View(viewModel);
 			}
 
 			return RedirectToAction("Index", "Home");
