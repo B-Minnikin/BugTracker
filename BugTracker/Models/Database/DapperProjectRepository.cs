@@ -569,5 +569,15 @@ namespace BugTracker.Models
 				return milestoneBugReportIds;
 			}
 		}
+
+		public IEnumerable<BugReport> GetMilestoneBugReports(int milestoneId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var milestoneBugReports = connection.Query<BugReport>("dbo.MilestoneBugReports_GetAllReports", new { MilestoneId = milestoneId },
+					commandType: CommandType.StoredProcedure);
+				return milestoneBugReports;
+			}
+		}
 	}
 }
