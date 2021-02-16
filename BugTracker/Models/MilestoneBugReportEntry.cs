@@ -9,5 +9,6 @@ namespace BugTracker.Models
 	{
 		public int LocalBugReportId { get; set; }
 		public string Title { get; set; }
+		public string Url { get; set; }
 	}
 }

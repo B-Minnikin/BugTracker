@@ -95,8 +95,10 @@ namespace BugTracker.Controllers
 				MilestoneOverviewViewModel viewModel = new MilestoneOverviewViewModel
 				{
 					Milestone = model,
-					MilestoneBugReportEntries = projectRepository.GetMilestoneBugReportEntries(milestoneId).ToList()
+					MilestoneBugReportEntries = GenerateBugReportEntries(milestoneId).ToList()
 				};
+
+				var myUrl = Url.Action("ReportOverview", "BugReport", new { id = 23}, Request.Scheme);
 
 				return View(viewModel);
 			}
@@ -274,6 +276,36 @@ namespace BugTracker.Controllers
 			}
 
 			return RedirectToAction("Index", "Home");
+		}
+
+		private IEnumerable<MilestoneBugReportEntry> GenerateBugReportEntries(int milestoneId)
+		{
+			Milestone milestone = projectRepository.GetMilestoneById(milestoneId);
+			IEnumerable<MilestoneBugReportEntry> entries = projectRepository.GetMilestoneBugReportEntries(milestoneId);
+
+			foreach(var entry in entries)
+			{
+				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = bugReportId });
+			}
+
+			return entries;
+		}
+
+		private MilestoneBugReportEntry GenerateBugReportUrl(MilestoneBugReportEntry entry)
+		{
+			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
+			int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, currentProjectId).BugReportId;
+			return GenerateBugReportUrl(entry, bugReportId);
+		}
+
+		private MilestoneBugReportEntry GenerateBugReportUrl(MilestoneBugReportEntry entry, int bugReportId)
+		{
+			if (entry.Url == null)
+			{
+				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = bugReportId });
+			}
+			return entry;
 		}
 	}
 }
