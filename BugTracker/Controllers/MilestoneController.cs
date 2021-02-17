@@ -285,8 +285,8 @@ namespace BugTracker.Controllers
 
 			foreach(var entry in entries)
 			{
-				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
-				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = bugReportId });
+				entry.BugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = entry.BugReportId });
 			}
 
 			return entries;
