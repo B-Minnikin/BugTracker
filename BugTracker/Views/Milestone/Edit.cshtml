@@ -19,7 +19,9 @@
             <!-- Hidden input fields -->
             <input type="hidden" asp-for="Milestone.MilestoneId" />
             <input id="project-id" type="hidden" asp-for="Milestone.ProjectId" />
-            <input id="local-bug-report-id" type="hidden" asp-for="LocalBugReportId"/>
+            <input id="bug-report-id" type="hidden" />
+            <input id="local-bug-report-id" type="hidden" asp-for="LocalBugReportId" />
+            <input id="bug-report-link" type="hidden" />
             <input type="hidden" asp-for="Milestone.CreationTime" />
 
             <!-- Title -->
@@ -91,6 +93,8 @@
         }
 
         var index = $("#tbEntries").children("tr").length;
+        var bugReportLink = $("#bug-report-link").val(); 
+        var bugReportId = $("#bug-report-id").val();
         var localBugReportId = $("#local-bug-report-id").val();
         var bugReportTitle = $("#Search").val();
 
@@ -100,18 +104,20 @@
         var removeCell = `<input id='btnRemoveEntry' type='button'
             class="btn btn-danger m-1" value='Remove' onclick='removeRow(${index});' />`;
 
-        var text = `<p class='m-1'><strong>${localBugReportId}</strong> - ${bugReportTitle}</p>`
+        var text = `<p class='m-1'><strong>${localBugReportId}</strong> - <a href="${bugReportLink}">${bugReportTitle}</a></p>`
         var bugReportCard = `<td><div class="card"><div class="card-body">
             <div class='row'>${text}${removeCell}</div>
         </div></div>`
 
         var localIdCell = `<td><input id='MilestoneBugReportEntries_${index}_LocalBugReportId'
             name='MilestoneBugReportEntries[${index}].LocalBugReportId' type='hidden' value='${localBugReportId}' /></td>`;
+        var idCell = `<td><input id='MilestoneBugReportEntries_${index}_BugReportId'
+            name='MilestoneBugReportEntries[${index}].BugReportId' type='hidden' value='${bugReportId}' /></td>`
         var titleCell = `<td><input id='MilestoneBugReportEntries_${index}_Title'
             name='MilestoneBugReportEntries[${index}].Title' type='hidden' value='${bugReportTitle}' /></td>`;
 
         var newRow = `<tr id='trEntry${index}'>
-            ${indexCell}${localIdCell}${titleCell}${bugReportCard}</tr>`;
+            ${indexCell}${localIdCell}${idCell}${titleCell}${bugReportCard}</tr>`;
         $("#tbEntries").append(newRow);
     }
 
@@ -127,8 +133,12 @@
         for (var i = 0; i < bugReportEntries.length; i++)
         {
             var bugReportEntry = bugReportEntries[i];
+
+            // Set hidden variables
+            document.getElementById("bug-report-id").value = bugReportEntry.bugReportId;
             document.getElementById("local-bug-report-id").value = bugReportEntry.localBugReportId;
             document.getElementById("Search").value = bugReportEntry.title;
+            document.getElementById("bug-report-link").value = bugReportEntry.url;
 
             if (bugReportEntry.localBugReportId > 0) {
                 addRow();

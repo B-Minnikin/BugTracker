@@ -104,6 +104,12 @@ namespace BugTracker.Controllers
 					bugReportSearchResults = projectRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId).ToList();
 			}
 
+			// Generate an URL for each bug report
+			foreach(var result in bugReportSearchResults)
+			{
+				result.Url = Url.Action("ReportOverview", "BugReport", new { id = result.BugReportId }, Request.Scheme);
+			}
+
 			return Json(bugReportSearchResults);
 		}
 

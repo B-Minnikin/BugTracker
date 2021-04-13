@@ -14,7 +14,9 @@ $(document).ready(function () {
             filter: function (reportSuggestions) {
                 return $.map(reportSuggestions, function (suggestion) {
                     return {
+                        report_id: suggestion.bugReportId,
                         report_localId: suggestion.localBugReportId,
+                        report_link: suggestion.url,
                         report_title: suggestion.title
                     }
                 })
@@ -46,6 +48,17 @@ $(document).ready(function () {
         });
 
     $('#Search').bind('typeahead:select', function (ev, suggestion) {
+
+        var bugReportIdInput = document.getElementById('bug-report-id');
+        if (bugReportIdInput !== null) {
+            bugReportIdInput.value = suggestion.report_id;
+        }
+
+        var bugReportLink = document.getElementById('bug-report-link');
+        if (bugReportLink !== null) {
+            bugReportLink.value = suggestion.report_link;
+        }
+
         document.getElementById('local-bug-report-id').value = suggestion.report_localId;
     });
 
