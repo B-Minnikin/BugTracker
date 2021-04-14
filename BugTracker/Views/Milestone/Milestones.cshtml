@@ -23,8 +23,9 @@
                     </div>
 
                     <div class="card-body">
-                        <p>@milestone.Description</p>
-                        <p>@milestone.DueDate</p>
+                        <p>Description: @milestone.Description</p>
+                        <p>Created: @milestone.CreationTime</p>
+                        <p>Due: @milestone.DueDate</p>
 
                         <!-- Whole card links to overview -->
                         <a asp-controller="Milestone" asp-action="Overview" asp-route-milestoneId="@milestone.MilestoneId" class="stretched-link"></a>
