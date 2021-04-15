@@ -1,6 +1,5 @@
 ﻿@model BugReportSearchSelectorViewModel
 
-
 <input id="project-id" type="hidden" asp-for="ProjectId" />
 <input id="can-remove-entry" type="hidden" asp-for="CanRemoveEntry" />
 <input id="show-search-bar" type="hidden" asp-for="ShowSearchBar" />
@@ -33,13 +32,10 @@
         }
 
         var index = $("#tbEntries").children("tr").length;
-        var showSearchBar = $("#show-search-bar").val(); // show ????
-        var canRemoveEntry = $("#can-remove-entry").val();
+        var canRemoveEntry = $("#can-remove-entry").val() === 'True';
         var bugReportLink = $("#bug-report-link").val();
         var bugReportId = $("#bug-report-id").val();
         var localBugReportId = $("#local-bug-report-id").val();
-
-        //console.table([index, showSearchBar, canRemoveEntry, bugReportLink, bugReportId, localBugReportId]);
 
         var bugReportTitle = $("#bug-report-title").val();
 
@@ -48,7 +44,7 @@
 
         var removeCell = '';
         console.log("canRemoveEntry = " + canRemoveEntry);
-        if(canRemoveEntry === true) {
+        if (canRemoveEntry) {
             removeCell = `<input id='btnRemoveEntry' type='button'
             class="btn btn-danger m-1" value='Remove' onclick='removeRow(${index});' />`;
         }
@@ -114,6 +110,6 @@
 </script>
 
 @* Typeahead script *@
-@if(Model.ShowSearchBar) { 
+@if (Model.ShowSearchBar) {
     <script src="@Url.Content("~/js/bug-report-search-typeahead.js")"></script>
 }
