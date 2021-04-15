@@ -43,7 +43,6 @@
             type='hidden' value='${index}' /></td>`;
 
         var removeCell = '';
-        console.log("canRemoveEntry = " + canRemoveEntry);
         if (canRemoveEntry) {
             removeCell = `<input id='btnRemoveEntry' type='button'
             class="btn btn-danger m-1" value='Remove' onclick='removeRow(${index});' />`;
@@ -92,19 +91,6 @@
             }
         }
     }
-
-    /*
-    function updateTitle() {
-        var searchValue = document.getElementById("Search").value;
-        console.log("searchValue = " + searchValue);
-        document.getElementById("bug-report-title").value = searchValue;
-    }
-
-    var showSearchBar = $("#show-search-bar").val();
-    if (showSearchBar) {
-        var searchBar = document.getElementById("Search");
-        searchBar.addEventListener('input', updateTitle);
-    }*/
 
     populateInitialRows();
 </script>
