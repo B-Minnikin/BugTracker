@@ -10,14 +10,14 @@ namespace BugTracker.ViewComponents
 {
 	public class BugReportSearchSelector : ViewComponent
 	{
-		public IViewComponentResult Invoke(int projectId, List<MilestoneBugReportEntry> milestoneBugReportEntries)
+		public IViewComponentResult Invoke(int projectId, List<MilestoneBugReportEntry> milestoneBugReportEntries, bool showSearchBar = false, bool canRemoveEntry = false)
 		{
 			BugReportSearchSelectorViewModel viewModel = new BugReportSearchSelectorViewModel
 			{
 				ProjectId = projectId,
 				MilestoneBugReportEntries = milestoneBugReportEntries,
-				CanRemoveEntry = true,
-				ShowSearchBar = true
+				CanRemoveEntry = canRemoveEntry,
+				ShowSearchBar = showSearchBar
 			};
 
 			return View(viewModel);
