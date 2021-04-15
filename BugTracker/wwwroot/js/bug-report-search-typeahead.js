@@ -59,6 +59,11 @@ $(document).ready(function () {
             bugReportLink.value = suggestion.report_link;
         }
 
+        var bugReportTitle = document.getElementById('bug-report-title');
+        if (bugReportTitle !== null) {
+            bugReportTitle.value = suggestion.report_title;
+        }
+
         document.getElementById('local-bug-report-id').value = suggestion.report_localId;
     });
 

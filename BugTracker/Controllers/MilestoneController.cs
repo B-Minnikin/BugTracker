@@ -212,7 +212,7 @@ namespace BugTracker.Controllers
 				{
 					Milestone = projectRepository.GetMilestoneById(milestoneId),
 					ProjectId = currentProjectId,
-					MilestoneBugReportEntries = projectRepository.GetMilestoneBugReportEntries(milestoneId).ToList()
+					MilestoneBugReportEntries = GenerateBugReportEntries(milestoneId).ToList()
 				};
 
 				return View(viewModel);
