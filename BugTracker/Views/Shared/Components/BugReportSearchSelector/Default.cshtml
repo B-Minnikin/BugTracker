@@ -1,30 +1,32 @@
 ﻿@model BugReportSearchSelectorViewModel
 
-<input id="project-id" type="hidden" asp-for="ProjectId" />
-<input id="can-remove-entry" type="hidden" asp-for="CanRemoveEntry" />
-<input id="show-search-bar" type="hidden" asp-for="ShowSearchBar" />
+    <h2>Bug Reports</h2>
 
-<input id="bug-report-id" type="hidden" />
-<input id="local-bug-report-id" type="hidden" />
-<input id="bug-report-title" type="hidden" />
-<input id="bug-report-link" type="hidden" />
+    <input id="project-id" type="hidden" asp-for="ProjectId" />
+    <input id="can-remove-entry" type="hidden" asp-for="CanRemoveEntry" />
+    <input id="show-search-bar" type="hidden" asp-for="ShowSearchBar" />
 
-<!-- Typeahead input field for adding bug reports -->
-@if (Model.ShowSearchBar)
-{
-    <div class="row m-3">
-        <input id="Search" type="text" class="typeahead form-control" placeholder="Type bug report title / ID" autocomplete="off" spellcheck="false" />
-        <input id="btnAddBugReportEntry" type="button" onclick="addRow();" value="Add Bug Report" class="btn btn-primary" />
-    </div>
-}
+    <input id="bug-report-id" type="hidden" />
+    <input id="local-bug-report-id" type="hidden" />
+    <input id="bug-report-title" type="hidden" />
+    <input id="bug-report-link" type="hidden" />
 
-<!-- Display bug reports -->
-<table>
-    <tbody id="tbEntries">
-    </tbody>
-</table>
+    <!-- Typeahead input field for adding bug reports -->
+    @if (Model.ShowSearchBar)
+    {
+        <div class="row m-3">
+            <input id="Search" type="text" class="typeahead form-control" placeholder="Type bug report title / ID" autocomplete="off" spellcheck="false" />
+            <input id="btnAddBugReportEntry" type="button" onclick="addRow();" value="Add Bug Report" class="btn btn-primary" />
+        </div>
+    }
 
-<script language="javascript" type="text/javascript">
+    <!-- Display bug reports -->
+    <table>
+        <tbody id="tbEntries">
+        </tbody>
+    </table>
+
+    <script language="javascript" type="text/javascript">
 
     function addRow() {
         @{
@@ -93,9 +95,10 @@
     }
 
     populateInitialRows();
-</script>
+    </script>
 
-@* Typeahead script *@
-@if (Model.ShowSearchBar) {
-    <script src="@Url.Content("~/js/bug-report-search-typeahead.js")"></script>
-}
+    @* Typeahead script *@
+    @if (Model.ShowSearchBar)
+    {
+        <script src="@Url.Content("~/js/bug-report-search-typeahead.js")"></script>
+    }
