@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Helpers;
+using System.Globalization;
 
 namespace BugTracker.Controllers
 {
@@ -92,10 +93,15 @@ namespace BugTracker.Controllers
 				ViewData["BreadcrumbNode"] = chosenMilestoneNode;
 				// --------------------------------------------------------------------------------------------
 
+				//  Create view model
+				var bugReports = GenerateBugReportEntries(milestoneId).ToList();
+
 				MilestoneOverviewViewModel viewModel = new MilestoneOverviewViewModel
 				{
 					Milestone = model,
-					MilestoneBugReportEntries = GenerateBugReportEntries(milestoneId).ToList()
+					MilestoneBugReportEntries = bugReports,
+
+					MilestoneProgress = new MilestoneProgress(bugReports)
 				};
 
 				var myUrl = Url.Action("ReportOverview", "BugReport", new { id = 23}, Request.Scheme);
@@ -287,6 +293,7 @@ namespace BugTracker.Controllers
 			{
 				entry.BugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
 				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = entry.BugReportId });
+				entry.CurrentState = projectRepository.GetLatestState(entry.BugReportId);
 			}
 
 			return entries;
