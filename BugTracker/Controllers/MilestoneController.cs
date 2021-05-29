@@ -120,8 +120,6 @@ namespace BugTracker.Controllers
 					MilestoneProgress = new MilestoneProgress(bugReports)
 				};
 
-				var myUrl = Url.Action("ReportOverview", "BugReport", new { id = 23}, Request.Scheme);
-
 				return View(viewModel);
 			}
 
