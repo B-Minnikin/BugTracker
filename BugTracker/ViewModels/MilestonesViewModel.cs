@@ -11,6 +11,6 @@ namespace BugTracker.ViewModels
 		public int ProjectId { get; set; }
 		public bool ShowNewButton { get; set; } = false;
 
-		public List<Milestone> ProjectMilestones { get; set; }
+		public List<MilestoneContainer> ProjectMilestones { get; set; }
 	}
 }

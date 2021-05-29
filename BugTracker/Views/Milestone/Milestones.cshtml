@@ -13,22 +13,29 @@
 
 <div class="card-deck">
     @{
-        foreach (var milestone in Model.ProjectMilestones)
+        foreach (var milestoneContainer in Model.ProjectMilestones)
         {
             <div class="row col-12">
                 <div class="card m-3">
 
                     <div class="card-header">
-                        <h3>@milestone.Title</h3>
+                        <h3>@milestoneContainer.Milestone.Title</h3>
                     </div>
 
                     <div class="card-body">
-                        <p>Description: @milestone.Description</p>
-                        <p>Created: @milestone.CreationTime</p>
-                        <p>Due: @milestone.DueDate</p>
+                        <p>Description: @milestoneContainer.Milestone.Description</p>
+                        <p>Created: @milestoneContainer.Milestone.CreationTime</p>
+                        <p>Due: @milestoneContainer.Milestone.DueDate</p>
+
+                        <p>@milestoneContainer.MilestoneProgress.CompletedBugReports / @milestoneContainer.MilestoneProgress.TotalBugReports completed</p>
+
+                        <!-- Progress Bar -->
+                        <div class="progress m-3">
+                            <div class="progress-bar" role="progressbar" style="width: @milestoneContainer.MilestoneProgress.PercentCompleted;" aria-valuemin="0" aria-valuemax="100" aria-valuetext="@milestoneContainer.MilestoneProgress.PercentCompletedAria">@milestoneContainer.MilestoneProgress.PercentCompleted</div>
+                        </div>
 
                         <!-- Whole card links to overview -->
-                        <a asp-controller="Milestone" asp-action="Overview" asp-route-milestoneId="@milestone.MilestoneId" class="stretched-link"></a>
+                        <a asp-controller="Milestone" asp-action="Overview" asp-route-milestoneId="@milestoneContainer.Milestone.MilestoneId" class="stretched-link"></a>
                     </div>
 
                 </div>

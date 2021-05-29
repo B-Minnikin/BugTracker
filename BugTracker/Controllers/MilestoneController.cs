@@ -59,8 +59,24 @@ namespace BugTracker.Controllers
 			{
 				ProjectId = projectId,
 				ShowNewButton = isAuthorized,
-				ProjectMilestones = projectRepository.GetAllMilestones(projectId).ToList()
+				ProjectMilestones = new List<MilestoneContainer>()
 			};
+
+			var milestones = projectRepository.GetAllMilestones(projectId);
+			foreach (var milestone in milestones)
+			{
+				var bugReportEntries = projectRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
+				foreach (var bugReport in bugReportEntries) // <------- REFACTOR NEEDED
+				{
+					bugReport.CurrentState = projectRepository.GetLatestState(bugReport.BugReportId);
+				}
+
+				model.ProjectMilestones.Add(new MilestoneContainer
+				{
+					Milestone = milestone,
+					MilestoneProgress = new MilestoneProgress(bugReportEntries)
+				});
+			}
 
 			return View(model);
 		}
