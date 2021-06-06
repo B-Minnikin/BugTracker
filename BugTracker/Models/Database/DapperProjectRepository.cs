@@ -497,7 +497,8 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var deletedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_DeleteById", new { MilestoneId = milestoneId },
+				var deletedMilestone = connection.QueryFirst<Milestone>("dbo.Milestones_GetById @MilestoneId", new { MilestoneId = milestoneId });
+				connection.Execute("dbo.Milestones_DeleteById", new { MilestoneId = milestoneId },
 					commandType: CommandType.StoredProcedure);
 
 				return deletedMilestone;
