@@ -11,6 +11,6 @@ namespace BugTracker.ViewModels
 		public Milestone Milestone { get; set; }
 		public List<MilestoneBugReportEntry> MilestoneBugReportEntries { get; set; }  = new List<MilestoneBugReportEntry>();
 
-		public MilestoneProgress MilestoneProgress { get; set; }
+		public MilestoneContainer ProjectMilestone { get; set; }
 	}
 }

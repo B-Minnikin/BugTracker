@@ -117,7 +117,11 @@ namespace BugTracker.Controllers
 					Milestone = model,
 					MilestoneBugReportEntries = bugReports,
 
-					MilestoneProgress = new MilestoneProgress(bugReports)
+					ProjectMilestone = new MilestoneContainer
+					{
+						Milestone = model,
+						MilestoneProgress = new MilestoneProgress(bugReports)
+					}
 				};
 
 				return View(viewModel);
