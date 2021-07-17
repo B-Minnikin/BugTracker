@@ -83,5 +83,11 @@ namespace BugTracker.Models
 		IEnumerable<UserTypeaheadSearchResult> GetMatchingProjectMembersBySearchQuery(string query, int projectId);
 		IEnumerable<BugReportTypeaheadSearchResult> GetMatchingBugReportsByLocalIdSearchQuery(int localBugReportId, int projectId);
 		IEnumerable<BugReportTypeaheadSearchResult> GetMatchingBugReportsByTitleSearchQuery(string query, int projectId);
+
+		// Activities
+		void AddActivity(Activity activity);
+		void RemoveActivity(Activity activity);
+		IEnumerable<Activity> GetUserActivities(int userId);
+		IEnumerable<Activity> GetBugReportActivities(int bugReportId);
 	}
 }
