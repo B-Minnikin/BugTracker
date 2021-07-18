@@ -263,6 +263,12 @@ namespace BugTracker.Controllers
 					projectRepository.UpdateMilestone(model.Milestone);
 					UpdateEditedMilestoneBugReports(model.Milestone, model.MilestoneBugReportEntries);
 
+					// Create activity event
+					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+					var activityEvent = new ActivityMilestone(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.MilestoneEdited, userId, model.Milestone.MilestoneId);
+					projectRepository.AddActivity(activityEvent);
+
 					return RedirectToAction("Overview", "Milestone", new { milestoneId = model.Milestone.MilestoneId });
 				}
 
