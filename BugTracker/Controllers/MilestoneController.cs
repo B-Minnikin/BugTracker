@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Helpers;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace BugTracker.Controllers
 {
@@ -193,6 +194,12 @@ namespace BugTracker.Controllers
 						BugReport report = projectRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
 						
 						projectRepository.AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
+
+						// Create activity event
+						int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+						var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+						var activityEvent = new ActivityMilestone(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
+						projectRepository.AddActivity(activityEvent);
 					}
 
 					return RedirectToAction("Overview", "Milestone", new { milestoneId = createdMilestone.MilestoneId });
