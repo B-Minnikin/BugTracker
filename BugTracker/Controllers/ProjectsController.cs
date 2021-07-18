@@ -116,9 +116,14 @@ namespace BugTracker.Controllers
 				Project addedProject = projectRepository.CreateProject(newProject);
 				projectRepository.CreateLocalBugReportId(addedProject.ProjectId);
 
+				// Create activity event
+				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+				var activityEvent = new ActivityProject(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.ProjectCreated, userId);
+				projectRepository.AddActivity(activityEvent);
+
 				// Add the user who created the project to its administrator role
-				string userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-				var user = await userManager.FindByIdAsync(userId);
+				var user = await userManager.FindByIdAsync(userId.ToString());
 				await userManager.AddToRoleAsync(user, "Administrator", addedProject.ProjectId);
 
 				_logger.LogInformation($"New project created. ID: {addedProject.ProjectId}, Name: {addedProject.Name}");
