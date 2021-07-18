@@ -285,6 +285,7 @@ namespace BugTracker.Controllers
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 				var activityEvent = new ActivityBugReportAssigned(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAssignedToUser, userId, model.BugReportId, assignedUserId);
+				projectRepository.AddActivity(activityEvent);
 
 				return RedirectToAction("AssignMember", new { model.BugReportId });
 			}
