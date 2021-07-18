@@ -27,6 +27,7 @@ namespace BugTracker.Models
 
 	public enum ActivityMessage
 	{
+		ProjectCreated,
 		ProjectEdited,
 		CommentPosted,
 		CommentEdited,

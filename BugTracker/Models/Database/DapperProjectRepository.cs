@@ -674,7 +674,8 @@ namespace BugTracker.Models
 						BugReportId = activityMilestoneBugReport.BugReportId
 					}, "MilestoneBugReports");
 					break;
-				case ActivityMessage.ProjectEdited: // Project ID already stored in ActivityEvents
+				case ActivityMessage.ProjectCreated: // Project ID already stored in ActivityEvents
+				case ActivityMessage.ProjectEdited:
 				default:
 					break;
 			}
