@@ -277,8 +277,14 @@ namespace BugTracker.Controllers
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				var user = await userManager.FindByEmailAsync(model.MemberEmail);
+				var assignedUserId = Int32.Parse(user.Id);
 
-				projectRepository.AddUserAssignedToBugReport(Int32.Parse(user.Id), model.BugReportId);
+				projectRepository.AddUserAssignedToBugReport(assignedUserId, model.BugReportId);
+
+				// Create activity event
+				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+				var activityEvent = new ActivityBugReportAssigned(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAssignedToUser, userId, model.BugReportId, assignedUserId);
 
 				return RedirectToAction("AssignMember", new { model.BugReportId });
 			}
