@@ -181,6 +181,12 @@ namespace BugTracker.Controllers
 
 				_ = projectRepository.UpdateBugReport(bugReport);
 
+				// Create activity event
+				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+				var activityEvent = new ActivityBugReport(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportEdited, userId, bugReport.BugReportId);
+				projectRepository.AddActivity(activityEvent);
+
 				BugState latestBugState = projectRepository.GetLatestState(bugReport.BugReportId);
 				if (!model.CurrentState.Equals(latestBugState.StateType))
 				{
