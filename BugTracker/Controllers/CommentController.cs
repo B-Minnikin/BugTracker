@@ -91,6 +91,11 @@ namespace BugTracker.Controllers
 				BugReportComment addedComment = projectRepository.CreateComment(newComment);
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
+				// Create activity event
+				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+				var commentActivity = new ActivityComment(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportCommentId);
+				projectRepository.AddActivity(commentActivity);
+
 				if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedComment.BugReportId))
 				{
 					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
