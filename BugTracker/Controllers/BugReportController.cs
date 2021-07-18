@@ -202,6 +202,10 @@ namespace BugTracker.Controllers
 
 					string bugReportUrl = Url.Action("ReportOverview", "BugReport", new { id = bugReport.BugReportId }, Request.Scheme);
 					subscriptions.NotifyBugReportStateChanged(newBugState, bugReportUrl);
+
+					// Create activity event
+					var stateActivityEvent = new ActivityBugReportStateChange(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, newBugState, latestBugState);
+					projectRepository.AddActivity(stateActivityEvent);
 				}
 
 				return RedirectToAction("ReportOverview", new { id = bugReport.BugReportId});
