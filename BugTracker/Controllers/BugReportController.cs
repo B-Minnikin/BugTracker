@@ -352,6 +352,11 @@ namespace BugTracker.Controllers
 				var linkToReport = projectRepository.GetBugReportByLocalId(model.LinkToBugReportLocalId, model.ProjectId);
 				projectRepository.AddBugReportLink(model.BugReportId, linkToReport.BugReportId);
 
+				// Create activity event
+				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+				var activityEvent = new ActivityBugReportLink(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportsLinked, userId, model.BugReportId, linkToReport.BugReportId);
+
 				return RedirectToAction("ReportOverview", new { id = model.BugReportId });
 			}
 
