@@ -580,5 +580,118 @@ namespace BugTracker.Models
 				return milestoneBugReports;
 			}
 		}
+
+		private int InsertActivityByTable(object fieldProperties, string activityTablePostfix)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				int insertedActivityId = (Int32)connection.ExecuteScalar($"dbo.Activity{ activityTablePostfix }_Insert", fieldProperties,
+					commandType: CommandType.StoredProcedure);
+				return insertedActivityId;
+			}
+		}
+
+		public void AddActivity(Activity activity)
+		{
+			// create base activity
+			int baseActivityId = InsertActivityByTable(new {
+				Timestamp = activity.Timestamp,
+				ProjectId = activity.ProjectId,
+				MessageId = activity.MessageId,
+				UserId = activity.UserId
+			}, "Events");
+
+			// depending on message type, insert additional data into the appropriate table
+			switch (activity.MessageId)
+			{
+				case ActivityMessage.CommentPosted:
+					var activityComment = activity as ActivityComment;
+					if (activity == null) break;
+					InsertActivityByTable(new 
+					{
+						ActivityId = baseActivityId, 
+						BugReportCommentId = activityComment.BugReportCommentId 
+					}, "Comments");
+					break;
+				case ActivityMessage.BugReportPosted:
+				case ActivityMessage.BugReportEdited:
+					var activityBugReport = activity as ActivityBugReport;
+					if (activity == null) break;
+					InsertActivityByTable(new
+					{ 
+						ActivityId = baseActivityId,
+						BugReportId = activityBugReport.BugReportId 
+					}, "BugReports");
+					break;
+				case ActivityMessage.BugReportStateChanged:
+					var activityBugReportStateChanged = activity as ActivityBugReportStateChange;
+					if (activity == null) break;
+					InsertActivityByTable(new {
+						ActivityId = baseActivityId,
+						NewBugReportStateId = activityBugReportStateChanged.NewBugReportStateId,
+						PreviousBugReportStateId = activityBugReportStateChanged.PreviousBugReportStateId
+					}, "BugReportStateChanges");
+					break;
+				case ActivityMessage.BugReportsLinked:
+					var activityBugReportLinks = activity as ActivityBugReportLink;
+					if (activity == null) break;
+					InsertActivityByTable(new
+					{
+						ActivityId = baseActivityId,
+						FirstBugReportId = activityBugReportLinks.FirstBugReportId,
+						SecondBugReportId = activityBugReportLinks.SecondBugReportId
+					}, "BugReportLinks");
+					break;
+				case ActivityMessage.BugReportAssignedToUser:
+					var activityBugReportAssigned = activity as ActivityBugReportAssigned;
+					if (activity == null) break;
+					InsertActivityByTable(new
+					{
+						ActivityId = baseActivityId,
+						BugReportId = activityBugReportAssigned.BugReportId,
+						AssigneeId = activityBugReportAssigned.AssigneeId
+					}, "BugReportAssigned");
+					break;
+				case ActivityMessage.MilestonePosted:
+				case ActivityMessage.MilestoneEdited:
+					var activityMilestone = activity as ActivityMilestone;
+					if (activity == null) break;
+					InsertActivityByTable(new
+					{
+						ActivityId = baseActivityId,
+						MilestoneId = activityMilestone.MilestoneId
+					}, "Milestones");
+					break;
+				case ActivityMessage.BugReportAddedToMilestone:
+				case ActivityMessage.BugReportRemovedFromMilestone:
+					var activityMilestoneBugReport = activity as ActivityMilestoneBugReport;
+					if (activity == null) break;
+					InsertActivityByTable(new
+					{
+						ActivityId = baseActivityId,
+						MilestoneId = activityMilestoneBugReport.MilestoneId,
+						BugReportId = activityMilestoneBugReport.BugReportId
+					}, "MilestoneBugReports");
+					break;
+				case ActivityMessage.ProjectEdited: // Project ID already stored in ActivityEvents
+				default:
+					break;
+			}
+		}
+
+		public void RemoveActivity(Activity activity)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<Activity> GetUserActivities(int userId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<Activity> GetBugReportActivities(int bugReportId)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
