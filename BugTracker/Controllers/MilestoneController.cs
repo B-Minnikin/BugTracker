@@ -306,6 +306,10 @@ namespace BugTracker.Controllers
 			{
 				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
 				projectRepository.RemoveMilestoneBugReport(milestone.MilestoneId, bugReportId);
+
+				// Create activity event
+				var activityEvent = new ActivityMilestoneBugReport(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportRemovedFromMilestone, userId, milestone.MilestoneId, entry.BugReportId);
+				projectRepository.AddActivity(activityEvent);
 			}
 		}
 
