@@ -87,7 +87,12 @@ namespace BugTracker.Controllers
 
 					// add bug report to current project
 					BugReport addedReport = projectRepository.AddBugReport(newBugReport);
-					
+
+					// Create activity event
+					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					var commentActivity = new ActivityBugReport(-1, DateTime.Now, currentProjectId, ActivityMessage.BugReportPosted, userId, addedReport.BugReportId);
+					projectRepository.AddActivity(commentActivity);
+
 					BugState newBugState = new BugState
 					{
 						Time = DateTime.Now,
@@ -97,7 +102,6 @@ namespace BugTracker.Controllers
 					};
 					BugState addedBugState = projectRepository.CreateBugState(newBugState);
 					
-					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					// deal with subscriptions after bug states to prevent premature email updates
 					if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedReport.BugReportId))
 					{
