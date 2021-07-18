@@ -29,6 +29,7 @@ namespace BugTracker.Models
 	{
 		ProjectEdited,
 		CommentPosted,
+		CommentEdited,
 		BugReportPosted,
 		BugReportEdited,
 		BugReportStateChanged,

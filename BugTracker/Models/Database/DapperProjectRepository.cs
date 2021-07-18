@@ -605,6 +605,7 @@ namespace BugTracker.Models
 			switch (activity.MessageId)
 			{
 				case ActivityMessage.CommentPosted:
+				case ActivityMessage.CommentEdited:
 					var activityComment = activity as ActivityComment;
 					if (activity == null) break;
 					InsertActivityByTable(new 
