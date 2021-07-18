@@ -288,10 +288,18 @@ namespace BugTracker.Controllers
 			// if bug report missing from entries, but exists in repo - delete in repo
 			IEnumerable<MilestoneBugReportEntry> toDelete = existingBugReports.Except(editedBugReports, new MilestoneBugReportEntryEqualityComparer());
 
+			// preparation data for creating activity events
+			int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+
 			foreach (var entry in toAdd)
 			{
 				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
 				projectRepository.AddMilestoneBugReport(milestone.MilestoneId, bugReportId);
+
+				// Create activity event
+				var activityEvent = new ActivityMilestoneBugReport(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAddedToMilestone, userId, milestone.MilestoneId, entry.BugReportId);
+				projectRepository.AddActivity(activityEvent);
 			}
 
 			foreach(var entry in toDelete)
