@@ -159,6 +159,11 @@ namespace BugTracker.Controllers
 					// update edit time
 
 					projectRepository.UpdateBugReportComment(comment);
+
+					// Create activity event
+					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					var commentActivity = new ActivityComment(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportCommentId);
+					projectRepository.AddActivity(commentActivity);
 				}
 				return RedirectToAction("ReportOverview", "BugReport", new { id = comment.BugReportId});
 			}
