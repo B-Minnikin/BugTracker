@@ -14,8 +14,8 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var insertedProjectId = connection.ExecuteScalar("dbo.Projects_Insert", new { 
-					Name = project.Name, Description = project.Description, CreationTime = project.CreationTime, 
+				var insertedProjectId = connection.ExecuteScalar("dbo.Projects_Insert", new {
+					Name = project.Name, Description = project.Description, CreationTime = project.CreationTime,
 					LastUpdateTime = project.LastUpdateTime, Hidden = project.Hidden },
 					commandType: CommandType.StoredProcedure);
 				var insertedProject = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = insertedProjectId });
@@ -31,8 +31,8 @@ namespace BugTracker.Models
 				connection.Execute("dbo.LocalProjectBugReportIds_IncrementNextFreeId @ProjectId", new { ProjectId = bugReport.ProjectId });
 
 				var insertedBugReportId = connection.ExecuteScalar("dbo.BugReports_Insert", new {
-					Title = bugReport.Title, ProgramBehaviour = bugReport.ProgramBehaviour, DetailsToReproduce = bugReport.DetailsToReproduce, 
-					CreationTime = bugReport.CreationTime, Severity = bugReport.Severity, Importance = bugReport.Importance, 
+					Title = bugReport.Title, ProgramBehaviour = bugReport.ProgramBehaviour, DetailsToReproduce = bugReport.DetailsToReproduce,
+					CreationTime = bugReport.CreationTime, Severity = bugReport.Severity, Importance = bugReport.Importance,
 					PersonReporting = bugReport.PersonReporting, Hidden = bugReport.Hidden, ProjectId = bugReport.ProjectId,
 					LocalBugReportId = nextFreeId },
 					commandType: CommandType.StoredProcedure);
@@ -73,7 +73,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = projectId});
+				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = projectId });
 				return bugReports;
 			}
 		}
@@ -180,7 +180,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var comments = connection.Query<BugReportComment>("dbo.Comments_GetAll @BugReportId", new { BugReportId = bugReportId});
+				var comments = connection.Query<BugReportComment>("dbo.Comments_GetAll @BugReportId", new { BugReportId = bugReportId });
 				return comments;
 			}
 		}
@@ -221,7 +221,7 @@ namespace BugTracker.Models
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				connection.Execute("dbo.Comments_DeleteById", new { BugReportCommentId = bugReportCommentId }, 
+				connection.Execute("dbo.Comments_DeleteById", new { BugReportCommentId = bugReportCommentId },
 					commandType: CommandType.StoredProcedure);
 			}
 		}
@@ -608,10 +608,11 @@ namespace BugTracker.Models
 				case ActivityMessage.CommentEdited:
 					var activityComment = activity as ActivityComment;
 					if (activity == null) break;
-					InsertActivityByTable(new 
+					InsertActivityByTable(new
 					{
-						ActivityId = baseActivityId, 
-						BugReportCommentId = activityComment.BugReportCommentId 
+						ActivityId = baseActivityId,
+						BugReportId = activityComment.BugReportId,
+						BugReportCommentId = activityComment.BugReportCommentId
 					}, "Comments");
 					break;
 				case ActivityMessage.BugReportPosted:
@@ -619,9 +620,9 @@ namespace BugTracker.Models
 					var activityBugReport = activity as ActivityBugReport;
 					if (activity == null) break;
 					InsertActivityByTable(new
-					{ 
+					{
 						ActivityId = baseActivityId,
-						BugReportId = activityBugReport.BugReportId 
+						BugReportId = activityBugReport.BugReportId
 					}, "BugReports");
 					break;
 				case ActivityMessage.BugReportStateChanged:
@@ -629,6 +630,7 @@ namespace BugTracker.Models
 					if (activity == null) break;
 					InsertActivityByTable(new {
 						ActivityId = baseActivityId,
+						BugReportId = activityBugReportStateChanged.BugReportId,
 						NewBugReportStateId = activityBugReportStateChanged.NewBugReportStateId,
 						PreviousBugReportStateId = activityBugReportStateChanged.PreviousBugReportStateId
 					}, "BugReportStateChanges");
@@ -688,12 +690,83 @@ namespace BugTracker.Models
 
 		public IEnumerable<Activity> GetUserActivities(int userId)
 		{
-			throw new NotImplementedException();
+			return GetActivities("UserId", userId);
 		}
 
 		public IEnumerable<Activity> GetBugReportActivities(int bugReportId)
 		{
-			throw new NotImplementedException();
+			return GetActivities("BugReportId", bugReportId);
+		}
+
+		private IEnumerable<Activity> GetActivities(string key, int id)
+		{
+			var activityEvents = new List<Activity>();
+
+			var activityProjects = new List<ActivityProject>();
+			var activityBugReports = new List<ActivityBugReport>();
+			var activityBugReportLinks = new List<ActivityBugReportLink>();
+			var activityBugReportStateChange = new List<ActivityBugReportStateChange>();
+			var activityBugReportAssigned = new List<ActivityBugReportAssigned>();
+			var activityBugReportComments = new List<ActivityComment>();
+			var activityMilestones = new List<ActivityMilestone>();
+			var activityMilestoneBugReports = new List<ActivityMilestoneBugReport>();
+
+			var sql = @"SELECT * FROM ActivityEvents WHERE @Key = @Id ORDER BY Timestamp";
+			var parameters = new { Key = key, Id = id};
+
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (var reader = connection.ExecuteReader(sql, parameters))
+			{
+				var activityProjectParser = reader.GetRowParser<ActivityProject>();
+				var activityBugReportParser = reader.GetRowParser<ActivityBugReport>();
+				var activityBugReportLinkParser = reader.GetRowParser<ActivityBugReportLink>();
+				var activityBugReportStateChangeParser = reader.GetRowParser<ActivityBugReportStateChange>();
+				var activityBugReportAssignedParser = reader.GetRowParser<ActivityBugReportAssigned>();
+				var activityBugReportCommentParser = reader.GetRowParser<ActivityComment>();
+				var activityMilestoneParser = reader.GetRowParser<ActivityMilestone>();
+				var activityMilestoneBugReportParser = reader.GetRowParser<ActivityMilestoneBugReport>();
+
+				while (reader.Read())
+				{
+					var discriminator = (ActivityMessage)reader.GetInt32(reader.GetOrdinal(nameof(ActivityMessage)));
+					switch (discriminator)
+					{
+						case ActivityMessage.ProjectCreated:
+						case ActivityMessage.ProjectEdited:
+							activityEvents.Add(activityProjectParser(reader));
+							break;
+						case ActivityMessage.BugReportPosted:
+						case ActivityMessage.BugReportEdited:
+							activityEvents.Add(activityBugReportParser(reader));
+							break;
+						case ActivityMessage.CommentPosted:
+						case ActivityMessage.CommentEdited:
+							activityEvents.Add(activityBugReportCommentParser(reader));
+							break;
+						case ActivityMessage.BugReportStateChanged:
+							activityEvents.Add(activityBugReportStateChangeParser(reader));
+							break;
+						case ActivityMessage.BugReportsLinked:
+							activityEvents.Add(activityBugReportLinkParser(reader));
+							break;
+						case ActivityMessage.BugReportAssignedToUser:
+							activityEvents.Add(activityBugReportAssignedParser(reader));
+							break;
+						case ActivityMessage.MilestonePosted:
+						case ActivityMessage.MilestoneEdited:
+							activityEvents.Add(activityMilestoneParser(reader));
+							break;
+						case ActivityMessage.BugReportAddedToMilestone:
+						case ActivityMessage.BugReportRemovedFromMilestone:
+							activityEvents.Add(activityMilestoneBugReportParser(reader));
+							break;
+						default:
+							break;
+					}
+				}
+
+				return activityEvents;
+			}
 		}
 	}
 }

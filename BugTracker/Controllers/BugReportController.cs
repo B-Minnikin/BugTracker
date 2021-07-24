@@ -204,7 +204,7 @@ namespace BugTracker.Controllers
 					subscriptions.NotifyBugReportStateChanged(newBugState, bugReportUrl);
 
 					// Create activity event
-					var stateActivityEvent = new ActivityBugReportStateChange(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, newBugState, latestBugState);
+					var stateActivityEvent = new ActivityBugReportStateChange(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, bugReport.BugReportId, newBugState, latestBugState);
 					projectRepository.AddActivity(stateActivityEvent);
 				}
 

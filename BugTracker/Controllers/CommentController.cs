@@ -93,7 +93,7 @@ namespace BugTracker.Controllers
 
 				// Create activity event
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-				var commentActivity = new ActivityComment(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportCommentId);
+				var commentActivity = new ActivityComment(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportId, addedComment.BugReportCommentId);
 				projectRepository.AddActivity(commentActivity);
 
 				if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedComment.BugReportId))
@@ -162,7 +162,7 @@ namespace BugTracker.Controllers
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-					var commentActivity = new ActivityComment(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportCommentId);
+					var commentActivity = new ActivityComment(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportId, comment.BugReportCommentId);
 					projectRepository.AddActivity(commentActivity);
 				}
 				return RedirectToAction("ReportOverview", "BugReport", new { id = comment.BugReportId});

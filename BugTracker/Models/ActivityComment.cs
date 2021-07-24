@@ -7,11 +7,13 @@ namespace BugTracker.Models
 {
 	public class ActivityComment : Activity
 	{
+		public int BugReportId { get; set; }
 		public int BugReportCommentId { get; set; }
 
-		public ActivityComment(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportCommentId) 
+		public ActivityComment(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId, int bugReportCommentId) 
 			: base(activityId, timestamp, projectId, messageId, userId)
 		{
+			BugReportId = bugReportId;
 			BugReportCommentId = bugReportCommentId;
 		}
 
