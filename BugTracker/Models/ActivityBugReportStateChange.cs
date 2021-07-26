@@ -13,8 +13,8 @@ namespace BugTracker.Models
 
 		public ActivityBugReportStateChange() { }
 
-		public ActivityBugReportStateChange(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId, BugState newBugReportStateId, BugState previousBugReportStateId)
-			: base(activityId, timestamp, projectId, messageId, userId)
+		public ActivityBugReportStateChange(DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId, BugState newBugReportStateId, BugState previousBugReportStateId)
+			: base(timestamp, projectId, messageId, userId)
 		{
 			BugReportId = bugReportId;
 			NewBugReportStateId = newBugReportStateId;

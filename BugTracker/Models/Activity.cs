@@ -17,9 +17,8 @@ namespace BugTracker.Models
 
 		public Activity() { }
 
-		public Activity(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId)
+		public Activity(DateTime timestamp, int projectId, ActivityMessage messageId, int userId)
 		{
-			ActivityId = activityId;
 			Timestamp = timestamp;
 			ProjectId = projectId;
 			MessageId = messageId;

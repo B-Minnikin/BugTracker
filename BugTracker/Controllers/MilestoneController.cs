@@ -198,7 +198,7 @@ namespace BugTracker.Controllers
 						// Create activity event
 						int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 						var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-						var activityEvent = new ActivityMilestone(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
+						var activityEvent = new ActivityMilestone(DateTime.Now, currentProjectId.Value, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
 						projectRepository.AddActivity(activityEvent);
 					}
 
@@ -266,7 +266,7 @@ namespace BugTracker.Controllers
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-					var activityEvent = new ActivityMilestone(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.MilestoneEdited, userId, model.Milestone.MilestoneId);
+					var activityEvent = new ActivityMilestone(DateTime.Now, currentProjectId.Value, ActivityMessage.MilestoneEdited, userId, model.Milestone.MilestoneId);
 					projectRepository.AddActivity(activityEvent);
 
 					return RedirectToAction("Overview", "Milestone", new { milestoneId = model.Milestone.MilestoneId });
@@ -298,7 +298,7 @@ namespace BugTracker.Controllers
 				projectRepository.AddMilestoneBugReport(milestone.MilestoneId, bugReportId);
 
 				// Create activity event
-				var activityEvent = new ActivityMilestoneBugReport(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAddedToMilestone, userId, milestone.MilestoneId, entry.BugReportId);
+				var activityEvent = new ActivityMilestoneBugReport(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAddedToMilestone, userId, milestone.MilestoneId, entry.BugReportId);
 				projectRepository.AddActivity(activityEvent);
 			}
 
@@ -308,7 +308,7 @@ namespace BugTracker.Controllers
 				projectRepository.RemoveMilestoneBugReport(milestone.MilestoneId, bugReportId);
 
 				// Create activity event
-				var activityEvent = new ActivityMilestoneBugReport(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportRemovedFromMilestone, userId, milestone.MilestoneId, entry.BugReportId);
+				var activityEvent = new ActivityMilestoneBugReport(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportRemovedFromMilestone, userId, milestone.MilestoneId, entry.BugReportId);
 				projectRepository.AddActivity(activityEvent);
 			}
 		}

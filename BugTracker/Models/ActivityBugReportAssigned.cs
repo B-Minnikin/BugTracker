@@ -12,8 +12,8 @@ namespace BugTracker.Models
 
 		public ActivityBugReportAssigned()	{ }
 
-		public ActivityBugReportAssigned(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId, int assigneeId)
-			: base(activityId, timestamp, projectId, messageId, userId)
+		public ActivityBugReportAssigned(DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId, int assigneeId)
+			: base(timestamp, projectId, messageId, userId)
 		{
 			BugReportId = bugReportId;
 			AssigneeId = assigneeId;

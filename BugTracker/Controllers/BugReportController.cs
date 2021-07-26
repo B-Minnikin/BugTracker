@@ -90,7 +90,7 @@ namespace BugTracker.Controllers
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-					var commentActivity = new ActivityBugReport(-1, DateTime.Now, currentProjectId, ActivityMessage.BugReportPosted, userId, addedReport.BugReportId);
+					var commentActivity = new ActivityBugReport(DateTime.Now, currentProjectId, ActivityMessage.BugReportPosted, userId, addedReport.BugReportId);
 					projectRepository.AddActivity(commentActivity);
 
 					BugState newBugState = new BugState
@@ -184,7 +184,7 @@ namespace BugTracker.Controllers
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-				var activityEvent = new ActivityBugReport(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportEdited, userId, bugReport.BugReportId);
+				var activityEvent = new ActivityBugReport(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportEdited, userId, bugReport.BugReportId);
 				projectRepository.AddActivity(activityEvent);
 
 				BugState latestBugState = projectRepository.GetLatestState(bugReport.BugReportId);
@@ -204,7 +204,7 @@ namespace BugTracker.Controllers
 					subscriptions.NotifyBugReportStateChanged(newBugState, bugReportUrl);
 
 					// Create activity event
-					var stateActivityEvent = new ActivityBugReportStateChange(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, bugReport.BugReportId, newBugState, latestBugState);
+					var stateActivityEvent = new ActivityBugReportStateChange(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, bugReport.BugReportId, newBugState, latestBugState);
 					projectRepository.AddActivity(stateActivityEvent);
 				}
 
@@ -284,7 +284,7 @@ namespace BugTracker.Controllers
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-				var activityEvent = new ActivityBugReportAssigned(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAssignedToUser, userId, model.BugReportId, assignedUserId);
+				var activityEvent = new ActivityBugReportAssigned(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAssignedToUser, userId, model.BugReportId, assignedUserId);
 				projectRepository.AddActivity(activityEvent);
 
 				return RedirectToAction("AssignMember", new { model.BugReportId });
@@ -362,7 +362,7 @@ namespace BugTracker.Controllers
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-				var activityEvent = new ActivityBugReportLink(-1, DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportsLinked, userId, model.BugReportId, linkToReport.BugReportId);
+				var activityEvent = new ActivityBugReportLink(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportsLinked, userId, model.BugReportId, linkToReport.BugReportId);
 				projectRepository.AddActivity(activityEvent);
 
 				return RedirectToAction("ReportOverview", new { id = model.BugReportId });

@@ -9,8 +9,8 @@ namespace BugTracker.Models
 	{
 		public ActivityProject() { }
 
-		public ActivityProject(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId)
-			: base(activityId, timestamp, projectId, messageId, userId)
+		public ActivityProject(DateTime timestamp, int projectId, ActivityMessage messageId, int userId)
+			: base(timestamp, projectId, messageId, userId)
 		{ }
 
 		public override string ActivityMessage { 

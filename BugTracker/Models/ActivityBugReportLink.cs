@@ -12,8 +12,8 @@ namespace BugTracker.Models
 
 		public ActivityBugReportLink() { }
 
-		public ActivityBugReportLink(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int firstBugReportId, int secondBugReportId)
-			: base(activityId, timestamp, projectId, messageId, userId)
+		public ActivityBugReportLink(DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int firstBugReportId, int secondBugReportId)
+			: base(timestamp, projectId, messageId, userId)
 		{
 			FirstBugReportId = firstBugReportId;
 			SecondBugReportId = secondBugReportId;
