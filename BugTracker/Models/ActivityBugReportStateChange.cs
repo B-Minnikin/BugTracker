@@ -11,6 +11,8 @@ namespace BugTracker.Models
 		public BugState NewBugReportStateId { get; set; }
 		public BugState PreviousBugReportStateId { get; set; }
 
+		public ActivityBugReportStateChange() { }
+
 		public ActivityBugReportStateChange(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId, BugState newBugReportStateId, BugState previousBugReportStateId)
 			: base(activityId, timestamp, projectId, messageId, userId)
 		{

@@ -15,6 +15,8 @@ namespace BugTracker.Models
 
 		public abstract string ActivityMessage { get; set; }
 
+		public Activity() { }
+
 		public Activity(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId)
 		{
 			ActivityId = activityId;

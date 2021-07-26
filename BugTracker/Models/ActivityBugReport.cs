@@ -9,6 +9,8 @@ namespace BugTracker.Models
 	{
 		public int BugReportId { get; set; }
 
+		public ActivityBugReport() : base() { }
+
 		public ActivityBugReport(int activityId, DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId)
 			: base(activityId, timestamp, projectId, messageId, userId)
 		{

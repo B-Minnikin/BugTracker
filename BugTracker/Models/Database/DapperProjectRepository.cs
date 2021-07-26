@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using BugTracker.Extension_Methods;
+using Dapper;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -593,93 +594,26 @@ namespace BugTracker.Models
 
 		public void AddActivity(Activity activity)
 		{
-			// create base activity
-			int baseActivityId = InsertActivityByTable(new {
-				Timestamp = activity.Timestamp,
-				ProjectId = activity.ProjectId,
-				MessageId = activity.MessageId,
-				UserId = activity.UserId
-			}, "Events");
-
-			// depending on message type, insert additional data into the appropriate table
-			switch (activity.MessageId)
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				case ActivityMessage.CommentPosted:
-				case ActivityMessage.CommentEdited:
-					var activityComment = activity as ActivityComment;
-					if (activity == null) break;
-					InsertActivityByTable(new
-					{
-						ActivityId = baseActivityId,
-						BugReportId = activityComment.BugReportId,
-						BugReportCommentId = activityComment.BugReportCommentId
-					}, "Comments");
-					break;
-				case ActivityMessage.BugReportPosted:
-				case ActivityMessage.BugReportEdited:
-					var activityBugReport = activity as ActivityBugReport;
-					if (activity == null) break;
-					InsertActivityByTable(new
-					{
-						ActivityId = baseActivityId,
-						BugReportId = activityBugReport.BugReportId
-					}, "BugReports");
-					break;
-				case ActivityMessage.BugReportStateChanged:
-					var activityBugReportStateChanged = activity as ActivityBugReportStateChange;
-					if (activity == null) break;
-					InsertActivityByTable(new {
-						ActivityId = baseActivityId,
-						BugReportId = activityBugReportStateChanged.BugReportId,
-						NewBugReportStateId = activityBugReportStateChanged.NewBugReportStateId,
-						PreviousBugReportStateId = activityBugReportStateChanged.PreviousBugReportStateId
-					}, "BugReportStateChanges");
-					break;
-				case ActivityMessage.BugReportsLinked:
-					var activityBugReportLinks = activity as ActivityBugReportLink;
-					if (activity == null) break;
-					InsertActivityByTable(new
-					{
-						ActivityId = baseActivityId,
-						FirstBugReportId = activityBugReportLinks.FirstBugReportId,
-						SecondBugReportId = activityBugReportLinks.SecondBugReportId
-					}, "BugReportLinks");
-					break;
-				case ActivityMessage.BugReportAssignedToUser:
-					var activityBugReportAssigned = activity as ActivityBugReportAssigned;
-					if (activity == null) break;
-					InsertActivityByTable(new
-					{
-						ActivityId = baseActivityId,
-						BugReportId = activityBugReportAssigned.BugReportId,
-						AssigneeId = activityBugReportAssigned.AssigneeId
-					}, "BugReportAssigned");
-					break;
-				case ActivityMessage.MilestonePosted:
-				case ActivityMessage.MilestoneEdited:
-					var activityMilestone = activity as ActivityMilestone;
-					if (activity == null) break;
-					InsertActivityByTable(new
-					{
-						ActivityId = baseActivityId,
-						MilestoneId = activityMilestone.MilestoneId
-					}, "Milestones");
-					break;
-				case ActivityMessage.BugReportAddedToMilestone:
-				case ActivityMessage.BugReportRemovedFromMilestone:
-					var activityMilestoneBugReport = activity as ActivityMilestoneBugReport;
-					if (activity == null) break;
-					InsertActivityByTable(new
-					{
-						ActivityId = baseActivityId,
-						MilestoneId = activityMilestoneBugReport.MilestoneId,
-						BugReportId = activityMilestoneBugReport.BugReportId
-					}, "MilestoneBugReports");
-					break;
-				case ActivityMessage.ProjectCreated: // Project ID already stored in ActivityEvents
-				case ActivityMessage.ProjectEdited:
-				default:
-					break;
+				var sql = @"INSERT INTO dbo.ActivityEvents (Timestamp, ProjectId, MessageId, UserId, BugReportId, AssigneeId, LinkedBugReportId, NewBugReportStateId, PreviousBugReportStateId, BugReportCommentId, MilestoneId)
+					OUTPUT inserted.ActivityId 
+					VALUES(@Timestamp, @ProjectId, @MessageId, @UserId, @BugReportId, @AssigneeId, @LinkedBugReportId, @NewBugReportStateId, @PreviousBugReportStateId, @BugReportCommentId, @MilestoneId)";
+				var parameters = new { 
+					Timestamp = DateTime.Now,
+					ProjectId = activity.ProjectId,
+					MessageId = activity.MessageId,
+					UserId = activity.UserId,
+					BugReportId = activity.HasProperty(nameof(ActivityBugReport.BugReportId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReport.BugReportId)) : null, // sets to null if member does not exist
+					AssigneeId = activity.HasProperty(nameof(ActivityBugReportAssigned.AssigneeId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportAssigned.AssigneeId)) : null,
+					LinkedBugReportId = activity.HasProperty(nameof(ActivityBugReportLink.SecondBugReportId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportLink.SecondBugReportId)) : null,
+					NewBugReportStateId = activity.HasProperty(nameof(ActivityBugReportStateChange.NewBugReportStateId.BugStateId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportStateChange.NewBugReportStateId.BugStateId)) : null,
+					PreviousBugReportStateId = activity.HasProperty(nameof(ActivityBugReportStateChange.PreviousBugReportStateId.BugStateId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportStateChange.PreviousBugReportStateId.BugStateId)) : null,
+					BugReportCommentId = activity.HasProperty(nameof(ActivityComment.BugReportCommentId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityComment.BugReportCommentId)) : null,
+					MilestoneId = activity.HasProperty(nameof(ActivityMilestone.MilestoneId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityMilestone.MilestoneId)) : null
+				};
+
+				connection.Execute(sql, parameters);
 			}
 		}
 
@@ -690,29 +624,20 @@ namespace BugTracker.Models
 
 		public IEnumerable<Activity> GetUserActivities(int userId)
 		{
-			return GetActivities("UserId", userId);
+			return GetActivities(nameof(Activity.UserId), userId);
 		}
 
 		public IEnumerable<Activity> GetBugReportActivities(int bugReportId)
 		{
-			return GetActivities("BugReportId", bugReportId);
+			return GetActivities(nameof(ActivityBugReport.BugReportId), bugReportId);
 		}
 
 		private IEnumerable<Activity> GetActivities(string key, int id)
 		{
 			var activityEvents = new List<Activity>();
 
-			var activityProjects = new List<ActivityProject>();
-			var activityBugReports = new List<ActivityBugReport>();
-			var activityBugReportLinks = new List<ActivityBugReportLink>();
-			var activityBugReportStateChange = new List<ActivityBugReportStateChange>();
-			var activityBugReportAssigned = new List<ActivityBugReportAssigned>();
-			var activityBugReportComments = new List<ActivityComment>();
-			var activityMilestones = new List<ActivityMilestone>();
-			var activityMilestoneBugReports = new List<ActivityMilestoneBugReport>();
-
-			var sql = @"SELECT * FROM ActivityEvents WHERE @Key = @Id ORDER BY Timestamp";
-			var parameters = new { Key = key, Id = id};
+			var sql = $"SELECT * FROM ActivityEvents WHERE {key} = @Id;";
+			var parameters = new { Key = key, Id = id.ToString()};
 
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			using (var reader = connection.ExecuteReader(sql, parameters))
@@ -728,7 +653,7 @@ namespace BugTracker.Models
 
 				while (reader.Read())
 				{
-					var discriminator = (ActivityMessage)reader.GetInt32(reader.GetOrdinal(nameof(ActivityMessage)));
+					var discriminator = (ActivityMessage)reader.GetInt32(reader.GetOrdinal("MessageId"));
 					switch (discriminator)
 					{
 						case ActivityMessage.ProjectCreated:
