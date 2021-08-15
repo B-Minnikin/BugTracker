@@ -56,6 +56,7 @@ namespace BugTracker.Models
 		// Bug Report States
 		IEnumerable<BugState> GetBugStates(int bugReportId);
 		BugState GetLatestState(int bugReportId);
+		BugState GetBugStateById(int bugStateId);
 		BugState CreateBugState(BugState bugState);
 
 		// Bug Report Linking

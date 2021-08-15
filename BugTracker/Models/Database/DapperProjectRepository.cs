@@ -282,6 +282,15 @@ namespace BugTracker.Models
 			}
 		}
 
+		public BugState GetBugStateById(int bugStateId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				BugState bugState = connection.QueryFirst<BugState>("dbo.BugStates_GetById @BugStateId", new { BugStateId = bugStateId });
+				return bugState;
+			}
+		}
+
 		public void CreateSubscription(int userId, int bugReportId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))

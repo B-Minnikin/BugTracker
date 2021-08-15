@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
@@ -17,12 +14,6 @@ namespace BugTracker.Models
 		{
 			FirstBugReportId = firstBugReportId;
 			SecondBugReportId = secondBugReportId;
-		}
-
-		public override string ActivityMessage 
-		{ 
-			get => throw new NotImplementedException(); 
-			set => throw new NotImplementedException(); 
 		}
 	}
 }
