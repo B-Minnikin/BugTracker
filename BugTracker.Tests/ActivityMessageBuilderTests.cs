@@ -1,4 +1,5 @@
 using BugTracker.Models;
+using BugTracker.Models.Authorization;
 using BugTracker.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,6 +15,7 @@ namespace BugTracker.Tests
 		private readonly Moq.Mock<IHttpContextAccessor> mockAccessor;
 		private readonly Mock<IProjectRepository> mockProjectRepository;
 		private readonly Mock<LinkGenerator> linkGenerator;
+		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private ActivityMessageBuilder builder;
 
 		public ActivityMessageBuilderTests()
@@ -21,10 +23,12 @@ namespace BugTracker.Tests
 			mockAccessor = new Mock<IHttpContextAccessor>();
 			mockProjectRepository = new Mock<IProjectRepository>();
 			linkGenerator = new Mock<LinkGenerator>();
+			mockUserManager = new Mock<ApplicationUserManager>();
 
 			// inject mocked dependencies
 			builder = new ActivityMessageBuilder(
-					mockAccessor.Object, linkGenerator.Object, mockProjectRepository.Object
+					mockAccessor.Object, linkGenerator.Object,
+					mockUserManager.Object, mockProjectRepository.Object
 				);
 		}
 

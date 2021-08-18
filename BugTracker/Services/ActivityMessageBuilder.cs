@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BugTracker.Extension_Methods;
 using System.Text;
 using BugTracker.Models.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace BugTracker.Services
 {
@@ -15,15 +16,15 @@ namespace BugTracker.Services
 	{
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly LinkGenerator linkGenerator;
-		private readonly ApplicationUserManager userManager;
+		private readonly UserManager<IdentityUser> userManager;
 		private readonly IProjectRepository projectRepository;
 
 		public ActivityMessageBuilder(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator,
-			IProjectRepository projectRepository)
+			UserManager<IdentityUser> userManager, IProjectRepository projectRepository)
 		{
 			this.httpContextAccessor = httpContextAccessor;
 			this.linkGenerator = linkGenerator;
-			this.userManager = new ApplicationUserManager();
+			this.userManager = userManager;
 			this.projectRepository = projectRepository;
 		}
 
