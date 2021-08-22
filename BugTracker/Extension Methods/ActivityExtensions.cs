@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Extension_Methods
 {
-	public static class ActivityExtensions
+	public interface IActivityMethods
 	{
-		public static bool HasProperty(this Activity activity, string propertyName)
+		public bool HasProperty(Activity activity, string propertyName);
+		public T GetDerivedProperty<T>(Activity thisActivity, string targetProperty);
+	}
+
+	public class ActivityMethods : IActivityMethods
+	{
+		public bool HasProperty(Activity activity, string propertyName)
 		{
 			if (string.IsNullOrEmpty(propertyName))
 			{
@@ -19,13 +25,32 @@ namespace BugTracker.Extension_Methods
 			return type.GetProperty(propertyName) != null;
 		}
 
-		public static T GetDerivedProperty<T>(this Activity thisActivity, string targetProperty)
+		public T GetDerivedProperty<T>(Activity thisActivity, string targetProperty)
 		{
 			var derivedType = thisActivity.GetType();
 			var propertyName = derivedType.GetProperty(targetProperty);
 			T result = (T)propertyName.GetValue(thisActivity);
 
 			return result;
+		}
+	}
+
+	public static class ActivityExtensions
+	{
+		private static IActivityMethods defaultImplementation = new ActivityMethods();
+		public static IActivityMethods Implementation { private get; set; } = defaultImplementation;
+
+		public static void RevertToDefaultImplementation()
+		{
+			Implementation = defaultImplementation;
+		}
+
+		public static bool HasProperty(this Activity activity, string propertyName) {
+			return Implementation.HasProperty(activity, propertyName);
+		}
+
+		public static T GetDerivedProperty<T>(this Activity activity, string targetProperty) {
+			return Implementation.GetDerivedProperty<T>(activity, targetProperty);
 		}
 	}
 }

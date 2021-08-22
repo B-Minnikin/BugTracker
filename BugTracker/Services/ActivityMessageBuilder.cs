@@ -14,15 +14,14 @@ namespace BugTracker.Services
 {
 	public class ActivityMessageBuilder : IActivityMessageBuilder
 	{
-		private readonly IHttpContextAccessor httpContextAccessor;
-		private readonly LinkGenerator linkGenerator;
+		private readonly ILinkGenerator linkGenerator;
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly IProjectRepository projectRepository;
 
-		public ActivityMessageBuilder(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator,
-			UserManager<IdentityUser> userManager, IProjectRepository projectRepository)
+		public ActivityMessageBuilder(ILinkGenerator linkGenerator,
+			UserManager<IdentityUser> userManager,
+			IProjectRepository projectRepository)
 		{
-			this.httpContextAccessor = httpContextAccessor;
 			this.linkGenerator = linkGenerator;
 			this.userManager = userManager;
 			this.projectRepository = projectRepository;
@@ -42,7 +41,7 @@ namespace BugTracker.Services
 		{
 			if (activity == null) throw new ArgumentNullException("Unable to generate activity message. Activity is null.");
 
-			string message = $"{activity.Timestamp}: ";
+			string message = $"{activity.Timestamp} ";
 			var usernameAnchorString = GetUserAnchorString(activity);
 
 			switch (activity.MessageId)
@@ -100,7 +99,7 @@ namespace BugTracker.Services
 		private string GetUserAnchorString(Activity activity)
 		{
 			var user = userManager.FindByIdAsync(activity.UserId.ToString());
-			string userUri = linkGenerator.GetPathByAction(httpContextAccessor.HttpContext, "View", "Profile", new { id = activity.UserId });
+			string userUri = linkGenerator.GetPathByAction("View", "Profile", new { id = activity.UserId });
 			string userName = user.Result.UserName;
 			var userNameAnchorString = GetHTMLAnchorString(userUri, userName);
 			return userNameAnchorString;
@@ -109,7 +108,7 @@ namespace BugTracker.Services
 		private string GetProjectAnchorString(Activity activity)
 		{
 			var projectId = activity.GetDerivedProperty<int>(nameof(Activity.ProjectId));
-			string projectUri = linkGenerator.GetUriByAction(httpContextAccessor.HttpContext, "Overview", "Projects", new { id = projectId });
+			string projectUri = linkGenerator.GetUriByAction("Overview", "Projects", new { id = projectId });
 			string projectName = projectRepository.GetProjectById(projectId).Name;
 			string projectAnchorString = GetHTMLAnchorString(projectUri, projectName);
 			return projectAnchorString;
@@ -118,7 +117,7 @@ namespace BugTracker.Services
 		private string GetBugReportAnchorString(Activity activity)
 		{
 			var bugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReport.BugReportId));
-			string bugReportUri = linkGenerator.GetUriByAction(httpContextAccessor.HttpContext, "ReportOverview", "BugReport", new { id = bugReportId });
+			string bugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = bugReportId });
 			string bugReportName = projectRepository.GetBugReportById(bugReportId).Title;
 			string bugReportAnchorString = GetHTMLAnchorString(bugReportUri, bugReportName);
 			return bugReportAnchorString;
@@ -127,7 +126,7 @@ namespace BugTracker.Services
 		private string GetSecondBugReportAnchorString(Activity activity)
 		{
 			var secondBugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReportLink.SecondBugReportId));
-			string secondBugReportUri = linkGenerator.GetUriByAction(httpContextAccessor.HttpContext, "ReportOverview", "BugReport", new { id = secondBugReportId });
+			string secondBugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = secondBugReportId });
 			string secondBugReportName = projectRepository.GetBugReportById(secondBugReportId).Title;
 			string secondBugReportAnchorString = GetHTMLAnchorString(secondBugReportUri, secondBugReportName);
 			return secondBugReportAnchorString;
@@ -136,7 +135,7 @@ namespace BugTracker.Services
 		private string GetAssignedUsernameAnchorString(Activity activity)
 		{
 			var assignedUser = userManager.FindByIdAsync(activity.UserId.ToString());
-			string assignedUserUri = linkGenerator.GetUriByAction(httpContextAccessor.HttpContext, "View", "Profile", new { id = assignedUser.Id });
+			string assignedUserUri = linkGenerator.GetUriByAction("View", "Profile", new { id = assignedUser.Id });
 			string assignedUserName = assignedUser.Result.UserName;
 			string assignedUserAnchorString = GetHTMLAnchorString(assignedUserUri, assignedUserName);
 			return assignedUserAnchorString;
@@ -153,7 +152,7 @@ namespace BugTracker.Services
 		private string GetMilestoneAnchorString(Activity activity)
 		{
 			var milestoneId = activity.GetDerivedProperty<int>(nameof(ActivityMilestone.MilestoneId));
-			string milestoneUri = linkGenerator.GetUriByAction(httpContextAccessor.HttpContext, "Overview", "Milestone", new { milestoneId = milestoneId });
+			string milestoneUri = linkGenerator.GetUriByAction("Overview", "Milestone", new { milestoneId = milestoneId });
 			string milestoneName = projectRepository.GetMilestoneById(milestoneId).Title;
 			string milestoneAnchorString = GetHTMLAnchorString(milestoneUri, milestoneName);
 			return milestoneAnchorString;
