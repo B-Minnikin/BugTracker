@@ -1,10 +1,12 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
+using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -24,19 +26,22 @@ namespace BugTracker.Controllers
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
+		private readonly LinkGenerator linkGenerator;
 		private readonly ApplicationUserManager userManager;
 
 		public BugReportController(ILogger<BugReportController> logger,
 									        IProjectRepository projectRepository,
 										  IAuthorizationService authorizationService,
 										  IHttpContextAccessor httpContextAccessor,
-										  ISubscriptions subscriptions)
+										  ISubscriptions subscriptions,
+										  LinkGenerator linkGenerator)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
+			this.linkGenerator = linkGenerator;
 			this.userManager = new ApplicationUserManager();
 		}
 
@@ -410,9 +415,15 @@ namespace BugTracker.Controllers
 					BugReport = bugReport,
 					BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
 					BugStates = bugStates,
+					Activities = projectRepository.GetBugReportActivities(bugReport.BugReportId).ToList(),
 					CurrentState = bugStates[0].StateType,
 					AssignedMembersDisplay = assignedMembersDisplay
 				};
+
+				// generate activity messages
+				var applicationLinkGenerator = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
+				var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository);
+				activityMessageBuilder.GenerateMessages(bugViewModel.Activities);
 
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 				if (subscriptions.IsSubscribed(userId, bugViewModel.BugReport.BugReportId))

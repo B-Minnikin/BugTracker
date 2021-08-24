@@ -41,6 +41,10 @@
 }
 <hr />
 
+@await Component.InvokeAsync("ActivityFeed", new { Activities = Model.Activities })
+
+<hr />
+
 <h3>Comments</h3>
 @foreach (var comment in Model.BugReportComments)
 {

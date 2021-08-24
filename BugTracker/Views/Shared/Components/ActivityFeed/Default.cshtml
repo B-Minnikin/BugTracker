@@ -1,0 +1,10 @@
+﻿@model ActivityFeedViewModel
+
+<h2>Activity Feed</h2>
+
+@{ 
+      foreach(var activity in @Model.Activities)
+			{
+                <div class="row"><p>@Html.Raw(@activity.ActivityMessage)</p></div> // sort out the spaces
+			}
+}
