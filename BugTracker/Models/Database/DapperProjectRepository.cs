@@ -626,9 +626,18 @@ namespace BugTracker.Models
 			}
 		}
 
-		public void RemoveActivity(Activity activity)
+		public void RemoveActivity(int activityId)
 		{
-			throw new NotImplementedException();
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var sql = @"DELETE FROM dbo.ActivityEvents WHERE ActivityId = @activityId";
+				var parameters = new
+				{
+					ActivityId = activityId
+				};
+
+				connection.Execute(sql, parameters);
+			}
 		}
 
 		public IEnumerable<Activity> GetUserActivities(int userId)

@@ -87,7 +87,7 @@ namespace BugTracker.Models
 
 		// Activities
 		void AddActivity(Activity activity);
-		void RemoveActivity(Activity activity);
+		void RemoveActivity(int activityId);
 		IEnumerable<Activity> GetUserActivities(int userId);
 		IEnumerable<Activity> GetBugReportActivities(int bugReportId);
 	}
