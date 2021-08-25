@@ -1,10 +1,12 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
+using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -22,6 +24,7 @@ namespace BugTracker.Controllers
 		private readonly IAuthorizationService authorizationService;
 		private readonly ISubscriptions subscriptions;
 		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly LinkGenerator linkGenerator;
 		private readonly ApplicationUserManager userManager;
 		private readonly IProjectRepository projectRepository;
 
@@ -29,12 +32,14 @@ namespace BugTracker.Controllers
 									IProjectRepository projectRepository,
 									IAuthorizationService authorizationService,
 									ISubscriptions subscriptions,
-									IHttpContextAccessor httpContextAccessor)
+									IHttpContextAccessor httpContextAccessor,
+									LinkGenerator linkGenerator)
 		{
 			this.logger = logger;
 			this.authorizationService = authorizationService;
 			this.subscriptions = subscriptions;
 			this.httpContextAccessor = httpContextAccessor;
+			this.linkGenerator = linkGenerator;
 			this.userManager = new ApplicationUserManager();
 			this.projectRepository = projectRepository;
 		}
@@ -42,12 +47,18 @@ namespace BugTracker.Controllers
 		[Breadcrumb("My Profile", FromController = typeof(HomeController))]
 		public ViewResult View(string id)
 		{
-			EditProfileViewModel profileModel = new EditProfileViewModel
+			EditProfileViewModel viewModel = new EditProfileViewModel
 			{
-				User = userManager.FindByIdAsync(id).Result
+				User = userManager.FindByIdAsync(id).Result,
+				Activities = projectRepository.GetUserActivities(Int32.Parse(id)).ToList()
 			};
 
-			return View(profileModel);
+			// generate activity messages
+			var applicationLinkGenerator = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
+			var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository);
+			activityMessageBuilder.GenerateMessages(viewModel.Activities);
+
+			return View(viewModel);
 		}
 
 		[Authorize]

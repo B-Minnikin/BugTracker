@@ -25,4 +25,12 @@
 
 </div>
 
+<div>
+    <hr />
+
+    @await Component.InvokeAsync("ActivityFeed", new { Activities = Model.Activities }) 
+
+    <hr />
+</div>
+
 <a asp-controller="Profile" asp-action="Edit" asp-route-id="@Model.User.Id" class="btn btn-primary">Edit</a>
