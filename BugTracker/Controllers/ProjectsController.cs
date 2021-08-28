@@ -118,8 +118,7 @@ namespace BugTracker.Controllers
 
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-				var activityEvent = new ActivityProject(DateTime.Now, currentProjectId.Value, ActivityMessage.ProjectCreated, userId);
+				var activityEvent = new ActivityProject(DateTime.Now, addedProject.ProjectId, ActivityMessage.ProjectCreated, userId);
 				projectRepository.AddActivity(activityEvent);
 
 				// Add the user who created the project to its administrator role
