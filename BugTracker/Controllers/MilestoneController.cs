@@ -188,18 +188,22 @@ namespace BugTracker.Controllers
 
 					var createdMilestone = projectRepository.AddMilestone(newMilestone);
 
+					// Create activity event
+					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					var milestoneActivityEvent = new ActivityMilestone(DateTime.Now, createdMilestone.ProjectId, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
+					projectRepository.AddActivity(milestoneActivityEvent);
+
 					// handle bug report ids
-					foreach(var reportEntry in model.MilestoneBugReportEntries)
+					foreach (var reportEntry in model.MilestoneBugReportEntries)
 					{
 						BugReport report = projectRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
 						
 						projectRepository.AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
 
 						// Create activity event
-						int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 						var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-						var activityEvent = new ActivityMilestone(DateTime.Now, currentProjectId.Value, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
-						projectRepository.AddActivity(activityEvent);
+						var bugReportActivityEvent = new ActivityMilestone(DateTime.Now, currentProjectId.Value, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
+						projectRepository.AddActivity(bugReportActivityEvent);
 					}
 
 					return RedirectToAction("Overview", "Milestone", new { milestoneId = createdMilestone.MilestoneId });
