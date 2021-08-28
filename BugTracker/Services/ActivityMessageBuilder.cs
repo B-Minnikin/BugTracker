@@ -145,7 +145,7 @@ namespace BugTracker.Services
 		{
 			var bugReportStateId = activity.GetDerivedProperty<int>(propertyName);
 			var bugState = projectRepository.GetBugStateById(bugReportStateId);
-			string bugReportStateName = Enum.GetName(typeof(BugState), bugState.StateType);
+			string bugReportStateName = Enum.GetName(typeof(StateType), bugState.StateType);
 			return bugReportStateName;
 		}
 

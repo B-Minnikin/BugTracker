@@ -203,13 +203,13 @@ namespace BugTracker.Controllers
 						BugReportId = bugReport.BugReportId
 					};
 
-					projectRepository.CreateBugState(newBugState);
+					var createdBugState = projectRepository.CreateBugState(newBugState);
 
 					string bugReportUrl = Url.Action("ReportOverview", "BugReport", new { id = bugReport.BugReportId }, Request.Scheme);
-					subscriptions.NotifyBugReportStateChanged(newBugState, bugReportUrl);
+					subscriptions.NotifyBugReportStateChanged(createdBugState, bugReportUrl);
 
 					// Create activity event
-					var stateActivityEvent = new ActivityBugReportStateChange(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, bugReport.BugReportId, newBugState.BugStateId, latestBugState.BugStateId);
+					var stateActivityEvent = new ActivityBugReportStateChange(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, bugReport.BugReportId, createdBugState.BugStateId, latestBugState.BugStateId);
 					projectRepository.AddActivity(stateActivityEvent);
 				}
 
