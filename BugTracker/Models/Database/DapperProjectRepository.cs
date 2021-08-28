@@ -613,17 +613,22 @@ namespace BugTracker.Models
 					ProjectId = activity.ProjectId,
 					MessageId = activity.MessageId,
 					UserId = activity.UserId,
-					BugReportId = activity.HasProperty(nameof(ActivityBugReport.BugReportId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReport.BugReportId)) : null, // sets to null if member does not exist
-					AssigneeId = activity.HasProperty(nameof(ActivityBugReportAssigned.AssigneeId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportAssigned.AssigneeId)) : null,
-					LinkedBugReportId = activity.HasProperty(nameof(ActivityBugReportLink.SecondBugReportId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportLink.SecondBugReportId)) : null,
-					NewBugReportStateId = activity.HasProperty(nameof(ActivityBugReportStateChange.NewBugReportStateId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportStateChange.NewBugReportStateId)) : null,
-					PreviousBugReportStateId = activity.HasProperty(nameof(ActivityBugReportStateChange.PreviousBugReportStateId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityBugReportStateChange.PreviousBugReportStateId)) : null,
-					BugReportCommentId = activity.HasProperty(nameof(ActivityComment.BugReportCommentId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityComment.BugReportCommentId)) : null,
-					MilestoneId = activity.HasProperty(nameof(ActivityMilestone.MilestoneId)) ? activity.GetDerivedProperty<int?>(nameof(ActivityMilestone.MilestoneId)) : null
+					BugReportId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReport.BugReportId)), // sets to null if member does not exist
+					AssigneeId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportAssigned.AssigneeId)),
+					LinkedBugReportId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportLink.SecondBugReportId)),
+					NewBugReportStateId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportStateChange.NewBugReportStateId)),
+					PreviousBugReportStateId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportStateChange.PreviousBugReportStateId)),
+					BugReportCommentId = GetDerivedPropertyOrNull(activity, nameof(ActivityComment.BugReportCommentId)),
+					MilestoneId = GetDerivedPropertyOrNull(activity, nameof(ActivityMilestone.MilestoneId))
 				};
 
 				connection.Execute(sql, parameters);
 			}
+		}
+
+		private int? GetDerivedPropertyOrNull(Activity activity, string propertyName)
+		{
+			return activity.HasProperty(propertyName) ? activity.GetDerivedProperty<int?>(propertyName) : null;
 		}
 
 		public void RemoveActivity(int activityId)
