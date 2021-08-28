@@ -194,8 +194,7 @@ namespace BugTracker.Controllers
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-					var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-					var activityEvent = new ActivityProject(DateTime.Now, currentProjectId.Value, ActivityMessage.ProjectEdited, userId);
+					var activityEvent = new ActivityProject(DateTime.Now, model.Project.ProjectId, ActivityMessage.ProjectEdited, userId);
 					projectRepository.AddActivity(activityEvent);
 
 					return RedirectToAction("Overview", new { id = project.ProjectId });
