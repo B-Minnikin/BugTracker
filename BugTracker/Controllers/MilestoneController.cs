@@ -67,7 +67,7 @@ namespace BugTracker.Controllers
 				ProjectMilestones = new List<MilestoneContainer>()
 			};
 
-			var milestones = milestoneRepository.GetAllMilestones(projectId);
+			var milestones = milestoneRepository.GetAllById(projectId);
 			foreach (var milestone in milestones)
 			{
 				var bugReportEntries = milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
@@ -89,7 +89,7 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult Overview(int milestoneId)
 		{
-			Milestone model = milestoneRepository.GetMilestoneById(milestoneId);
+			Milestone model = milestoneRepository.GetById(milestoneId);
 			var currentProject = projectRepository.GetProjectById(model.ProjectId);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "CanAccessProjectPolicy");
@@ -190,7 +190,7 @@ namespace BugTracker.Controllers
 						DueDate = model.DueDate
 					};
 
-					var createdMilestone = milestoneRepository.AddMilestone(newMilestone);
+					var createdMilestone = milestoneRepository.Add(newMilestone);
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -249,7 +249,7 @@ namespace BugTracker.Controllers
 
 				var viewModel = new EditMilestoneViewModel
 				{
-					Milestone = milestoneRepository.GetMilestoneById(milestoneId),
+					Milestone = milestoneRepository.GetById(milestoneId),
 					ProjectId = currentProjectId,
 					MilestoneBugReportEntries = GenerateBugReportEntries(milestoneId).ToList()
 				};
@@ -268,7 +268,7 @@ namespace BugTracker.Controllers
 			{
 				if (ModelState.IsValid)
 				{
-					milestoneRepository.UpdateMilestone(model.Milestone);
+					milestoneRepository.Update(model.Milestone);
 					UpdateEditedMilestoneBugReports(model.Milestone, model.MilestoneBugReportEntries);
 
 					// Create activity event
@@ -327,7 +327,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				milestoneRepository.DeleteMilestone(milestoneId);
+				milestoneRepository.Delete(milestoneId);
 
 				return RedirectToAction("Milestones", "Milestone", new { projectId = currentProjectId});
 			}
@@ -337,7 +337,7 @@ namespace BugTracker.Controllers
 
 		private IEnumerable<MilestoneBugReportEntry> GenerateBugReportEntries(int milestoneId)
 		{
-			Milestone milestone = milestoneRepository.GetMilestoneById(milestoneId);
+			Milestone milestone = milestoneRepository.GetById(milestoneId);
 			IEnumerable<MilestoneBugReportEntry> entries = milestoneRepository.GetMilestoneBugReportEntries(milestoneId);
 
 			foreach(var entry in entries)

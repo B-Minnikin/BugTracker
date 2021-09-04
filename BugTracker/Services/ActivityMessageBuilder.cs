@@ -157,7 +157,7 @@ namespace BugTracker.Services
 		{
 			var milestoneId = activity.GetDerivedProperty<int>(nameof(ActivityMilestone.MilestoneId));
 			string milestoneUri = linkGenerator.GetUriByAction("Overview", "Milestone", new { milestoneId = milestoneId });
-			string milestoneName = milestoneRepository.GetMilestoneById(milestoneId).Title;
+			string milestoneName = milestoneRepository.GetById(milestoneId).Title;
 			string milestoneAnchorString = GetHTMLAnchorString(milestoneUri, milestoneName);
 			return milestoneAnchorString;
 		}

@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Repository
 {
-	public class DapperMilestoneRepository : IMilestoneRepository
+	public class DapperMilestoneRepository: IMilestoneRepository
 	{
-
-		public Milestone AddMilestone(Milestone milestone)
+		public Milestone Add(Milestone milestone)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -24,12 +23,12 @@ namespace BugTracker.Repository
 					DueDate = milestone.DueDate
 				},
 					commandType: CommandType.StoredProcedure);
-				Milestone insertedMilestone = this.GetMilestoneById(insertedMilestoneId);
+				Milestone insertedMilestone = this.GetById(insertedMilestoneId);
 				return insertedMilestone;
 			}
 		}
 
-		public Milestone DeleteMilestone(int milestoneId)
+		public Milestone Delete(int milestoneId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -41,7 +40,7 @@ namespace BugTracker.Repository
 			}
 		}
 
-		public Milestone UpdateMilestone(Milestone milestone)
+		public Milestone Update(Milestone milestone)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -55,12 +54,12 @@ namespace BugTracker.Repository
 					DueDate = milestone.DueDate
 				}, commandType: CommandType.StoredProcedure);
 
-				Milestone updatedMilestone = this.GetMilestoneById(milestone.MilestoneId);
+				Milestone updatedMilestone = this.GetById(milestone.MilestoneId);
 				return updatedMilestone;
 			}
 		}
 
-		public IEnumerable<Milestone> GetAllMilestones(int projectId)
+		public IEnumerable<Milestone> GetAllById(int projectId)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -70,7 +69,7 @@ namespace BugTracker.Repository
 			}
 		}
 
-		public Milestone GetMilestoneById(int id)
+		public Milestone GetById(int id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
