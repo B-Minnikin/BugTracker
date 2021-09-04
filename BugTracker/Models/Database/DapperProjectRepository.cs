@@ -615,7 +615,7 @@ namespace BugTracker.Models
 					UserId = activity.UserId,
 					BugReportId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReport.BugReportId)), // sets to null if member does not exist
 					AssigneeId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportAssigned.AssigneeId)),
-					LinkedBugReportId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportLink.SecondBugReportId)),
+					LinkedBugReportId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportLink.LinkedBugReportId)),
 					NewBugReportStateId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportStateChange.NewBugReportStateId)),
 					PreviousBugReportStateId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportStateChange.PreviousBugReportStateId)),
 					BugReportCommentId = GetDerivedPropertyOrNull(activity, nameof(ActivityComment.BugReportCommentId)),

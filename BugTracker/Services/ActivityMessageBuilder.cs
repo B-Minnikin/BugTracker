@@ -125,7 +125,7 @@ namespace BugTracker.Services
 
 		private string GetSecondBugReportAnchorString(Activity activity)
 		{
-			var secondBugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReportLink.SecondBugReportId));
+			var secondBugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReportLink.LinkedBugReportId));
 			string secondBugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = secondBugReportId });
 			string secondBugReportName = projectRepository.GetBugReportById(secondBugReportId).Title;
 			string secondBugReportAnchorString = GetHTMLAnchorString(secondBugReportUri, secondBugReportName);
