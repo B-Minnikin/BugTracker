@@ -18,16 +18,19 @@ namespace BugTracker.Services
 		private readonly ILinkGenerator linkGenerator;
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly IProjectRepository projectRepository;
+		private readonly IBugReportRepository bugReportRepository;
 		private readonly IMilestoneRepository milestoneRepository;
 
 		public ActivityMessageBuilder(ILinkGenerator linkGenerator,
 			UserManager<IdentityUser> userManager,
 			IProjectRepository projectRepository,
+			IBugReportRepository bugReportRepository,
 			IMilestoneRepository milestoneRepository)
 		{
 			this.linkGenerator = linkGenerator;
 			this.userManager = userManager;
 			this.projectRepository = projectRepository;
+			this.bugReportRepository = bugReportRepository;
 			this.milestoneRepository = milestoneRepository;
 		}
 
@@ -122,7 +125,7 @@ namespace BugTracker.Services
 		{
 			var bugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReport.BugReportId));
 			string bugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = bugReportId });
-			string bugReportName = projectRepository.GetBugReportById(bugReportId).Title;
+			string bugReportName = bugReportRepository.GetById(bugReportId).Title;
 			string bugReportAnchorString = GetHTMLAnchorString(bugReportUri, bugReportName);
 			return bugReportAnchorString;
 		}
@@ -131,7 +134,7 @@ namespace BugTracker.Services
 		{
 			var secondBugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReportLink.LinkedBugReportId));
 			string secondBugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = secondBugReportId });
-			string secondBugReportName = projectRepository.GetBugReportById(secondBugReportId).Title;
+			string secondBugReportName = bugReportRepository.GetById(secondBugReportId).Title;
 			string secondBugReportAnchorString = GetHTMLAnchorString(secondBugReportUri, secondBugReportName);
 			return secondBugReportAnchorString;
 		}

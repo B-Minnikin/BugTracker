@@ -19,15 +19,6 @@ namespace BugTracker.Models
 		// Bug Reports - Local IDs
 		void CreateLocalBugReportId(int projectId);
 
-		// Bug Reports
-		BugReport AddBugReport(BugReport bugReport);
-		IEnumerable<BugReport> GetAllBugReports(int projectId);
-		BugReport GetBugReportById(int bugReportId);
-		BugReport GetBugReportByLocalId(int localBugReportId, int projectId);
-		BugReport UpdateBugReport(BugReport reportChanges);
-		BugReport DeleteBugReport(int id);
-		int GetCommentCountById(int bugReportId);
-
 		// Users assigned to bug reports
 		void AddUserAssignedToBugReport(int userId, int bugReportId);
 		void RemoveUserAssignedToBugReport(int userId, int bugReportId);

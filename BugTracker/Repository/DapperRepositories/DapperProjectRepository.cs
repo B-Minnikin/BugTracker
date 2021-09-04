@@ -24,24 +24,6 @@ namespace BugTracker.Models
 			}
 		}
 
-		public BugReport AddBugReport(BugReport bugReport)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var nextFreeId = connection.ExecuteScalar("dbo.LocalProjectBugReportIds_GetNextFreeId @ProjectId", new { ProjectId = bugReport.ProjectId });
-				connection.Execute("dbo.LocalProjectBugReportIds_IncrementNextFreeId @ProjectId", new { ProjectId = bugReport.ProjectId });
-
-				var insertedBugReportId = connection.ExecuteScalar("dbo.BugReports_Insert", new {
-					Title = bugReport.Title, ProgramBehaviour = bugReport.ProgramBehaviour, DetailsToReproduce = bugReport.DetailsToReproduce,
-					CreationTime = bugReport.CreationTime, Severity = bugReport.Severity, Importance = bugReport.Importance,
-					PersonReporting = bugReport.PersonReporting, Hidden = bugReport.Hidden, ProjectId = bugReport.ProjectId,
-					LocalBugReportId = nextFreeId },
-					commandType: CommandType.StoredProcedure);
-				BugReport insertedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = insertedBugReportId });
-				return insertedBugReport;
-			}
-		}
-
 		public BugReportComment CreateComment(BugReportComment bugReportComment)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
@@ -67,34 +49,6 @@ namespace BugTracker.Models
 				var result = connection.Execute("dbo.Projects_Delete @ProjectId", new { ProjectId = id });
 
 				return deletedProject;
-			}
-		}
-
-		public IEnumerable<BugReport> GetAllBugReports(int projectId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = projectId });
-				return bugReports;
-			}
-		}
-
-		public BugReport GetBugReportById(int bugReportId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = bugReportId });
-				return bugReport;
-			}
-		}
-
-		public BugReport GetBugReportByLocalId(int localBugReportId, int projectId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetByLocalId", new { LocalBugReportId = localBugReportId, ProjectId = projectId },
-					commandType: CommandType.StoredProcedure);
-				return bugReport;
 			}
 		}
 
@@ -140,25 +94,6 @@ namespace BugTracker.Models
 				}, commandType: CommandType.StoredProcedure);
 				var project = this.GetProjectById(projectChanges.ProjectId);
 				return project;
-			}
-		}
-
-		public BugReport UpdateBugReport(BugReport bugReportChanges)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				connection.ExecuteScalar("dbo.BugReports_Update", new
-				{
-					BugReportId = bugReportChanges.BugReportId,
-					Title = bugReportChanges.Title,
-					ProgramBehaviour = bugReportChanges.ProgramBehaviour,
-					DetailsToReproduce = bugReportChanges.DetailsToReproduce,
-					Severity = bugReportChanges.Severity,
-					Importance = bugReportChanges.Importance,
-					Hidden = bugReportChanges.Hidden
-				}, commandType: CommandType.StoredProcedure);
-				BugReport updatedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = bugReportChanges.BugReportId });
-				return updatedBugReport;
 			}
 		}
 
@@ -233,26 +168,6 @@ namespace BugTracker.Models
 			{
 				var parentId = connection.QueryFirst<int>("dbo.Comments_GetParentId @BugReportCommentId", new { BugReportCommentId = bugReportCommentId });
 				return parentId;
-			}
-		}
-
-		public BugReport DeleteBugReport(int id)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var deletedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = id });
-				connection.Execute("dbo.BugReports_DeleteById", new { BugReportId = id },
-					commandType: CommandType.StoredProcedure);
-				return deletedBugReport;
-			}
-		}
-
-		public int GetCommentCountById(int bugReportId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				int count = connection.ExecuteScalar<int>("dbo.BugReports_CommentCount @BugReportId", new { BugReportId = bugReportId });
-				return count;
 			}
 		}
 

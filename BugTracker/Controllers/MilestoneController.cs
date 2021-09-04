@@ -22,18 +22,21 @@ namespace BugTracker.Controllers
 		private readonly ILogger<MilestoneController> logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IMilestoneRepository milestoneRepository;
+		private readonly IBugReportRepository bugReportRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 
 		public MilestoneController(ILogger<MilestoneController> logger, 
 			IProjectRepository projectRepository,
 			IMilestoneRepository milestoneRepository,
+			IBugReportRepository bugReportRepository,
 			IAuthorizationService authorizationService,
 			IHttpContextAccessor httpContextAccessor)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.milestoneRepository = milestoneRepository;
+			this.bugReportRepository = bugReportRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 		}
@@ -200,7 +203,7 @@ namespace BugTracker.Controllers
 					// handle bug report ids
 					foreach (var reportEntry in model.MilestoneBugReportEntries)
 					{
-						BugReport report = projectRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
+						BugReport report = bugReportRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
 						
 						milestoneRepository.AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
 
@@ -302,7 +305,7 @@ namespace BugTracker.Controllers
 
 			foreach (var entry in toAdd)
 			{
-				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				int bugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
 				milestoneRepository.AddMilestoneBugReport(milestone.MilestoneId, bugReportId);
 
 				// Create activity event
@@ -312,7 +315,7 @@ namespace BugTracker.Controllers
 
 			foreach(var entry in toDelete)
 			{
-				int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				int bugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
 				milestoneRepository.RemoveMilestoneBugReport(milestone.MilestoneId, bugReportId);
 
 				// Create activity event
@@ -342,7 +345,7 @@ namespace BugTracker.Controllers
 
 			foreach(var entry in entries)
 			{
-				entry.BugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				entry.BugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
 				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = entry.BugReportId });
 				entry.CurrentState = projectRepository.GetLatestState(entry.BugReportId);
 			}
@@ -353,7 +356,7 @@ namespace BugTracker.Controllers
 		private MilestoneBugReportEntry GenerateBugReportUrl(MilestoneBugReportEntry entry)
 		{
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
-			int bugReportId = projectRepository.GetBugReportByLocalId(entry.LocalBugReportId, currentProjectId).BugReportId;
+			int bugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, currentProjectId).BugReportId;
 			return GenerateBugReportUrl(entry, bugReportId);
 		}
 

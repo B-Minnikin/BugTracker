@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.Repository;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,16 +17,19 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<SearchController> logger;
 		private readonly IProjectRepository projectRepository;
+		private readonly IBugReportRepository bugReportRepository;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IAuthorizationService authorizationService;
 
 		public SearchController(ILogger<SearchController> logger,
 									  IProjectRepository projectRepository,
+									  IBugReportRepository bugReportRepository,
 									  IHttpContextAccessor httpContextAccessor,
 									  IAuthorizationService authorizationService)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
+			this.bugReportRepository = bugReportRepository;
 			this.httpContextAccessor = httpContextAccessor;
 			this.authorizationService = authorizationService;
 		}
@@ -41,7 +45,7 @@ namespace BugTracker.Controllers
 				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 				if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 				{
-					var bugReports = projectRepository.GetAllBugReports(currentProjectId.Value);
+					var bugReports = bugReportRepository.GetAllById(currentProjectId.Value);
 
 					// set default start date to the project's creation date - if user has not entered more recent date
 					DateTime projectCreationTime = GetProjectCreationTime((int)currentProjectId);

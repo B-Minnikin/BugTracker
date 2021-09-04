@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Database;
+using BugTracker.Repository;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,18 +19,21 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<CommentController> _logger;
 		private readonly IProjectRepository projectRepository;
+		private readonly IBugReportRepository bugReportRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
 
 		public CommentController(ILogger<CommentController> logger,
 									IProjectRepository projectRepository,
+									IBugReportRepository bugReportRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
 									ISubscriptions subscriptions)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
+			this.bugReportRepository = bugReportRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -48,7 +52,7 @@ namespace BugTracker.Controllers
 
 				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 				var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
-				var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
+				var currentBugReport = bugReportRepository.GetById(currentBugReportId ?? 0);
 
 				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
@@ -118,7 +122,7 @@ namespace BugTracker.Controllers
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
 			var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
-			var currentBugReport = projectRepository.GetBugReportById(currentBugReportId ?? 0);
+			var currentBugReport = bugReportRepository.GetById(currentBugReportId ?? 0);
 
 			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");

@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models.Authorization;
+using BugTracker.Repository;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,16 @@ namespace BugTracker.Models.Database
 	public class Subscriptions : ISubscriptions
 	{
 		private readonly IProjectRepository projectRepository;
+		private readonly IBugReportRepository bugReportRepository;
 		private readonly IEmailHelper emailHelper;
 		private readonly ApplicationUserManager userManager;
 
 		public Subscriptions(IProjectRepository projectRepository,
+			IBugReportRepository bugReportRepository,
 			IEmailHelper emailHelper)
 		{
 			this.projectRepository = projectRepository;
+			this.bugReportRepository = bugReportRepository;
 			this.emailHelper = emailHelper;
 			userManager = new ApplicationUserManager();
 		}
@@ -64,7 +68,7 @@ namespace BugTracker.Models.Database
 		{
 			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
 
-			var bugReport = projectRepository.GetBugReportById(bugReportComment.BugReportId);
+			var bugReport = bugReportRepository.GetById(bugReportComment.BugReportId);
 			string projectName = projectRepository.GetProjectById(bugReport.ProjectId).Name;
 			string emailSubject = $"Bug report updated: {bugReport.Title}";
 			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {bugReportComment.Author}.\n" +
@@ -83,7 +87,7 @@ namespace BugTracker.Models.Database
 
 		private string ComposeBugStateEmailSubject(BugState bugState)
 		{
-			var bugReport = projectRepository.GetBugReportById(bugState.BugReportId);
+			var bugReport = bugReportRepository.GetById(bugState.BugReportId);
 			string message = $"Bug report updated: {bugReport.Title}";
 
 			return message;
@@ -91,7 +95,7 @@ namespace BugTracker.Models.Database
 
 		private string ComposeBugStateEmailMessage(BugState bugState, string bugReportUrl)
 		{
-			var bugReport = projectRepository.GetBugReportById(bugState.BugReportId);
+			var bugReport = bugReportRepository.GetById(bugState.BugReportId);
 			string projectName = projectRepository.GetProjectById(bugReport.ProjectId).Name;
 			string stateName = bugState.StateType.ToString().First().ToString().ToUpper() + bugState.StateType.ToString().Substring(1);
 

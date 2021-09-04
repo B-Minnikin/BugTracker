@@ -1,6 +1,7 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.ProjectInvitation;
+using BugTracker.Repository;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,6 +21,7 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<HomeController> _logger;
 		private readonly IProjectRepository projectRepository;
+		private readonly IBugReportRepository bugReportRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IProjectInviter projectInviter;
@@ -27,12 +29,14 @@ namespace BugTracker.Controllers
 
 		public ProjectsController(ILogger<HomeController> logger,
 									IProjectRepository projectRepository,
+									IBugReportRepository bugReportRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
 									IProjectInviter projectInvitation)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
+			this.bugReportRepository = bugReportRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.projectInviter = projectInvitation;
@@ -67,8 +71,8 @@ namespace BugTracker.Controllers
 				OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
 				{
 					Project = project,
-					BugReports = projectRepository.GetAllBugReports(id).ToList(),
-					CommentCountHandler = projectRepository.GetCommentCountById
+					BugReports = bugReportRepository.GetAllById(id).ToList(),
+					CommentCountHandler = bugReportRepository.GetCommentCountById
 				};
 
 				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------

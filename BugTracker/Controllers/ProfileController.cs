@@ -29,10 +29,12 @@ namespace BugTracker.Controllers
 		private readonly ApplicationUserManager userManager;
 		private readonly IProjectRepository projectRepository;
 		private readonly IMilestoneRepository milestoneRepository;
+		private readonly IBugReportRepository bugReportRepository;
 
 		public ProfileController(ILogger<ProfileController> logger,
 									IProjectRepository projectRepository,
 									IMilestoneRepository milestoneRepository,
+									IBugReportRepository bugReportRepository,
 									IAuthorizationService authorizationService,
 									ISubscriptions subscriptions,
 									IHttpContextAccessor httpContextAccessor,
@@ -46,6 +48,7 @@ namespace BugTracker.Controllers
 			this.userManager = new ApplicationUserManager();
 			this.projectRepository = projectRepository;
 			this.milestoneRepository = milestoneRepository;
+			this.bugReportRepository = bugReportRepository;
 		}
 
 		[Breadcrumb("My Profile", FromController = typeof(HomeController))]
@@ -59,7 +62,7 @@ namespace BugTracker.Controllers
 
 			// generate activity messages
 			var applicationLinkGenerator = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
-			var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository, milestoneRepository);
+			var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository, bugReportRepository, milestoneRepository);
 			activityMessageBuilder.GenerateMessages(viewModel.Activities);
 
 			return View(viewModel);
