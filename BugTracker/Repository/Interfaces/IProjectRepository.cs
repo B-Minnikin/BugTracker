@@ -33,12 +33,6 @@ namespace BugTracker.Models
 		void DeleteComment(int bugReportCommentId);
 		int GetCommentParentId(int bugReportCommentId);
 
-		// Bug Report States
-		IEnumerable<BugState> GetBugStates(int bugReportId);
-		BugState GetLatestState(int bugReportId);
-		BugState GetBugStateById(int bugStateId);
-		BugState CreateBugState(BugState bugState);
-
 		// Bug Report Linking
 		void AddBugReportLink(int bugReportId, int linkToBugReportId);
 		void RemoveBugReportLink(int bugReportId, int linkToBugReportId);

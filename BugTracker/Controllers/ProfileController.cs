@@ -2,6 +2,7 @@
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -30,11 +31,13 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportRepository bugReportRepository;
+		private readonly IBugReportStatesRepository bugReportStatesRepository;
 
 		public ProfileController(ILogger<ProfileController> logger,
 									IProjectRepository projectRepository,
 									IMilestoneRepository milestoneRepository,
 									IBugReportRepository bugReportRepository,
+									IBugReportStatesRepository bugReportStatesRepository,
 									IAuthorizationService authorizationService,
 									ISubscriptions subscriptions,
 									IHttpContextAccessor httpContextAccessor,
@@ -49,6 +52,7 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 			this.milestoneRepository = milestoneRepository;
 			this.bugReportRepository = bugReportRepository;
+			this.bugReportStatesRepository = bugReportStatesRepository;
 		}
 
 		[Breadcrumb("My Profile", FromController = typeof(HomeController))]
@@ -62,7 +66,8 @@ namespace BugTracker.Controllers
 
 			// generate activity messages
 			var applicationLinkGenerator = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
-			var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository, bugReportRepository, milestoneRepository);
+			var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository, 
+				bugReportRepository, milestoneRepository, bugReportStatesRepository);
 			activityMessageBuilder.GenerateMessages(viewModel.Activities);
 
 			return View(viewModel);

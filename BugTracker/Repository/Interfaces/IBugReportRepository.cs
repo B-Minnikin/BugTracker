@@ -11,12 +11,7 @@ namespace BugTracker.Repository
 		IUpdate<BugReport>, IDelete<BugReport>,
 		IGetById<BugReport>, IGetAllById<BugReport>
 	{
-		//BugReport AddBugReport(BugReport bugReport);
-		//IEnumerable<BugReport> GetAllBugReports(int projectId);
-		//BugReport GetBugReportById(int bugReportId);
 		BugReport GetBugReportByLocalId(int localBugReportId, int projectId);
-		//BugReport UpdateBugReport(BugReport reportChanges);
-		//BugReport DeleteBugReport(int id);
 		int GetCommentCountById(int bugReportId);
 	}
 }

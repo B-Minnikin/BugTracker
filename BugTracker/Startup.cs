@@ -8,6 +8,7 @@ using BugTracker.Models.Database;
 using BugTracker.Models.ProjectInvitation;
 using BugTracker.Repository;
 using BugTracker.Repository.DapperRepositories;
+using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +43,7 @@ namespace BugTracker
 			services.AddScoped<IProjectRepository, DapperProjectRepository>();
 			services.AddScoped<IMilestoneRepository, DapperMilestoneRepository>();
 			services.AddScoped<IBugReportRepository, DapperBugReportRepository>();
+			services.AddScoped<IBugReportStatesRepository, DapperBugReportStatesRepository>();
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();

@@ -10,6 +10,7 @@ using System.Text;
 using BugTracker.Models.Authorization;
 using Microsoft.AspNetCore.Identity;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 
 namespace BugTracker.Services
 {
@@ -20,18 +21,21 @@ namespace BugTracker.Services
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IMilestoneRepository milestoneRepository;
+		private readonly IBugReportStatesRepository bugReportStatesRepository;
 
 		public ActivityMessageBuilder(ILinkGenerator linkGenerator,
 			UserManager<IdentityUser> userManager,
 			IProjectRepository projectRepository,
 			IBugReportRepository bugReportRepository,
-			IMilestoneRepository milestoneRepository)
+			IMilestoneRepository milestoneRepository,
+			IBugReportStatesRepository bugReportStatesRepository)
 		{
 			this.linkGenerator = linkGenerator;
 			this.userManager = userManager;
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
 			this.milestoneRepository = milestoneRepository;
+			this.bugReportStatesRepository = bugReportStatesRepository;
 		}
 
 		public void GenerateMessages(IEnumerable<Activity> activities)
@@ -151,7 +155,7 @@ namespace BugTracker.Services
 		private string GetBugReportStateAnchorString(Activity activity, string propertyName)
 		{
 			var bugReportStateId = activity.GetDerivedProperty<int>(propertyName);
-			var bugState = projectRepository.GetBugStateById(bugReportStateId);
+			var bugState = bugReportStatesRepository.GetById(bugReportStateId);
 			string bugReportStateName = Enum.GetName(typeof(StateType), bugState.StateType);
 			return bugReportStateName;
 		}

@@ -13,6 +13,7 @@ using BugTracker.Helpers;
 using System.Globalization;
 using System.Security.Claims;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 
 namespace BugTracker.Controllers
 {
@@ -23,6 +24,7 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportRepository bugReportRepository;
+		private readonly IBugReportStatesRepository bugReportStatesRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 
@@ -30,6 +32,7 @@ namespace BugTracker.Controllers
 			IProjectRepository projectRepository,
 			IMilestoneRepository milestoneRepository,
 			IBugReportRepository bugReportRepository,
+			IBugReportStatesRepository bugReportStatesRepository,
 			IAuthorizationService authorizationService,
 			IHttpContextAccessor httpContextAccessor)
 		{
@@ -37,6 +40,7 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 			this.milestoneRepository = milestoneRepository;
 			this.bugReportRepository = bugReportRepository;
+			this.bugReportStatesRepository = bugReportStatesRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 		}
@@ -76,7 +80,7 @@ namespace BugTracker.Controllers
 				var bugReportEntries = milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
 				foreach (var bugReport in bugReportEntries) // <------- REFACTOR NEEDED
 				{
-					bugReport.CurrentState = projectRepository.GetLatestState(bugReport.BugReportId);
+					bugReport.CurrentState = bugReportStatesRepository.GetLatestState(bugReport.BugReportId);
 				}
 
 				model.ProjectMilestones.Add(new MilestoneContainer
@@ -347,7 +351,7 @@ namespace BugTracker.Controllers
 			{
 				entry.BugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
 				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = entry.BugReportId });
-				entry.CurrentState = projectRepository.GetLatestState(entry.BugReportId);
+				entry.CurrentState = bugReportStatesRepository.GetLatestState(entry.BugReportId);
 			}
 
 			return entries;

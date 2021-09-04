@@ -2,6 +2,7 @@
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,7 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportRepository bugReportRepository;
+		private readonly IBugReportStatesRepository bugReportStatesRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
@@ -36,6 +38,7 @@ namespace BugTracker.Controllers
 									        IProjectRepository projectRepository,
 										  IMilestoneRepository milestoneRepository,
 										  IBugReportRepository bugReportRepository,
+										  IBugReportStatesRepository bugReportStatesRepository,
 										  IAuthorizationService authorizationService,
 										  IHttpContextAccessor httpContextAccessor,
 										  ISubscriptions subscriptions,
@@ -45,6 +48,7 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 			this.milestoneRepository = milestoneRepository;
 			this.bugReportRepository = bugReportRepository;
+			this.bugReportStatesRepository = bugReportStatesRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -112,7 +116,7 @@ namespace BugTracker.Controllers
 						Author = HttpContext.User.Identity.Name,
 						BugReportId = addedReport.BugReportId
 					};
-					BugState addedBugState = projectRepository.CreateBugState(newBugState);
+					BugState addedBugState = bugReportStatesRepository.Add(newBugState);
 					
 					// deal with subscriptions after bug states to prevent premature email updates
 					if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedReport.BugReportId))
@@ -143,7 +147,7 @@ namespace BugTracker.Controllers
 			EditBugReportViewModel reportViewModel = new EditBugReportViewModel
 			{
 				BugReport = bugReportRepository.GetById(bugReportId),
-				CurrentState = projectRepository.GetLatestState(bugReportId).StateType
+				CurrentState = bugReportStatesRepository.GetLatestState(bugReportId).StateType
 			};
 
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
@@ -199,7 +203,7 @@ namespace BugTracker.Controllers
 				var activityEvent = new ActivityBugReport(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportEdited, userId, bugReport.BugReportId);
 				projectRepository.AddActivity(activityEvent);
 
-				BugState latestBugState = projectRepository.GetLatestState(bugReport.BugReportId);
+				BugState latestBugState = bugReportStatesRepository.GetLatestState(bugReport.BugReportId);
 				if (!model.CurrentState.Equals(latestBugState.StateType))
 				{
 					BugState newBugState = new BugState
@@ -210,7 +214,7 @@ namespace BugTracker.Controllers
 						BugReportId = bugReport.BugReportId
 					};
 
-					var createdBugState = projectRepository.CreateBugState(newBugState);
+					var createdBugState = bugReportStatesRepository.Add(newBugState);
 
 					string bugReportUrl = Url.Action("ReportOverview", "BugReport", new { id = bugReport.BugReportId }, Request.Scheme);
 					subscriptions.NotifyBugReportStateChanged(createdBugState, bugReportUrl);
@@ -407,7 +411,7 @@ namespace BugTracker.Controllers
 				HttpContext.Session.SetInt32("currentBugReport", id);
 				BugReport bugReport = bugReportRepository.GetById(id);
 
-				var bugStates = projectRepository.GetBugStates(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
+				var bugStates = bugReportStatesRepository.GetAllById(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
 
 				var assignedMembers = projectRepository.GetAssignedUsersForBugReport(id)
 					.Select(x => new string(x.UserName)).ToList();
@@ -429,7 +433,8 @@ namespace BugTracker.Controllers
 
 				// generate activity messages
 				var applicationLinkGenerator = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
-				var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository, bugReportRepository, milestoneRepository);
+				var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository, 
+					bugReportRepository, milestoneRepository, bugReportStatesRepository);
 				activityMessageBuilder.GenerateMessages(bugViewModel.Activities);
 
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
