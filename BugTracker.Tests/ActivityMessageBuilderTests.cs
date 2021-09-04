@@ -1,6 +1,7 @@
 using BugTracker.Extension_Methods;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
+using BugTracker.Repository;
 using BugTracker.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,7 @@ namespace BugTracker.Tests
 		private readonly Mock<ILinkGenerator> mockLinkGenerator;
 
 		private readonly Mock<IProjectRepository> mockProjectRepository;
+		private readonly Mock<IMilestoneRepository> mockMilestoneRepository;
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private ActivityMessageBuilder builder;
 
@@ -28,12 +30,14 @@ namespace BugTracker.Tests
 			//mockLinkGenerator.Setup(lnk => lnk.GetPathByAction("", "", new { })).Returns("");
 
 			mockProjectRepository = new Mock<IProjectRepository>();
+			mockMilestoneRepository = new Mock<IMilestoneRepository>();
 			mockUserManager = new Mock<ApplicationUserManager>();
 
 			// inject mocked dependencies
 			builder = new ActivityMessageBuilder(
 					mockLinkGenerator.Object,
-					mockUserManager.Object, mockProjectRepository.Object
+					mockUserManager.Object, mockProjectRepository.Object,
+					mockMilestoneRepository.Object
 				);
 		}
 
