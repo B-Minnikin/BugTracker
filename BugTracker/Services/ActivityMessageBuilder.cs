@@ -9,6 +9,7 @@ using BugTracker.Extension_Methods;
 using System.Text;
 using BugTracker.Models.Authorization;
 using Microsoft.AspNetCore.Identity;
+using BugTracker.Repository;
 
 namespace BugTracker.Services
 {
@@ -17,14 +18,17 @@ namespace BugTracker.Services
 		private readonly ILinkGenerator linkGenerator;
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly IProjectRepository projectRepository;
+		private readonly IMilestoneRepository milestoneRepository;
 
 		public ActivityMessageBuilder(ILinkGenerator linkGenerator,
 			UserManager<IdentityUser> userManager,
-			IProjectRepository projectRepository)
+			IProjectRepository projectRepository,
+			IMilestoneRepository milestoneRepository)
 		{
 			this.linkGenerator = linkGenerator;
 			this.userManager = userManager;
 			this.projectRepository = projectRepository;
+			this.milestoneRepository = milestoneRepository;
 		}
 
 		public void GenerateMessages(IEnumerable<Activity> activities)
@@ -153,7 +157,7 @@ namespace BugTracker.Services
 		{
 			var milestoneId = activity.GetDerivedProperty<int>(nameof(ActivityMilestone.MilestoneId));
 			string milestoneUri = linkGenerator.GetUriByAction("Overview", "Milestone", new { milestoneId = milestoneId });
-			string milestoneName = projectRepository.GetMilestoneById(milestoneId).Title;
+			string milestoneName = milestoneRepository.GetMilestoneById(milestoneId).Title;
 			string milestoneAnchorString = GetHTMLAnchorString(milestoneUri, milestoneName);
 			return milestoneAnchorString;
 		}

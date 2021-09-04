@@ -1,6 +1,7 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
+using BugTracker.Repository;
 using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,7 @@ namespace BugTracker.Controllers
 	{
 		private readonly ILogger<BugReportController> logger;
 		private readonly IProjectRepository projectRepository;
+		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
@@ -31,6 +33,7 @@ namespace BugTracker.Controllers
 
 		public BugReportController(ILogger<BugReportController> logger,
 									        IProjectRepository projectRepository,
+										  IMilestoneRepository milestoneRepository,
 										  IAuthorizationService authorizationService,
 										  IHttpContextAccessor httpContextAccessor,
 										  ISubscriptions subscriptions,
@@ -38,6 +41,7 @@ namespace BugTracker.Controllers
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
+			this.milestoneRepository = milestoneRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -422,7 +426,7 @@ namespace BugTracker.Controllers
 
 				// generate activity messages
 				var applicationLinkGenerator = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
-				var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository);
+				var activityMessageBuilder = new ActivityMessageBuilder(applicationLinkGenerator, userManager, projectRepository, milestoneRepository);
 				activityMessageBuilder.GenerateMessages(bugViewModel.Activities);
 
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
