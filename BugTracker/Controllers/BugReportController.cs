@@ -28,6 +28,7 @@ namespace BugTracker.Controllers
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IBugReportStatesRepository bugReportStatesRepository;
+		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
@@ -39,6 +40,7 @@ namespace BugTracker.Controllers
 										  IMilestoneRepository milestoneRepository,
 										  IBugReportRepository bugReportRepository,
 										  IBugReportStatesRepository bugReportStatesRepository,
+										  IUserSubscriptionsRepository userSubscriptionsRepository,
 										  IAuthorizationService authorizationService,
 										  IHttpContextAccessor httpContextAccessor,
 										  ISubscriptions subscriptions,
@@ -49,6 +51,7 @@ namespace BugTracker.Controllers
 			this.milestoneRepository = milestoneRepository;
 			this.bugReportRepository = bugReportRepository;
 			this.bugReportStatesRepository = bugReportStatesRepository;
+			this.userSubscriptionsRepository = userSubscriptionsRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -122,7 +125,7 @@ namespace BugTracker.Controllers
 					if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedReport.BugReportId))
 					{
 						// add to subscriptions in the repo
-						projectRepository.CreateSubscription(userId, addedReport.BugReportId);
+						userSubscriptionsRepository.AddSubscription(userId, addedReport.BugReportId);
 					}
 
 					return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });

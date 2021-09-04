@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models.Authorization;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -12,29 +13,32 @@ namespace BugTracker.Models.Database
 	{
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
+		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 		private readonly IEmailHelper emailHelper;
 		private readonly ApplicationUserManager userManager;
 
 		public Subscriptions(IProjectRepository projectRepository,
 			IBugReportRepository bugReportRepository,
+			IUserSubscriptionsRepository userSubscriptionsRepository,
 			IEmailHelper emailHelper)
 		{
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
+			this.userSubscriptionsRepository = userSubscriptionsRepository;
 			this.emailHelper = emailHelper;
 			userManager = new ApplicationUserManager();
 		}
 
 		public bool IsSubscribed(int userId, int bugReportId)
 		{
-			return projectRepository.IsSubscribed(userId, bugReportId);
+			return userSubscriptionsRepository.IsSubscribed(userId, bugReportId);
 		}
 
 		public void CreateSubscriptionIfNotSubscribed(int userId, int bugReportId)
 		{
 			if(!IsSubscribed(userId, bugReportId))
 			{
-				projectRepository.CreateSubscription(userId, bugReportId);
+				userSubscriptionsRepository.AddSubscription(userId, bugReportId);
 			}
 		}
 
@@ -42,13 +46,13 @@ namespace BugTracker.Models.Database
 		{
 			if(IsSubscribed(userId, bugReportId))
 			{
-				projectRepository.DeleteSubscription(userId, bugReportId);
+				userSubscriptionsRepository.DeleteSubscription(userId, bugReportId);
 			}
 		}
 
 		public async Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl)
 		{
-			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugState.BugReportId);
+			var subscribedUserIds = userSubscriptionsRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
 			string emailSubject = ComposeBugStateEmailSubject(bugState);
 			string emailMessage = ComposeBugStateEmailMessage(bugState, bugReportUrl);
@@ -66,7 +70,7 @@ namespace BugTracker.Models.Database
 
 		public async Task NotifyBugReportNewComment(BugReportComment bugReportComment, string bugReportUrl)
 		{
-			var subscribedUserIds = projectRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
+			var subscribedUserIds = userSubscriptionsRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
 
 			var bugReport = bugReportRepository.GetById(bugReportComment.BugReportId);
 			string projectName = projectRepository.GetProjectById(bugReport.ProjectId).Name;

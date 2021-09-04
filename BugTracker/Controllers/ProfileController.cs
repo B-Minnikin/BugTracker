@@ -32,12 +32,14 @@ namespace BugTracker.Controllers
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IBugReportStatesRepository bugReportStatesRepository;
+		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 
 		public ProfileController(ILogger<ProfileController> logger,
 									IProjectRepository projectRepository,
 									IMilestoneRepository milestoneRepository,
 									IBugReportRepository bugReportRepository,
 									IBugReportStatesRepository bugReportStatesRepository,
+									IUserSubscriptionsRepository userSubscriptionsRepository,
 									IAuthorizationService authorizationService,
 									ISubscriptions subscriptions,
 									IHttpContextAccessor httpContextAccessor,
@@ -53,6 +55,7 @@ namespace BugTracker.Controllers
 			this.milestoneRepository = milestoneRepository;
 			this.bugReportRepository = bugReportRepository;
 			this.bugReportStatesRepository = bugReportStatesRepository;
+			this.userSubscriptionsRepository = userSubscriptionsRepository;
 		}
 
 		[Breadcrumb("My Profile", FromController = typeof(HomeController))]
@@ -78,7 +81,7 @@ namespace BugTracker.Controllers
 		{
 			SubscriptionsViewModel subscriptionsViewModel = new SubscriptionsViewModel
 			{
-				BugReports = projectRepository.GetSubscribedReports(id).ToList()
+				BugReports = userSubscriptionsRepository.GetSubscribedReports(id).ToList()
 			};
 
 			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------

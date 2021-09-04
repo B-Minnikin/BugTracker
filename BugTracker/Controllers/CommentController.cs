@@ -1,6 +1,7 @@
 ﻿using BugTracker.Models;
 using BugTracker.Models.Database;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,6 +21,7 @@ namespace BugTracker.Controllers
 		private readonly ILogger<CommentController> _logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
+		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
@@ -27,6 +29,7 @@ namespace BugTracker.Controllers
 		public CommentController(ILogger<CommentController> logger,
 									IProjectRepository projectRepository,
 									IBugReportRepository bugReportRepository,
+									IUserSubscriptionsRepository userSubscriptionsRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
 									ISubscriptions subscriptions)
@@ -34,6 +37,7 @@ namespace BugTracker.Controllers
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
+			this.userSubscriptionsRepository = userSubscriptionsRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -102,7 +106,7 @@ namespace BugTracker.Controllers
 
 				if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedComment.BugReportId))
 				{
-					projectRepository.CreateSubscription(userId, addedComment.BugReportId);
+					userSubscriptionsRepository.AddSubscription(userId, addedComment.BugReportId);
 				}
 
 				string bugReportUrl = Url.Action("ReportOverview", "BugReport", new { id = addedComment.BugReportId}, Request.Scheme);
