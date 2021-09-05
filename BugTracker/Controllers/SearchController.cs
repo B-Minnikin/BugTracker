@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,18 +19,21 @@ namespace BugTracker.Controllers
 		private readonly ILogger<SearchController> logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
+		private readonly ISearchRepository searchRepository;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IAuthorizationService authorizationService;
 
 		public SearchController(ILogger<SearchController> logger,
 									  IProjectRepository projectRepository,
 									  IBugReportRepository bugReportRepository,
+									  ISearchRepository searchRepository,
 									  IHttpContextAccessor httpContextAccessor,
 									  IAuthorizationService authorizationService)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
+			this.searchRepository = searchRepository;
 			this.httpContextAccessor = httpContextAccessor;
 			this.authorizationService = authorizationService;
 		}
@@ -86,7 +90,7 @@ namespace BugTracker.Controllers
 			List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
 
 			if(!string.IsNullOrEmpty(query) && projectId > 0)
-				userSearchResults = projectRepository.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId).ToList();
+				userSearchResults = searchRepository.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId).ToList();
 
 			return Json(userSearchResults);
 		}
@@ -103,9 +107,9 @@ namespace BugTracker.Controllers
 				bool intParseSuccess = Int32.TryParse(query, out localBugReportId);
 
 				if(intParseSuccess)
-					bugReportSearchResults = projectRepository.GetMatchingBugReportsByLocalIdSearchQuery(localBugReportId, projectId).ToList();
+					bugReportSearchResults = searchRepository.GetMatchingBugReportsByLocalIdSearchQuery(localBugReportId, projectId).ToList();
 				else
-					bugReportSearchResults = projectRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId).ToList();
+					bugReportSearchResults = searchRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId).ToList();
 			}
 
 			// Generate an URL for each bug report
