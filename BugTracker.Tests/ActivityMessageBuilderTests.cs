@@ -120,9 +120,9 @@ namespace BugTracker.Tests
 			ActivityMessage activityMessage = ActivityMessage.CommentPosted;
 			int userId = 1;
 			int bugReportId = 1;
-			int bugReportCommentId = 1;
+			int commentId = 1;
 
-			return new ActivityComment(timestamp, projectId, activityMessage, userId, bugReportId, bugReportCommentId);
+			return new ActivityComment(timestamp, projectId, activityMessage, userId, bugReportId, commentId);
 		}
 	}
 }

@@ -12,7 +12,7 @@ GO
 -- Description:	Update the comment specified by the comment ID.
 -- =============================================
 CREATE PROCEDURE [dbo].[Comments_Update]
-	@BugReportCommentId int,
+	@CommentId int,
 	@Author nvarchar(MAX),
 	@MainText nvarchar(MAX)
 AS
@@ -22,9 +22,9 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	UPDATE dbo.BugReportComment
+	UPDATE dbo.Comment
 	SET Author = @Author, MainText = @MainText
-	WHERE BugReportCommentId = @BugReportCommentId
+	WHERE CommentId = @CommentId
 END
 GO
 

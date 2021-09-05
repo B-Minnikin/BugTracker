@@ -68,21 +68,21 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public async Task NotifyBugReportNewComment(BugReportComment bugReportComment, string bugReportUrl)
+		public async Task NotifyBugReportNewComment(Comment comment, string bugReportUrl)
 		{
-			var subscribedUserIds = userSubscriptionsRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
+			var subscribedUserIds = userSubscriptionsRepository.GetAllSubscribedUserIds(comment.BugReportId);
 
-			var bugReport = bugReportRepository.GetById(bugReportComment.BugReportId);
+			var bugReport = bugReportRepository.GetById(comment.BugReportId);
 			string projectName = projectRepository.GetById(bugReport.ProjectId).Name;
 			string emailSubject = $"Bug report updated: {bugReport.Title}";
-			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {bugReportComment.Author}.\n" +
+			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {comment.Author}.\n" +
 				$"Please <a href=\"{ bugReportUrl}\">click here</a> to review new content.";
 
 			foreach (var userId in subscribedUserIds)
 			{
 				IdentityUser user = await userManager.FindByIdAsync(userId.ToString());
 
-				if(bugReportComment.Author != user.UserName)
+				if(comment.Author != user.UserName)
 				{
 					emailHelper.Send(user.UserName, user.Email, emailSubject, emailMessage);
 				}

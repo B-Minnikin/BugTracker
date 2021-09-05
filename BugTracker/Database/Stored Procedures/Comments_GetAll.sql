@@ -20,7 +20,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT * FROM dbo.BugReportComment WHERE BugReportId = @BugReportId
+	SELECT * FROM dbo.Comment WHERE BugReportId = @BugReportId
 END
 GO
 

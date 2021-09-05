@@ -13,7 +13,7 @@ GO
 --		ID to which it belongs.
 -- =============================================
 CREATE PROCEDURE [dbo].[Comments_GetParentId]
-	@BugReportCommentId int
+	@CommentId int
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -21,7 +21,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT BugReportId FROM dbo.BugReportComment WHERE BugReportCommentId = @BugReportCommentId
+	SELECT BugReportId FROM dbo.Comment WHERE CommentId = @CommentId
 END
 GO
 

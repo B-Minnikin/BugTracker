@@ -22,7 +22,7 @@ BEGIN
 
     -- Insert statements for procedure here
 	SELECT COUNT (*)
-	FROM dbo.BugReportComment
+	FROM dbo.Comment
 	WHERE BugReportId = @BugReportId
 END
 GO

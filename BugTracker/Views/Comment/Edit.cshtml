@@ -1,4 +1,4 @@
-﻿@model BugReportComment
+﻿@model Comment
 
 @{
     ViewBag.Title = "Edit Comment";
@@ -12,7 +12,7 @@
         <textarea asp-for="MainText" class="form-control" placeholder="@Model.MainText" rows="4" ></textarea>
     </div>
 
-    <input hidden asp-for="BugReportCommentId" placeholder="@Model.BugReportCommentId"/>
+    <input hidden asp-for="CommentId" placeholder="@Model.CommentId"/>
 
     @* Add attachment *@
 
@@ -32,4 +32,4 @@
 </form>
 
 @* Delete comment button *@
-<a asp-controller="Comment" asp-action="Delete" asp-route-id="@Model.BugReportCommentId" class="btn btn-primary">Delete Comment</a>
+<a asp-controller="Comment" asp-action="Delete" asp-route-id="@Model.CommentId" class="btn btn-primary">Delete Comment</a>

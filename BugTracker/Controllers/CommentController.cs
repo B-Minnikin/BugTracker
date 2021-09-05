@@ -94,7 +94,7 @@ namespace BugTracker.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				BugReportComment newComment = new BugReportComment
+				Comment newComment = new Comment
 				{
 					Author = HttpContext.User.Identity.Name,
 					Date = DateTime.Now,
@@ -102,12 +102,12 @@ namespace BugTracker.Controllers
 					BugReportId = model.Comment.BugReportId
 				};
 
-				BugReportComment addedComment = commentRepository.Add(newComment);
+				Comment addedComment = commentRepository.Add(newComment);
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
 				// Create activity event
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-				var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportId, addedComment.BugReportCommentId);
+				var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportId, addedComment.CommentId);
 				activityRepository.Add(commentActivity);
 
 				if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedComment.BugReportId))
@@ -127,7 +127,7 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public ViewResult Edit(int id)
 		{
-			BugReportComment bugReportComment = commentRepository.GetById(id);
+			Comment comment = commentRepository.GetById(id);
 
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = projectRepository.GetById(currentProjectId ?? 0);
@@ -153,16 +153,16 @@ namespace BugTracker.Controllers
 			ViewData["BreadcrumbNode"] = commentNode;
 			// --------------------------------------------------------------------------------------------
 
-			return View(bugReportComment);
+			return View(comment);
 
 		}
 
 		[HttpPost]
-		public IActionResult Edit(BugReportComment model)
+		public IActionResult Edit(Comment model)
 		{
 			if (ModelState.IsValid)
 			{
-				BugReportComment comment = commentRepository.GetById(model.BugReportCommentId);
+				Comment comment = commentRepository.GetById(model.CommentId);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 
 				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = comment.Author}, "CanModifyCommentPolicy");
@@ -176,7 +176,7 @@ namespace BugTracker.Controllers
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-					var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportId, comment.BugReportCommentId);
+					var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportId, comment.CommentId);
 					activityRepository.Add(commentActivity);
 				}
 				return RedirectToAction("ReportOverview", "BugReport", new { id = comment.BugReportId});

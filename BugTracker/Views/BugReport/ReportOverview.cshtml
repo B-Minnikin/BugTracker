@@ -46,15 +46,15 @@
 <hr />
 
 <h3>Comments</h3>
-@foreach (var comment in Model.BugReportComments)
+@foreach (var comment in Model.Comments)
 {
     <div class="row col-12">
         <div class="card m-3">
 
             <div class="card-header">
                 <h3>@comment.Author -- @comment.Date</h3>
-                <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.BugReportCommentId" class="btn btn-primary">Edit</a>
-                <a asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.BugReportCommentId" class="btn btn-primary">Delete</a>
+                <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.CommentId" class="btn btn-primary">Edit</a>
+                <a asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.CommentId" class="btn btn-primary">Delete</a>
             </div>
 
             <div class="card-body">

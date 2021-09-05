@@ -12,7 +12,7 @@ GO
 -- Description:	Deletes the comment specified by ID.
 -- =============================================
 CREATE PROCEDURE [dbo].[Comments_DeleteById]
-	@BugReportCommentId int
+	@CommentId int
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -20,8 +20,8 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	DELETE FROM dbo.BugReportComment
-	WHERE BugReportCommentId = @BugReportCommentId
+	DELETE FROM dbo.Comment
+	WHERE CommentId = @CommentId
 END
 GO
 

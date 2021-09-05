@@ -20,7 +20,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT * FROM dbo.AttachmentPath WHERE BugReportCommentId = @ParentId
+	SELECT * FROM dbo.AttachmentPath WHERE CommentId = @ParentId
 END
 GO
 

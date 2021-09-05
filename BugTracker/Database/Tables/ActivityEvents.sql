@@ -19,7 +19,7 @@ CREATE TABLE [dbo].[ActivityEvents](
 	[LinkedBugReportId] [int] NULL,
 	[NewBugReportStateId] [int] NULL,
 	[PreviousBugReportStateId] [int] NULL,
-	[BugReportCommentId] [int] NULL,
+	[CommentId] [int] NULL,
 	[MilestoneId] [int] NULL,
  CONSTRAINT [PK_ActivityEvents] PRIMARY KEY CLUSTERED 
 (

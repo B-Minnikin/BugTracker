@@ -8,24 +8,24 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[BugReportComment](
-	[BugReportCommentId] [int] IDENTITY(1,1) NOT NULL,
+CREATE TABLE [dbo].[Comment](
+	[CommentId] [int] IDENTITY(1,1) NOT NULL,
 	[Author] [nvarchar](max) NULL,
 	[Date] [datetime2](7) NOT NULL,
 	[MainText] [nvarchar](max) NULL,
 	[BugReportId] [int] NULL,
- CONSTRAINT [PK_BugReportComment] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Comment] PRIMARY KEY CLUSTERED 
 (
-	[BugReportCommentId] ASC
+	[CommentId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[BugReportComment]  WITH CHECK ADD  CONSTRAINT [FK_BugReportComment_BugReport_BugReportId] FOREIGN KEY([BugReportId])
+ALTER TABLE [dbo].[Comment]  WITH CHECK ADD  CONSTRAINT [FK_Comment_BugReport_BugReportId] FOREIGN KEY([BugReportId])
 REFERENCES [dbo].[BugReport] ([BugReportId])
 ON DELETE CASCADE
 GO
 
-ALTER TABLE [dbo].[BugReportComment] CHECK CONSTRAINT [FK_BugReportComment_BugReport_BugReportId]
+ALTER TABLE [dbo].[Comment] CHECK CONSTRAINT [FK_Comment_BugReport_BugReportId]
 GO
 

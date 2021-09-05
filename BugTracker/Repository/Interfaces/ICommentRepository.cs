@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Repository.Interfaces
 {
-	public interface ICommentRepository : IAdd<BugReportComment>,
-		IUpdate<BugReportComment>, IDelete<BugReportComment>,
-		IGetById<BugReportComment>, IGetAllById<BugReportComment>
+	public interface ICommentRepository : IAdd<Comment>,
+		IUpdate<Comment>, IDelete<Comment>,
+		IGetById<Comment>, IGetAllById<Comment>
 	{
-		int GetCommentParentId(int bugReportCommentId);
+		int GetCommentParentId(int commentId);
 	}
 }

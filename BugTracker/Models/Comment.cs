@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
-	public class BugReportComment
+	public class Comment
 	{
 		[Key]
-		public int BugReportCommentId { get; set; }
+		public int CommentId { get; set; }
 		public string Author { get; set; }
 		public DateTime Date { get; set; }
 		public string MainText { get; set; }

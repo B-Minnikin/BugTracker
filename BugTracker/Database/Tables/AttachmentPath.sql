@@ -11,7 +11,7 @@ GO
 CREATE TABLE [dbo].[AttachmentPath](
 	[AttachmentPathId] [int] IDENTITY(1,1) NOT NULL,
 	[Path] [nvarchar](max) NULL,
-	[BugReportCommentId] [int] NULL,
+	[CommentId] [int] NULL,
  CONSTRAINT [PK_AttachmentPath] PRIMARY KEY CLUSTERED 
 (
 	[AttachmentPathId] ASC
@@ -19,11 +19,11 @@ CREATE TABLE [dbo].[AttachmentPath](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[AttachmentPath]  WITH CHECK ADD  CONSTRAINT [FK_AttachmentPath_BugReportComment_BugReportCommentId] FOREIGN KEY([BugReportCommentId])
-REFERENCES [dbo].[BugReportComment] ([BugReportCommentId])
+ALTER TABLE [dbo].[AttachmentPath]  WITH CHECK ADD  CONSTRAINT [FK_AttachmentPath_Comment_CommentId] FOREIGN KEY([CommentId])
+REFERENCES [dbo].[Comment] ([CommentId])
 ON DELETE CASCADE
 GO
 
-ALTER TABLE [dbo].[AttachmentPath] CHECK CONSTRAINT [FK_AttachmentPath_BugReportComment_BugReportCommentId]
+ALTER TABLE [dbo].[AttachmentPath] CHECK CONSTRAINT [FK_AttachmentPath_Comment_CommentId]
 GO
 

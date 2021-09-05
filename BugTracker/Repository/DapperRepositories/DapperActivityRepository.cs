@@ -16,9 +16,9 @@ namespace BugTracker.Repository.DapperRepositories
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
-				var sql = @"INSERT INTO dbo.ActivityEvents (Timestamp, ProjectId, MessageId, UserId, BugReportId, AssigneeId, LinkedBugReportId, NewBugReportStateId, PreviousBugReportStateId, BugReportCommentId, MilestoneId)
+				var sql = @"INSERT INTO dbo.ActivityEvents (Timestamp, ProjectId, MessageId, UserId, BugReportId, AssigneeId, LinkedBugReportId, NewBugReportStateId, PreviousBugReportStateId, CommentId, MilestoneId)
 					OUTPUT inserted.ActivityId 
-					VALUES(@Timestamp, @ProjectId, @MessageId, @UserId, @BugReportId, @AssigneeId, @LinkedBugReportId, @NewBugReportStateId, @PreviousBugReportStateId, @BugReportCommentId, @MilestoneId)";
+					VALUES(@Timestamp, @ProjectId, @MessageId, @UserId, @BugReportId, @AssigneeId, @LinkedBugReportId, @NewBugReportStateId, @PreviousBugReportStateId, @CommentId, @MilestoneId)";
 				var parameters = new
 				{
 					Timestamp = DateTime.Now,
@@ -30,7 +30,7 @@ namespace BugTracker.Repository.DapperRepositories
 					LinkedBugReportId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportLink.LinkedBugReportId)),
 					NewBugReportStateId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportStateChange.NewBugReportStateId)),
 					PreviousBugReportStateId = GetDerivedPropertyOrNull(activity, nameof(ActivityBugReportStateChange.PreviousBugReportStateId)),
-					BugReportCommentId = GetDerivedPropertyOrNull(activity, nameof(ActivityComment.BugReportCommentId)),
+					CommentId = GetDerivedPropertyOrNull(activity, nameof(ActivityComment.CommentId)),
 					MilestoneId = GetDerivedPropertyOrNull(activity, nameof(ActivityMilestone.MilestoneId))
 				};
 
@@ -86,7 +86,7 @@ namespace BugTracker.Repository.DapperRepositories
 				var activityBugReportLinkParser = reader.GetRowParser<ActivityBugReportLink>();
 				var activityBugReportStateChangeParser = reader.GetRowParser<ActivityBugReportStateChange>();
 				var activityBugReportAssignedParser = reader.GetRowParser<ActivityBugReportAssigned>();
-				var activityBugReportCommentParser = reader.GetRowParser<ActivityComment>();
+				var activityCommentParser = reader.GetRowParser<ActivityComment>();
 				var activityMilestoneParser = reader.GetRowParser<ActivityMilestone>();
 				var activityMilestoneBugReportParser = reader.GetRowParser<ActivityMilestoneBugReport>();
 
@@ -105,7 +105,7 @@ namespace BugTracker.Repository.DapperRepositories
 							break;
 						case ActivityMessage.CommentPosted:
 						case ActivityMessage.CommentEdited:
-							activityEvents.Add(activityBugReportCommentParser(reader));
+							activityEvents.Add(activityCommentParser(reader));
 							break;
 						case ActivityMessage.BugReportStateChanged:
 							activityEvents.Add(activityBugReportStateChangeParser(reader));

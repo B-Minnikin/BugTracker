@@ -10,7 +10,7 @@ GO
 
 -- =============================================
 -- Description:	Create a new comment, insert into 
---		BugReportComment table, and then return the newly created
+--		Comment table, and then return the newly created
 --		comment.
 -- =============================================
 CREATE PROCEDURE [dbo].[Comments_Insert]
@@ -25,8 +25,8 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	INSERT INTO dbo.BugReportComment (Author, MainText, Date, BugReportId)
-	OUTPUT inserted.BugReportCommentId
+	INSERT INTO dbo.Comment (Author, MainText, Date, BugReportId)
+	OUTPUT inserted.CommentId
 	VALUES (@Author, @MainText, @Date, @BugReportId)
 END
 GO

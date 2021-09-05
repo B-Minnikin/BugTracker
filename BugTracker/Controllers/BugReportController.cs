@@ -433,7 +433,7 @@ namespace BugTracker.Controllers
 				OverviewBugReportViewModel bugViewModel = new OverviewBugReportViewModel
 				{
 					BugReport = bugReport,
-					BugReportComments = commentRepository.GetAllById(bugReport.BugReportId).ToList(),
+					Comments = commentRepository.GetAllById(bugReport.BugReportId).ToList(),
 					BugStates = bugStates,
 					Activities = activityRepository.GetBugReportActivities(bugReport.BugReportId).ToList(),
 					CurrentState = bugStates[0].StateType,

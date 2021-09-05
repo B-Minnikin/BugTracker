@@ -12,7 +12,7 @@ GO
 -- Description:	Get a specific comment by its ID.
 -- =============================================
 CREATE PROCEDURE [dbo].[Comments_GetById]
-	@BugReportCommentId int
+	@CommentId int
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -20,7 +20,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT * FROM dbo.BugReportComment WHERE BugReportCommentId = @BugReportCommentId
+	SELECT * FROM dbo.Comment WHERE CommentId = @CommentId
 END
 GO
 
