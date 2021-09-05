@@ -120,7 +120,7 @@ namespace BugTracker.Services
 		{
 			var projectId = activity.GetDerivedProperty<int>(nameof(Activity.ProjectId));
 			string projectUri = linkGenerator.GetUriByAction("Overview", "Projects", new { id = projectId });
-			string projectName = projectRepository.GetProjectById(projectId).Name;
+			string projectName = projectRepository.GetById(projectId).Name;
 			string projectAnchorString = GetHTMLAnchorString(projectUri, projectName);
 			return projectAnchorString;
 		}

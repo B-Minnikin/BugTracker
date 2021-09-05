@@ -63,7 +63,7 @@ namespace BugTracker.Controllers
 					}
 
 					// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-					string currentProjectName = projectRepository.GetProjectById(currentProjectId.Value).Name;
+					string currentProjectName = projectRepository.GetById(currentProjectId.Value).Name;
 					var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 					var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProjectName)
 					{
@@ -123,7 +123,7 @@ namespace BugTracker.Controllers
 
 		private DateTime GetProjectCreationTime(int projectId)
 		{
-			Project currentProject = projectRepository.GetProjectById(projectId);
+			Project currentProject = projectRepository.GetById(projectId);
 			return currentProject.CreationTime;
 		}
 	}

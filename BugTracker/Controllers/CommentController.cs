@@ -60,7 +60,7 @@ namespace BugTracker.Controllers
 				CreateCommentViewModel createCommentViewModel = new CreateCommentViewModel{};
 				createCommentViewModel.Comment.BugReportId = bugReportId;
 
-				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+				var currentProject = projectRepository.GetById(currentProjectId ?? 0);
 				var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
 				var currentBugReport = bugReportRepository.GetById(currentBugReportId ?? 0);
 
@@ -130,7 +130,7 @@ namespace BugTracker.Controllers
 			BugReportComment bugReportComment = commentRepository.GetById(id);
 
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+			var currentProject = projectRepository.GetById(currentProjectId ?? 0);
 			var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
 			var currentBugReport = bugReportRepository.GetById(currentBugReportId ?? 0);
 

@@ -11,7 +11,7 @@ namespace BugTracker.Models
 {
 	public class DapperProjectRepository : IProjectRepository
 	{
-		public Project CreateProject(Project project)
+		public Project Add(Project project)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -24,7 +24,7 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project DeleteProject(int id)
+		public Project Delete(int id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -35,7 +35,7 @@ namespace BugTracker.Models
 			}
 		}
 
-		public IEnumerable<Project> GetAllProjects()
+		public IEnumerable<Project> GetAll()
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -44,7 +44,7 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project GetProjectById(int id)
+		public Project GetById(int id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -53,7 +53,7 @@ namespace BugTracker.Models
 			}
 		}
 
-		public Project UpdateProject(Project projectChanges)
+		public Project Update(Project projectChanges)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
 			{
@@ -66,7 +66,7 @@ namespace BugTracker.Models
 					LastUpdateTime = projectChanges.LastUpdateTime,
 					Hidden = projectChanges.Hidden
 				}, commandType: CommandType.StoredProcedure);
-				var project = this.GetProjectById(projectChanges.ProjectId);
+				var project = GetById(projectChanges.ProjectId);
 				return project;
 			}
 		}

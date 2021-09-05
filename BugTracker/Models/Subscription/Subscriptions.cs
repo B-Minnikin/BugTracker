@@ -73,7 +73,7 @@ namespace BugTracker.Models.Database
 			var subscribedUserIds = userSubscriptionsRepository.GetAllSubscribedUserIds(bugReportComment.BugReportId);
 
 			var bugReport = bugReportRepository.GetById(bugReportComment.BugReportId);
-			string projectName = projectRepository.GetProjectById(bugReport.ProjectId).Name;
+			string projectName = projectRepository.GetById(bugReport.ProjectId).Name;
 			string emailSubject = $"Bug report updated: {bugReport.Title}";
 			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {bugReportComment.Author}.\n" +
 				$"Please <a href=\"{ bugReportUrl}\">click here</a> to review new content.";
@@ -100,7 +100,7 @@ namespace BugTracker.Models.Database
 		private string ComposeBugStateEmailMessage(BugState bugState, string bugReportUrl)
 		{
 			var bugReport = bugReportRepository.GetById(bugState.BugReportId);
-			string projectName = projectRepository.GetProjectById(bugReport.ProjectId).Name;
+			string projectName = projectRepository.GetById(bugReport.ProjectId).Name;
 			string stateName = bugState.StateType.ToString().First().ToString().ToUpper() + bugState.StateType.ToString().Substring(1);
 
 			string message = $"Project: {projectName}\n{bugReport.Title} state updated to {stateName}\n" +

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BugTracker.Repository;
+using BugTracker.Repository.Common;
+using Microsoft.AspNetCore.Identity;
 using Org.BouncyCastle.Bcpg;
 using System;
 using System.Collections.Generic;
@@ -7,13 +9,15 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
-	public interface IProjectRepository
+	public interface IProjectRepository : IAdd<Project>,
+		IUpdate<Project>, IDelete<Project>,
+		IGetById<Project>
 	{
 		// Projects
-		Project GetProjectById(int id);
-		IEnumerable<Project> GetAllProjects();
-		Project CreateProject(Project project);
-		Project UpdateProject(Project projectChanges);
-		Project DeleteProject(int id);
+		//Project GetProjectById(int id);
+		IEnumerable<Project> GetAll();
+		//Project CreateProject(Project project);
+		//Project UpdateProject(Project projectChanges);
+		//Project DeleteProject(int id);
 	}
 }

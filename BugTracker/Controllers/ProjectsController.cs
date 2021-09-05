@@ -50,7 +50,7 @@ namespace BugTracker.Controllers
 		[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]
 		public ViewResult Projects()
 		{
-			var model = projectRepository.GetAllProjects().Where(project =>
+			var model = projectRepository.GetAll().Where(project =>
 					{
 						Task<AuthorizationResult> authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, project.ProjectId, "CanAccessProjectPolicy");
 						if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -69,7 +69,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanAccessProjectPolicy");
 			if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				Project project = projectRepository.GetProjectById(id);
+				Project project = projectRepository.GetById(id);
 				HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
 				OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
@@ -121,7 +121,7 @@ namespace BugTracker.Controllers
 					BugReports = new List<BugReport>()
 				};
 
-				Project addedProject = projectRepository.CreateProject(newProject);
+				Project addedProject = projectRepository.Add(newProject);
 				bugReportRepository.AddLocalBugReportId(addedProject.ProjectId);
 
 				// Create activity event
@@ -146,7 +146,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				projectRepository.DeleteProject(id);
+				projectRepository.Delete(id);
 				_logger.LogInformation($"Project deleted. ID: {id}");
 			}
 
@@ -159,7 +159,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var project = projectRepository.GetProjectById(id);
+				var project = projectRepository.GetById(id);
 				EditProjectViewModel projectViewModel = new EditProjectViewModel
 				{
 					Project = project
@@ -192,13 +192,13 @@ namespace BugTracker.Controllers
 			{
 				if (ModelState.IsValid)
 				{
-					Project project = projectRepository.GetProjectById(model.Project.ProjectId);
+					Project project = projectRepository.GetById(model.Project.ProjectId);
 					project.Name = model.Project.Name;
 					project.Description = model.Project.Description;
 					project.Hidden = model.Project.Hidden;
 					project.LastUpdateTime = DateTime.Now;
 
-					_ = projectRepository.UpdateProject(project);
+					_ = projectRepository.Update(project);
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -218,7 +218,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var project = projectRepository.GetProjectById(id);
+				var project = projectRepository.GetById(id);
 				InvitesViewModel invitesViewModel = new InvitesViewModel
 				{
 					ProjectId = id
@@ -255,7 +255,7 @@ namespace BugTracker.Controllers
 					ProjectInvitation invitation = new ProjectInvitation
 					{
 						EmailAddress = model.EmailAddress,
-						Project = projectRepository.GetProjectById(model.ProjectId),
+						Project = projectRepository.GetById(model.ProjectId),
 						ToUser = null,
 						FromUser = await userManager.GetUserAsync(HttpContext.User)
 					};

@@ -52,7 +52,7 @@ namespace BugTracker.Controllers
 		public IActionResult Milestones(int projectId)
 		{
 			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-			var currentProject = projectRepository.GetProjectById(projectId);
+			var currentProject = projectRepository.GetById(projectId);
 			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 			{
@@ -100,7 +100,7 @@ namespace BugTracker.Controllers
 		public IActionResult Overview(int milestoneId)
 		{
 			Milestone model = milestoneRepository.GetById(milestoneId);
-			var currentProject = projectRepository.GetProjectById(model.ProjectId);
+			var currentProject = projectRepository.GetById(model.ProjectId);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -148,7 +148,7 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult New(int projectId)
 		{
-			var currentProject = projectRepository.GetProjectById(projectId);
+			var currentProject = projectRepository.GetById(projectId);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -234,7 +234,7 @@ namespace BugTracker.Controllers
 		public IActionResult Edit(int milestoneId)
 		{
 			var currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetProjectById(currentProjectId);
+			var currentProject = projectRepository.GetById(currentProjectId);
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{

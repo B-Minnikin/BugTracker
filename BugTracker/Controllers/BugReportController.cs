@@ -69,7 +69,7 @@ namespace BugTracker.Controllers
 		public ViewResult CreateReport()
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+			var currentProject = projectRepository.GetById(currentProjectId ?? 0);
 
 			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
@@ -160,7 +160,7 @@ namespace BugTracker.Controllers
 			};
 
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+			var currentProject = projectRepository.GetById(currentProjectId ?? 0);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = reportViewModel.BugReport.PersonReporting}, "CanModifyReportPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -263,7 +263,7 @@ namespace BugTracker.Controllers
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var currentProject = projectRepository.GetProjectById(currentProjectId);
+				var currentProject = projectRepository.GetById(currentProjectId);
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 				{
@@ -344,7 +344,7 @@ namespace BugTracker.Controllers
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var currentProject = projectRepository.GetProjectById(currentProjectId);
+				var currentProject = projectRepository.GetById(currentProjectId);
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
 				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
 				{
@@ -457,7 +457,7 @@ namespace BugTracker.Controllers
 					bugViewModel.DisableAssignMembersButton = false;
 				}
 
-				var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
+				var currentProject = projectRepository.GetById(currentProjectId ?? 0);
 
 				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
