@@ -70,15 +70,5 @@ namespace BugTracker.Models
 				return project;
 			}
 		}
-
-		private int InsertActivityByTable(object fieldProperties, string activityTablePostfix)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				int insertedActivityId = (Int32)connection.ExecuteScalar($"dbo.Activity{ activityTablePostfix }_Insert", fieldProperties,
-					commandType: CommandType.StoredProcedure);
-				return insertedActivityId;
-			}
-		}
 	}
 }
