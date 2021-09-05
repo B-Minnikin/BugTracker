@@ -17,7 +17,7 @@ namespace BugTracker.Repository.DapperRepositories
 			{
 				var insertedCommentId = connection.ExecuteScalar("dbo.Comments_Insert", new
 				{
-					Author = comment.Author,
+					AuthorId = comment.AuthorId,
 					Date = comment.Date,
 					MainText = comment.MainText,
 					BugReportId = comment.BugReportId
@@ -35,7 +35,7 @@ namespace BugTracker.Repository.DapperRepositories
 				connection.Execute("dbo.Comments_Update", new
 				{
 					CommentId = commentChanges.CommentId,
-					Author = commentChanges.Author,
+					AuthorId = commentChanges.AuthorId,
 					MainText = commentChanges.MainText
 				}, commandType: CommandType.StoredProcedure);
 				Comment updatedComment = connection.QueryFirst<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = commentChanges.CommentId });

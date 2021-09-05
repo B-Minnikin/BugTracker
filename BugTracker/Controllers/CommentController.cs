@@ -94,16 +94,17 @@ namespace BugTracker.Controllers
 		{
 			if (ModelState.IsValid)
 			{
+				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
 				Comment newComment = new Comment
 				{
-					Author = HttpContext.User.Identity.Name,
+					AuthorId = userId,
 					Date = DateTime.Now,
 					MainText = model.Comment.MainText,
 					BugReportId = model.Comment.BugReportId
 				};
 
 				Comment addedComment = commentRepository.Add(newComment);
-				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
 				// Create activity event
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
@@ -165,7 +166,7 @@ namespace BugTracker.Controllers
 				Comment comment = commentRepository.GetById(model.CommentId);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 
-				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = comment.Author}, "CanModifyCommentPolicy");
+				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = comment.AuthorId}, "CanModifyCommentPolicy");
 				if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 				{
 					comment.MainText = model.MainText;
@@ -189,7 +190,7 @@ namespace BugTracker.Controllers
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			int parentBugReportId = commentRepository.GetCommentParentId(id);
-			string commentAuthor = commentRepository.GetById(id).Author;
+			int commentAuthor = commentRepository.GetById(id).AuthorId;
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = commentAuthor }, "CanModifyCommentPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)

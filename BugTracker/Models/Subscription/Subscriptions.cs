@@ -75,14 +75,14 @@ namespace BugTracker.Models.Database
 			var bugReport = bugReportRepository.GetById(comment.BugReportId);
 			string projectName = projectRepository.GetById(bugReport.ProjectId).Name;
 			string emailSubject = $"Bug report updated: {bugReport.Title}";
-			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {comment.Author}.\n" +
+			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {comment.AuthorId}.\n" +
 				$"Please <a href=\"{ bugReportUrl}\">click here</a> to review new content.";
 
 			foreach (var userId in subscribedUserIds)
 			{
 				IdentityUser user = await userManager.FindByIdAsync(userId.ToString());
 
-				if(comment.Author != user.UserName)
+				if(comment.AuthorId != int.Parse(user.Id))
 				{
 					emailHelper.Send(user.UserName, user.Email, emailSubject, emailMessage);
 				}

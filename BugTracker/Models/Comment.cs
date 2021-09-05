@@ -10,7 +10,7 @@ namespace BugTracker.Models
 	{
 		[Key]
 		public int CommentId { get; set; }
-		public string Author { get; set; }
+		public int AuthorId { get; set; }
 		public DateTime Date { get; set; }
 		public string MainText { get; set; }
 		public int BugReportId { get; set; }

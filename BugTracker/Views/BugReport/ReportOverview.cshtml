@@ -1,4 +1,5 @@
 ﻿@model OverviewBugReportViewModel
+@inject UserManager<IdentityUser> userManager
 
 @{
     ViewBag.Title = "Bug Report Overview";
@@ -52,7 +53,7 @@
         <div class="card m-3">
 
             <div class="card-header">
-                <h3>@comment.Author -- @comment.Date</h3>
+                <h3>@userManager.FindByIdAsync(comment.AuthorId.ToString()).Result.UserName -- @comment.Date</h3>
                 <a asp-controller="Comment" asp-action="Edit" asp-route-id="@comment.CommentId" class="btn btn-primary">Edit</a>
                 <a asp-controller="Comment" asp-action="Delete" asp-route-id="@comment.CommentId" class="btn btn-primary">Delete</a>
             </div>
