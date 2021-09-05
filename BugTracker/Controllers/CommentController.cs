@@ -22,6 +22,7 @@ namespace BugTracker.Controllers
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
+		private readonly IActivityRepository activityRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
@@ -30,6 +31,7 @@ namespace BugTracker.Controllers
 									IProjectRepository projectRepository,
 									IBugReportRepository bugReportRepository,
 									IUserSubscriptionsRepository userSubscriptionsRepository,
+									IActivityRepository activityRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
 									ISubscriptions subscriptions)
@@ -38,6 +40,7 @@ namespace BugTracker.Controllers
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
 			this.userSubscriptionsRepository = userSubscriptionsRepository;
+			this.activityRepository = activityRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -102,7 +105,7 @@ namespace BugTracker.Controllers
 				// Create activity event
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 				var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportId, addedComment.BugReportCommentId);
-				projectRepository.AddActivity(commentActivity);
+				activityRepository.Add(commentActivity);
 
 				if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedComment.BugReportId))
 				{
@@ -171,7 +174,7 @@ namespace BugTracker.Controllers
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportId, comment.BugReportCommentId);
-					projectRepository.AddActivity(commentActivity);
+					activityRepository.Add(commentActivity);
 				}
 				return RedirectToAction("ReportOverview", "BugReport", new { id = comment.BugReportId});
 			}

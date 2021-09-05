@@ -33,6 +33,7 @@ namespace BugTracker.Controllers
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IBugReportStatesRepository bugReportStatesRepository;
 		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
+		private readonly IActivityRepository activityRepository;
 
 		public ProfileController(ILogger<ProfileController> logger,
 									IProjectRepository projectRepository,
@@ -40,6 +41,7 @@ namespace BugTracker.Controllers
 									IBugReportRepository bugReportRepository,
 									IBugReportStatesRepository bugReportStatesRepository,
 									IUserSubscriptionsRepository userSubscriptionsRepository,
+									IActivityRepository activityRepository,
 									IAuthorizationService authorizationService,
 									ISubscriptions subscriptions,
 									IHttpContextAccessor httpContextAccessor,
@@ -56,6 +58,7 @@ namespace BugTracker.Controllers
 			this.bugReportRepository = bugReportRepository;
 			this.bugReportStatesRepository = bugReportStatesRepository;
 			this.userSubscriptionsRepository = userSubscriptionsRepository;
+			this.activityRepository = activityRepository;
 		}
 
 		[Breadcrumb("My Profile", FromController = typeof(HomeController))]
@@ -64,7 +67,7 @@ namespace BugTracker.Controllers
 			EditProfileViewModel viewModel = new EditProfileViewModel
 			{
 				User = userManager.FindByIdAsync(id).Result,
-				Activities = projectRepository.GetUserActivities(Int32.Parse(id)).ToList()
+				Activities = activityRepository.GetUserActivities(Int32.Parse(id)).ToList()
 			};
 
 			// generate activity messages

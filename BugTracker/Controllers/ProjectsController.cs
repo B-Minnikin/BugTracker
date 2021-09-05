@@ -2,6 +2,7 @@
 using BugTracker.Models.Authorization;
 using BugTracker.Models.ProjectInvitation;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,7 @@ namespace BugTracker.Controllers
 		private readonly ILogger<HomeController> _logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
+		private readonly IActivityRepository activityRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IProjectInviter projectInviter;
@@ -30,6 +32,7 @@ namespace BugTracker.Controllers
 		public ProjectsController(ILogger<HomeController> logger,
 									IProjectRepository projectRepository,
 									IBugReportRepository bugReportRepository,
+									IActivityRepository activityRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
 									IProjectInviter projectInvitation)
@@ -37,6 +40,7 @@ namespace BugTracker.Controllers
 			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
+			this.activityRepository = activityRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.projectInviter = projectInvitation;
@@ -123,7 +127,7 @@ namespace BugTracker.Controllers
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 				var activityEvent = new ActivityProject(DateTime.Now, addedProject.ProjectId, ActivityMessage.ProjectCreated, userId);
-				projectRepository.AddActivity(activityEvent);
+				activityRepository.Add(activityEvent);
 
 				// Add the user who created the project to its administrator role
 				var user = await userManager.FindByIdAsync(userId.ToString());
@@ -199,7 +203,7 @@ namespace BugTracker.Controllers
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					var activityEvent = new ActivityProject(DateTime.Now, model.Project.ProjectId, ActivityMessage.ProjectEdited, userId);
-					projectRepository.AddActivity(activityEvent);
+					activityRepository.Add(activityEvent);
 
 					return RedirectToAction("Overview", new { id = project.ProjectId });
 				}
