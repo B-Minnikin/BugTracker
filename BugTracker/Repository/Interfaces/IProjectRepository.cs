@@ -13,11 +13,6 @@ namespace BugTracker.Models
 		IUpdate<Project>, IDelete<Project>,
 		IGetById<Project>
 	{
-		// Projects
-		//Project GetProjectById(int id);
 		IEnumerable<Project> GetAll();
-		//Project CreateProject(Project project);
-		//Project UpdateProject(Project projectChanges);
-		//Project DeleteProject(int id);
 	}
 }

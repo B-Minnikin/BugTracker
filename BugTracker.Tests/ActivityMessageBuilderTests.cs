@@ -2,6 +2,7 @@ using BugTracker.Extension_Methods;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Repository;
+using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +20,9 @@ namespace BugTracker.Tests
 		private readonly Mock<ILinkGenerator> mockLinkGenerator;
 
 		private readonly Mock<IProjectRepository> mockProjectRepository;
+		private readonly Mock<IBugReportRepository> mockBugReportRepository;
 		private readonly Mock<IMilestoneRepository> mockMilestoneRepository;
+		private readonly Mock<IBugReportStatesRepository> mockBugReportStatesRepository;
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private ActivityMessageBuilder builder;
 
@@ -30,14 +33,18 @@ namespace BugTracker.Tests
 			//mockLinkGenerator.Setup(lnk => lnk.GetPathByAction("", "", new { })).Returns("");
 
 			mockProjectRepository = new Mock<IProjectRepository>();
+			mockBugReportRepository = new Mock<IBugReportRepository>();
 			mockMilestoneRepository = new Mock<IMilestoneRepository>();
+			mockBugReportStatesRepository = new Mock<IBugReportStatesRepository>();
 			mockUserManager = new Mock<ApplicationUserManager>();
 
 			// inject mocked dependencies
 			builder = new ActivityMessageBuilder(
 					mockLinkGenerator.Object,
 					mockUserManager.Object, mockProjectRepository.Object,
-					mockMilestoneRepository.Object
+					mockBugReportRepository.Object,
+					mockMilestoneRepository.Object,
+					mockBugReportStatesRepository.Object
 				);
 		}
 
@@ -58,7 +65,7 @@ namespace BugTracker.Tests
 		{
 			ActivityComment activity = GetTestActivityComment();
 
-			mockProjectRepository.Setup(repo => repo.GetBugReportById(activity.BugReportId)).Returns(new BugReport { Title = "Comment Activity Test Report"});
+			mockBugReportRepository.Setup(repo => repo.GetById(activity.BugReportId)).Returns(new BugReport { Title = "Comment Activity Test Report"});
 
 			// User
 			string userName = "John Smith";
