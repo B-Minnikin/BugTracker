@@ -46,6 +46,9 @@ namespace BugTracker
 			services.AddScoped<IBugReportStatesRepository, DapperBugReportStatesRepository>();
 			services.AddScoped<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>();
 			services.AddScoped<IActivityRepository, DapperActivityRepository>();
+			services.AddScoped<ICommentRepository, DapperCommentRepository>();
+			services.AddScoped<ICommentRepository, DapperCommentRepository>();
+			services.AddScoped<IProjectInvitationsRepository, DapperProjectInvitationsRepository>();
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();

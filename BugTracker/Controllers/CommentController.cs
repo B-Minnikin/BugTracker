@@ -23,6 +23,7 @@ namespace BugTracker.Controllers
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 		private readonly IActivityRepository activityRepository;
+		private readonly ICommentRepository commentRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
@@ -32,6 +33,7 @@ namespace BugTracker.Controllers
 									IBugReportRepository bugReportRepository,
 									IUserSubscriptionsRepository userSubscriptionsRepository,
 									IActivityRepository activityRepository,
+									ICommentRepository commentRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
 									ISubscriptions subscriptions)
@@ -41,6 +43,7 @@ namespace BugTracker.Controllers
 			this.bugReportRepository = bugReportRepository;
 			this.userSubscriptionsRepository = userSubscriptionsRepository;
 			this.activityRepository = activityRepository;
+			this.commentRepository = commentRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -99,7 +102,7 @@ namespace BugTracker.Controllers
 					BugReportId = model.Comment.BugReportId
 				};
 
-				BugReportComment addedComment = projectRepository.CreateComment(newComment);
+				BugReportComment addedComment = commentRepository.Add(newComment);
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
 				// Create activity event
@@ -124,7 +127,7 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public ViewResult Edit(int id)
 		{
-			BugReportComment bugReportComment = projectRepository.GetBugReportCommentById(id);
+			BugReportComment bugReportComment = commentRepository.GetById(id);
 
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = projectRepository.GetProjectById(currentProjectId ?? 0);
@@ -159,7 +162,7 @@ namespace BugTracker.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				BugReportComment comment = projectRepository.GetBugReportCommentById(model.BugReportCommentId);
+				BugReportComment comment = commentRepository.GetById(model.BugReportCommentId);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 
 				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = comment.Author}, "CanModifyCommentPolicy");
@@ -169,7 +172,7 @@ namespace BugTracker.Controllers
 					// increment edit count
 					// update edit time
 
-					projectRepository.UpdateBugReportComment(comment);
+					commentRepository.Update(comment);
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -185,13 +188,13 @@ namespace BugTracker.Controllers
 		public IActionResult Delete(int id)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			int parentBugReportId = projectRepository.GetCommentParentId(id);
-			string commentAuthor = projectRepository.GetBugReportCommentById(id).Author;
+			int parentBugReportId = commentRepository.GetCommentParentId(id);
+			string commentAuthor = commentRepository.GetById(id).Author;
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = commentAuthor }, "CanModifyCommentPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				projectRepository.DeleteComment(id);
+				commentRepository.Delete(id);
 			}
 
 			return RedirectToAction("ReportOverview", "BugReport", new { id = parentBugReportId });

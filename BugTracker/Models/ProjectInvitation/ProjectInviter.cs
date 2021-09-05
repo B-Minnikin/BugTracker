@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models.Authorization;
+using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,7 @@ namespace BugTracker.Models.ProjectInvitation
 	public class ProjectInviter : IProjectInviter
 	{
 		private readonly IProjectRepository projectRepository;
+		private readonly IProjectInvitationsRepository projectInvitationsRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IEmailHelper emailHelper;
 		private readonly IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory;
@@ -22,12 +24,14 @@ namespace BugTracker.Models.ProjectInvitation
 		private readonly ApplicationUserManager userManager;
 
 		public ProjectInviter(IProjectRepository projectRepository,
+			IProjectInvitationsRepository projectInvitationsRepository,
 			IAuthorizationService authorizationService,
 			IEmailHelper emailHelper,
 			IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory,
 			ILogger<ProjectInviter> logger)
 		{
 			this.projectRepository = projectRepository;
+			this.projectInvitationsRepository = projectInvitationsRepository;
 			this.authorizationService = authorizationService;
 			this.emailHelper = emailHelper;
 			this.userClaimsPrincipalFactory = userClaimsPrincipalFactory;
@@ -46,7 +50,7 @@ namespace BugTracker.Models.ProjectInvitation
 			{
 				if(!emailAddressIsPendingRegistration)
 				{
-					projectRepository.CreatePendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
+					projectInvitationsRepository.AddPendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
 					SendProjectInvitationEmail(invitation);
 				}
 			}
@@ -66,7 +70,7 @@ namespace BugTracker.Models.ProjectInvitation
 		{
 			if(EmailAddressPendingRegistration(emailAddress, projectId))
 			{
-				projectRepository.RemovePendingProjectInvitation(emailAddress, projectId);
+				projectInvitationsRepository.DeletePendingProjectInvitation(emailAddress, projectId);
 			}
 			else
 			{
@@ -81,7 +85,7 @@ namespace BugTracker.Models.ProjectInvitation
 
 			if(user != null)
 			{
-				List<int> projectIds = projectRepository.GetProjectInvitationsForEmailAddress(emailAddress).ToList();
+				List<int> projectIds = projectInvitationsRepository.GetProjectInvitationsForEmailAddress(emailAddress).ToList();
 				foreach (int projectId in projectIds)
 				{
 					await userManager.AddToRoleAsync(user, "Member", projectId);
@@ -92,7 +96,7 @@ namespace BugTracker.Models.ProjectInvitation
 
 		private bool EmailAddressPendingRegistration(string emailAddress, int projectId)
 		{
-			return projectRepository.IsEmailAddressPendingRegistration(emailAddress, projectId);
+			return projectInvitationsRepository.IsEmailAddressPendingRegistration(emailAddress, projectId);
 		}
 
 		private async Task<bool> UserHasProjectAuthorization(string emailAddress, int projectId)

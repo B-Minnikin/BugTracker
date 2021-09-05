@@ -30,6 +30,7 @@ namespace BugTracker.Controllers
 		private readonly IBugReportStatesRepository bugReportStatesRepository;
 		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 		private readonly IActivityRepository activityRepository;
+		private readonly ICommentRepository commentRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
@@ -43,6 +44,7 @@ namespace BugTracker.Controllers
 										  IBugReportStatesRepository bugReportStatesRepository,
 										  IUserSubscriptionsRepository userSubscriptionsRepository,
 										  IActivityRepository activityRepository,
+										  ICommentRepository commentRepository,
 										  IAuthorizationService authorizationService,
 										  IHttpContextAccessor httpContextAccessor,
 										  ISubscriptions subscriptions,
@@ -55,6 +57,7 @@ namespace BugTracker.Controllers
 			this.bugReportStatesRepository = bugReportStatesRepository;
 			this.userSubscriptionsRepository = userSubscriptionsRepository;
 			this.activityRepository = activityRepository;
+			this.commentRepository = commentRepository;
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
@@ -430,7 +433,7 @@ namespace BugTracker.Controllers
 				OverviewBugReportViewModel bugViewModel = new OverviewBugReportViewModel
 				{
 					BugReport = bugReport,
-					BugReportComments = projectRepository.GetBugReportComments(bugReport.BugReportId).ToList(),
+					BugReportComments = commentRepository.GetAllById(bugReport.BugReportId).ToList(),
 					BugStates = bugStates,
 					Activities = activityRepository.GetBugReportActivities(bugReport.BugReportId).ToList(),
 					CurrentState = bugStates[0].StateType,

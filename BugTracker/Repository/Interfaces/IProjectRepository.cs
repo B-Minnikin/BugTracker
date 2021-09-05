@@ -25,14 +25,6 @@ namespace BugTracker.Models
 		IEnumerable<BugReport> GetBugReportsForAssignedUser(int userId);
 		IEnumerable<IdentityUser> GetAssignedUsersForBugReport(int bugReportId);
 
-		// Bug Report Comments
-		BugReportComment CreateComment(BugReportComment bugReportComment);
-		IEnumerable<BugReportComment> GetBugReportComments(int bugReportId);
-		BugReportComment GetBugReportCommentById(int bugReportCommentId);
-		BugReportComment UpdateBugReportComment(BugReportComment bugReportCommentChanges);
-		void DeleteComment(int bugReportCommentId);
-		int GetCommentParentId(int bugReportCommentId);
-
 		// Bug Report Linking
 		void AddBugReportLink(int bugReportId, int linkToBugReportId);
 		void RemoveBugReportLink(int bugReportId, int linkToBugReportId);
@@ -40,12 +32,6 @@ namespace BugTracker.Models
 
 		// Attachment Paths
 		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
-
-		// Project Invitations
-		void CreatePendingProjectInvitation(string emailAddress, int projectId);
-		void RemovePendingProjectInvitation(string emailAddress, int projectId);
-		bool IsEmailAddressPendingRegistration(string emailAddress, int projectId);
-		IEnumerable<int> GetProjectInvitationsForEmailAddress(string emailAddress);
 
 		// Search
 		IEnumerable<UserTypeaheadSearchResult> GetMatchingProjectMembersBySearchQuery(string query, int projectId);

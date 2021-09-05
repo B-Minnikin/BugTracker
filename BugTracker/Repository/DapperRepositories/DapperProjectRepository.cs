@@ -24,23 +24,6 @@ namespace BugTracker.Models
 			}
 		}
 
-		public BugReportComment CreateComment(BugReportComment bugReportComment)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var insertedCommentId = connection.ExecuteScalar("dbo.Comments_Insert", new
-				{
-					Author = bugReportComment.Author,
-					Date = bugReportComment.Date,
-					MainText = bugReportComment.MainText,
-					BugReportId = bugReportComment.BugReportId
-				},
-					commandType: CommandType.StoredProcedure);
-				BugReportComment insertedComment = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportCommentId = insertedCommentId });
-				return insertedComment;
-			}
-		}
-
 		public Project DeleteProject(int id)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
@@ -70,15 +53,6 @@ namespace BugTracker.Models
 			}
 		}
 
-		public BugReportComment GetBugReportCommentById(int bugReportCommentId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var comment = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportCommentId = bugReportCommentId });
-				return comment;
-			}
-		}
-
 		public Project UpdateProject(Project projectChanges)
 		{
 			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
@@ -94,30 +68,6 @@ namespace BugTracker.Models
 				}, commandType: CommandType.StoredProcedure);
 				var project = this.GetProjectById(projectChanges.ProjectId);
 				return project;
-			}
-		}
-
-		public BugReportComment UpdateBugReportComment(BugReportComment bugReportCommentChanges)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				connection.Execute("dbo.Comments_Update", new
-				{
-					BugReportCommentId = bugReportCommentChanges.BugReportCommentId,
-					Author = bugReportCommentChanges.Author,
-					MainText = bugReportCommentChanges.MainText
-				}, commandType: CommandType.StoredProcedure);
-				BugReportComment updatedComment = connection.QueryFirst<BugReportComment>("dbo.Comments_GetById @BugReportCommentId", new { BugReportCommentId = bugReportCommentChanges.BugReportCommentId });
-				return updatedComment;
-			}
-		}
-
-		public IEnumerable<BugReportComment> GetBugReportComments(int bugReportId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var comments = connection.Query<BugReportComment>("dbo.Comments_GetAll @BugReportId", new { BugReportId = bugReportId });
-				return comments;
 			}
 		}
 
@@ -141,62 +91,6 @@ namespace BugTracker.Models
 
 				var attachmentPaths = connection.Query<AttachmentPath>(procedure, new { ParentId = parentId });
 				return attachmentPaths;
-			}
-		}
-
-		public void DeleteComment(int bugReportCommentId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				connection.Execute("dbo.Comments_DeleteById", new { BugReportCommentId = bugReportCommentId },
-					commandType: CommandType.StoredProcedure);
-			}
-		}
-
-		public int GetCommentParentId(int bugReportCommentId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var parentId = connection.QueryFirst<int>("dbo.Comments_GetParentId @BugReportCommentId", new { BugReportCommentId = bugReportCommentId });
-				return parentId;
-			}
-		}
-
-		public void CreatePendingProjectInvitation(string emailAddress, int projectId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				connection.Execute("dbo.ProjectInvitations_Insert", new { EmailAddress = emailAddress, ProjectId = projectId },
-					commandType: CommandType.StoredProcedure);
-			}
-		}
-
-		public void RemovePendingProjectInvitation(string emailAddress, int projectId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				connection.Execute("dbo.ProjectInvitations_Delete", new { EmailAddress = emailAddress, ProjectId = projectId },
-					commandType: CommandType.StoredProcedure);
-			}
-		}
-
-		public bool IsEmailAddressPendingRegistration(string emailAddress, int projectId)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var pendingRegistration = connection.ExecuteScalar<bool>("dbo.ProjectInvitations_IsPendingRegistration", new { EmailAddress = emailAddress, ProjectId = projectId },
-					commandType: CommandType.StoredProcedure);
-				return pendingRegistration;
-			}
-		}
-
-		public IEnumerable<int> GetProjectInvitationsForEmailAddress(string emailAddress)
-		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
-			{
-				var projectIds = connection.Query<int>("dbo.ProjectInvitations_GetInvitationsForEmailAddress", new { EmailAddress = emailAddress },
-					commandType: CommandType.StoredProcedure);
-				return projectIds;
 			}
 		}
 
