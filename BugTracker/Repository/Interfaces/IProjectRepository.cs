@@ -15,22 +15,5 @@ namespace BugTracker.Models
 		Project CreateProject(Project project);
 		Project UpdateProject(Project projectChanges);
 		Project DeleteProject(int id);
-
-		// Bug Reports - Local IDs
-		void CreateLocalBugReportId(int projectId);
-
-		// Users assigned to bug reports
-		void AddUserAssignedToBugReport(int userId, int bugReportId);
-		void RemoveUserAssignedToBugReport(int userId, int bugReportId);
-		IEnumerable<BugReport> GetBugReportsForAssignedUser(int userId);
-		IEnumerable<IdentityUser> GetAssignedUsersForBugReport(int bugReportId);
-
-		// Bug Report Linking
-		void AddBugReportLink(int bugReportId, int linkToBugReportId);
-		void RemoveBugReportLink(int bugReportId, int linkToBugReportId);
-		IEnumerable<BugReport> GetLinkedReports(int bugReportId);
-
-		// Attachment Paths
-		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
 	}
 }

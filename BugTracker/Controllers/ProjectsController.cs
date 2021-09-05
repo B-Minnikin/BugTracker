@@ -122,7 +122,7 @@ namespace BugTracker.Controllers
 				};
 
 				Project addedProject = projectRepository.CreateProject(newProject);
-				projectRepository.CreateLocalBugReportId(addedProject.ProjectId);
+				bugReportRepository.AddLocalBugReportId(addedProject.ProjectId);
 
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);

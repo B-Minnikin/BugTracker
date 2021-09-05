@@ -286,7 +286,7 @@ namespace BugTracker.Controllers
 				{
 					BugReportId = bugReportId,
 					ProjectId = currentProjectId,
-					AssignedUsers = projectRepository.GetAssignedUsersForBugReport(bugReportId).ToList()
+					AssignedUsers = bugReportRepository.GetAssignedUsersForBugReport(bugReportId).ToList()
 				};
 
 				return View(viewModel);
@@ -304,7 +304,7 @@ namespace BugTracker.Controllers
 				var user = await userManager.FindByEmailAsync(model.MemberEmail);
 				var assignedUserId = Int32.Parse(user.Id);
 
-				projectRepository.AddUserAssignedToBugReport(assignedUserId, model.BugReportId);
+				bugReportRepository.AddUserAssignedToBugReport(assignedUserId, model.BugReportId);
 
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -326,7 +326,7 @@ namespace BugTracker.Controllers
 			{
 				var user = await userManager.FindByEmailAsync(memberEmail);
 
-				projectRepository.RemoveUserAssignedToBugReport(Int32.Parse(user.Id), bugReportId);
+				bugReportRepository.DeleteUserAssignedToBugReport(Int32.Parse(user.Id), bugReportId);
 
 				return RedirectToAction("AssignMember", new { bugReportId });
 			}
@@ -366,7 +366,7 @@ namespace BugTracker.Controllers
 				ManageLinksViewModel model = new ManageLinksViewModel {
 					ProjectId = currentProjectId,
 					BugReportId = bugReportId,
-					LinkedReports = projectRepository.GetLinkedReports(bugReportId).ToList()
+					LinkedReports = bugReportRepository.GetLinkedReports(bugReportId).ToList()
 				};
 
 				return View(model);
@@ -382,7 +382,7 @@ namespace BugTracker.Controllers
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				var linkToReport = bugReportRepository.GetBugReportByLocalId(model.LinkToBugReportLocalId, model.ProjectId);
-				projectRepository.AddBugReportLink(model.BugReportId, linkToReport.BugReportId);
+				bugReportRepository.AddBugReportLink(model.BugReportId, linkToReport.BugReportId);
 
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -402,7 +402,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				projectRepository.RemoveBugReportLink(bugReportId, linkToBugReportId);
+				bugReportRepository.DeleteBugReportLink(bugReportId, linkToBugReportId);
 
 				return RedirectToAction("ReportOverview", new { id = bugReportId });
 			}
@@ -422,7 +422,7 @@ namespace BugTracker.Controllers
 
 				var bugStates = bugReportStatesRepository.GetAllById(bugReport.BugReportId).OrderByDescending(o => o.Time).ToList();
 
-				var assignedMembers = projectRepository.GetAssignedUsersForBugReport(id)
+				var assignedMembers = bugReportRepository.GetAssignedUsersForBugReport(id)
 					.Select(x => new string(x.UserName)).ToList();
 				string assignedMembersDisplay = "";
 				if (assignedMembers.Count > 0)

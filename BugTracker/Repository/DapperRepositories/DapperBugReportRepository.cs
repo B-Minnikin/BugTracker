@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using Dapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -100,6 +101,104 @@ namespace BugTracker.Repository.DapperRepositories
 				connection.Execute("dbo.BugReports_DeleteById", new { BugReportId = id },
 					commandType: CommandType.StoredProcedure);
 				return deletedBugReport;
+			}
+		}
+
+		public IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				string procedure;
+
+				switch (parentType)
+				{
+					case AttachmentParentType.BugReport:
+						procedure = "dbo.AttachmentPaths_BugReport_GetAll @ParentId";
+						break;
+					case AttachmentParentType.Comment:
+						procedure = "dbo.AttachmentPaths_Comment_GetAll @ParentId";
+						break;
+					default:
+						throw new System.ArgumentException("Parameter must be a valid type", "parentType");
+				}
+
+				var attachmentPaths = connection.Query<AttachmentPath>(procedure, new { ParentId = parentId });
+				return attachmentPaths;
+			}
+		}
+
+		public void AddLocalBugReportId(int projectId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.LocalProjectBugReportIds_Insert", new { ProjectId = projectId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public void AddUserAssignedToBugReport(int userId, int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.UsersAssignedToBugReport_Insert", new { UserId = userId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public void DeleteUserAssignedToBugReport(int userId, int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.UsersAssignedToBugReport_Delete", new { UserId = userId, BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public IEnumerable<BugReport> GetBugReportsForAssignedUser(int userId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugReports = connection.Query<BugReport>("dbo.UsersAssignedToBugReport_GetReportsForUser", new { UserId = userId },
+					commandType: CommandType.StoredProcedure);
+				return bugReports;
+			}
+		}
+
+		public IEnumerable<IdentityUser> GetAssignedUsersForBugReport(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var users = connection.Query<IdentityUser>("dbo.UsersAssignedToBugReport_GetUsersForReport", new { BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+				return users;
+			}
+		}
+
+		public void AddBugReportLink(int bugReportId, int linkToBugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.BugReports_InsertLink", new { BugReportId = bugReportId, LinkToBugReportId = linkToBugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public void DeleteBugReportLink(int bugReportId, int linkToBugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				connection.Execute("dbo.BugReports_DeleteLink", new { BugReportId = bugReportId, LinkToBugReportId = linkToBugReportId },
+					commandType: CommandType.StoredProcedure);
+			}
+		}
+
+		public IEnumerable<BugReport> GetLinkedReports(int bugReportId)
+		{
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			{
+				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetLinkedReports", new { BugReportId = bugReportId },
+					commandType: CommandType.StoredProcedure);
+				return bugReports;
 			}
 		}
 	}
