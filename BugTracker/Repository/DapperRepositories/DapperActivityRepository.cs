@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {
-	public class DapperActivityRepository : IActivityRepository
+	public class DapperActivityRepository : DapperBaseRepository, IActivityRepository
 	{
+		public DapperActivityRepository(string connectionString) : base(connectionString) { }
+
 		public Activity Add(Activity activity)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var sql = @"INSERT INTO dbo.ActivityEvents (Timestamp, ProjectId, MessageId, UserId, BugReportId, AssigneeId, LinkedBugReportId, NewBugReportStateId, PreviousBugReportStateId, CommentId, MilestoneId)
 					OUTPUT inserted.ActivityId 
@@ -47,7 +49,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public Activity Delete(int activityId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var activityToDelete = GetActivities("ActivityId", activityId).ToList().FirstOrDefault();
 				var sql = @"DELETE FROM dbo.ActivityEvents WHERE ActivityId = @activityId";
@@ -78,7 +80,7 @@ namespace BugTracker.Repository.DapperRepositories
 			var sql = $"SELECT * FROM ActivityEvents WHERE {key} = @Id;";
 			var parameters = new { Key = key, Id = id.ToString() };
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			using (var reader = connection.ExecuteReader(sql, parameters))
 			{
 				var activityProjectParser = reader.GetRowParser<ActivityProject>();

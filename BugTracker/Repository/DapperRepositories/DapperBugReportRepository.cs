@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {
-	public class DapperBugReportRepository : IBugReportRepository
+	public class DapperBugReportRepository : DapperBaseRepository, IBugReportRepository
 	{
+		public DapperBugReportRepository(string connectionString) : base(connectionString) { }
+
 		public BugReport Add(BugReport bugReport)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var nextFreeId = connection.ExecuteScalar("dbo.LocalProjectBugReportIds_GetNextFreeId @ProjectId", new { ProjectId = bugReport.ProjectId });
 				connection.Execute("dbo.LocalProjectBugReportIds_IncrementNextFreeId @ProjectId", new { ProjectId = bugReport.ProjectId });
@@ -39,7 +41,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public int GetCommentCountById(int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				int count = connection.ExecuteScalar<int>("dbo.BugReports_CommentCount @BugReportId", new { BugReportId = bugReportId });
 				return count;
@@ -48,7 +50,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public IEnumerable<BugReport> GetAllById(int projectId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = projectId });
 				return bugReports;
@@ -57,7 +59,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public BugReport GetById(int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = bugReportId });
 				return bugReport;
@@ -66,7 +68,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public BugReport GetBugReportByLocalId(int localBugReportId, int projectId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var bugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetByLocalId", new { LocalBugReportId = localBugReportId, ProjectId = projectId },
 					commandType: CommandType.StoredProcedure);
@@ -76,7 +78,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public BugReport Update(BugReport bugReportChanges)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				connection.ExecuteScalar("dbo.BugReports_Update", new
 				{
@@ -95,7 +97,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public BugReport Delete(int id)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var deletedBugReport = connection.QueryFirst<BugReport>("dbo.BugReports_GetById @BugReportId", new { BugReportId = id });
 				connection.Execute("dbo.BugReports_DeleteById", new { BugReportId = id },
@@ -106,7 +108,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				string procedure;
 
@@ -129,7 +131,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public void AddLocalBugReportId(int projectId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				connection.Execute("dbo.LocalProjectBugReportIds_Insert", new { ProjectId = projectId },
 					commandType: CommandType.StoredProcedure);
@@ -138,7 +140,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public void AddUserAssignedToBugReport(int userId, int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				connection.Execute("dbo.UsersAssignedToBugReport_Insert", new { UserId = userId, BugReportId = bugReportId },
 					commandType: CommandType.StoredProcedure);
@@ -147,7 +149,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public void DeleteUserAssignedToBugReport(int userId, int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				connection.Execute("dbo.UsersAssignedToBugReport_Delete", new { UserId = userId, BugReportId = bugReportId },
 					commandType: CommandType.StoredProcedure);
@@ -156,7 +158,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public IEnumerable<BugReport> GetBugReportsForAssignedUser(int userId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var bugReports = connection.Query<BugReport>("dbo.UsersAssignedToBugReport_GetReportsForUser", new { UserId = userId },
 					commandType: CommandType.StoredProcedure);
@@ -166,7 +168,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public IEnumerable<IdentityUser> GetAssignedUsersForBugReport(int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var users = connection.Query<IdentityUser>("dbo.UsersAssignedToBugReport_GetUsersForReport", new { BugReportId = bugReportId },
 					commandType: CommandType.StoredProcedure);
@@ -176,7 +178,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public void AddBugReportLink(int bugReportId, int linkToBugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				connection.Execute("dbo.BugReports_InsertLink", new { BugReportId = bugReportId, LinkToBugReportId = linkToBugReportId },
 					commandType: CommandType.StoredProcedure);
@@ -185,7 +187,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public void DeleteBugReportLink(int bugReportId, int linkToBugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				connection.Execute("dbo.BugReports_DeleteLink", new { BugReportId = bugReportId, LinkToBugReportId = linkToBugReportId },
 					commandType: CommandType.StoredProcedure);
@@ -194,7 +196,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public IEnumerable<BugReport> GetLinkedReports(int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetLinkedReports", new { BugReportId = bugReportId },
 					commandType: CommandType.StoredProcedure);

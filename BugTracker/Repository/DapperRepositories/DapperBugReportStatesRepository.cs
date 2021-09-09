@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {
-	public class DapperBugReportStatesRepository : IBugReportStatesRepository
+	public class DapperBugReportStatesRepository : DapperBaseRepository, IBugReportStatesRepository
 	{
+		public DapperBugReportStatesRepository(string connectionString) : base(connectionString) { }
 
 		public BugState Add(BugState bugState)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var insertedBugStateId = connection.ExecuteScalar("dbo.BugStates_Insert", new
 				{
@@ -31,7 +32,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public BugState GetLatestState(int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				BugState currentState = connection.QueryFirst<BugState>("dbo.BugStates_GetLatest @BugReportId", new { BugReportId = bugReportId });
 				return currentState;
@@ -40,7 +41,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public BugState GetById(int bugStateId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				BugState bugState = connection.QueryFirst<BugState>("dbo.BugStates_GetById @BugStateId", new { BugStateId = bugStateId });
 				return bugState;
@@ -49,7 +50,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public IEnumerable<BugState> GetAllById(int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var bugStates = connection.Query<BugState>("dbo.BugStates_GetAll @BugReportId", new { BugReportId = bugReportId });
 				return bugStates;

@@ -1,4 +1,5 @@
 ﻿using BugTracker.Extension_Methods;
+using BugTracker.Repository.DapperRepositories;
 using Dapper;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -9,11 +10,13 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Models
 {
-	public class DapperProjectRepository : IProjectRepository
+	public class DapperProjectRepository : DapperBaseRepository, IProjectRepository
 	{
+		public DapperProjectRepository(string connectionString) : base(connectionString) { }
+
 		public Project Add(Project project)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var insertedProjectId = connection.ExecuteScalar("dbo.Projects_Insert", new {
 					Name = project.Name, Description = project.Description, CreationTime = project.CreationTime,
@@ -26,7 +29,7 @@ namespace BugTracker.Models
 
 		public Project Delete(int id)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var deletedProject = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
 				var result = connection.Execute("dbo.Projects_Delete @ProjectId", new { ProjectId = id });
@@ -37,7 +40,7 @@ namespace BugTracker.Models
 
 		public IEnumerable<Project> GetAll()
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var projects = connection.Query<Project>("dbo.Projects_GetAll");
 				return projects;
@@ -46,7 +49,7 @@ namespace BugTracker.Models
 
 		public Project GetById(int id)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var project = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
 				return project;
@@ -55,7 +58,7 @@ namespace BugTracker.Models
 
 		public Project Update(Project projectChanges)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var projectId = connection.Execute("dbo.Projects_Update", new
 				{

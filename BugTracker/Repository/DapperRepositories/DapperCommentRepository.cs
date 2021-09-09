@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {
-	public class DapperCommentRepository : ICommentRepository
+	public class DapperCommentRepository : DapperBaseRepository, ICommentRepository
 	{
+		public DapperCommentRepository(string connectionString) : base(connectionString) { }
+
 		public Comment Add(Comment comment)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var insertedCommentId = connection.ExecuteScalar("dbo.Comments_Insert", new
 				{
@@ -30,7 +32,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public Comment Update(Comment commentChanges)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				connection.Execute("dbo.Comments_Update", new
 				{
@@ -45,7 +47,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public Comment Delete(int commentId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var commentToDelete = this.GetById(commentId);
 				connection.Execute("dbo.Comments_DeleteById", new { CommentId = commentId },
@@ -56,7 +58,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public Comment GetById(int commentId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var comment = connection.QueryFirst<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = commentId });
 				return comment;
@@ -65,7 +67,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public IEnumerable<Comment> GetAllById(int bugReportId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var comments = connection.Query<Comment>("dbo.Comments_GetAll @BugReportId", new { BugReportId = bugReportId });
 				return comments;
@@ -74,7 +76,7 @@ namespace BugTracker.Repository.DapperRepositories
 
 		public int GetCommentParentId(int commentId)
 		{
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var parentId = connection.QueryFirst<int>("dbo.Comments_GetParentId @CommentId", new { CommentId = commentId });
 				return parentId;

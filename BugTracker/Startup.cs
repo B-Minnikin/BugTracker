@@ -39,17 +39,7 @@ namespace BugTracker
 			services.AddSingleton<IConfiguration>(Configuration);
 			services.AddTransient<IEmailHelper, EmailHelper>();
 
-			// Repository
-			services.AddScoped<IProjectRepository, DapperProjectRepository>();
-			services.AddScoped<IMilestoneRepository, DapperMilestoneRepository>();
-			services.AddScoped<IBugReportRepository, DapperBugReportRepository>();
-			services.AddScoped<IBugReportStatesRepository, DapperBugReportStatesRepository>();
-			services.AddScoped<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>();
-			services.AddScoped<IActivityRepository, DapperActivityRepository>();
-			services.AddScoped<ICommentRepository, DapperCommentRepository>();
-			services.AddScoped<ICommentRepository, DapperCommentRepository>();
-			services.AddScoped<IProjectInvitationsRepository, DapperProjectInvitationsRepository>();
-			services.AddScoped<ISearchRepository, DapperSearchRepository>();
+			ConfigureRepositories(services, Configuration);
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();
@@ -90,6 +80,21 @@ namespace BugTracker
 			});
 			
 			services.AddBreadcrumbs(GetType().Assembly);
+		}
+
+		private void ConfigureRepositories(IServiceCollection services, IConfiguration configuration)
+		{
+			string connectionString = configuration.GetConnectionString("DBConnectionString");
+
+			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
+			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
+			services.AddTransient<IBugReportRepository, DapperBugReportRepository>(s => new DapperBugReportRepository(connectionString));
+			services.AddTransient<IBugReportStatesRepository, DapperBugReportStatesRepository>(s => new DapperBugReportStatesRepository(connectionString));
+			services.AddTransient<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>(s => new DapperUserSubscriptionsRepository(connectionString));
+			services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
+			services.AddTransient<ICommentRepository, DapperCommentRepository>(s => new DapperCommentRepository(connectionString));
+			services.AddTransient<IProjectInvitationsRepository, DapperProjectInvitationsRepository>(s => new DapperProjectInvitationsRepository(connectionString));
+			services.AddTransient<ISearchRepository, DapperSearchRepository>(s => new DapperSearchRepository(connectionString));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
