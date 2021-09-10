@@ -11,11 +11,16 @@ namespace BugTracker.Models.Database
 {
 	public class RoleStore : IRoleStore<IdentityRole>
 	{
+		public RoleStore(string connectionString)
+		{
+			this.connectionString = connectionString;
+		}
+
 		public async Task<IdentityResult> CreateAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
 			{
 				await connection.ExecuteScalarAsync("dbo.Roles_Insert", new
 				{
@@ -32,7 +37,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
 			{
 				await connection.ExecuteAsync("dbo.Roles_DeleteById @Id", new { Id = role.Id });
 			}
@@ -44,7 +49,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
 			{
 				var role = await connection.QuerySingleOrDefaultAsync<IdentityRole>("dbo.Roles_FindById @RoleId", new { RoleId = roleId });
 				return role;
@@ -55,7 +60,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
 			{
 				var role = await connection.QuerySingleOrDefaultAsync<IdentityRole>("dbo.Roles_FindByName @NormalizedName", new { NormalizedName = normalizedRoleName });
 				return role;
@@ -94,7 +99,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
 			{
 				await connection.ExecuteAsync("dbo.Roles_Update", new
 				{
@@ -111,7 +116,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Startup.ConnectionString))
+			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
 			{
 				await connection.ExecuteAsync("dbo.Roles_Update", new
 				{
@@ -127,6 +132,7 @@ namespace BugTracker.Models.Database
 
 		#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls
+		private readonly string connectionString;
 
 		protected virtual void Dispose(bool disposing)
 		{
