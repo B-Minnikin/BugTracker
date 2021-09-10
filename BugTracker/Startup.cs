@@ -44,8 +44,9 @@ namespace BugTracker
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();
 
-			services.AddTransient<IUserStore<IdentityUser>, UserStore>();
-			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
+			string connectionString = Configuration.GetConnectionString("DBConnectionString");
+			services.AddTransient<IUserStore<IdentityUser>, UserStore>(s => new UserStore(connectionString));
+			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>(s => new RoleStore(connectionString));
 			services.AddIdentity<IdentityUser, IdentityRole>(options =>
 				options.SignIn.RequireConfirmedEmail = true
 			)
@@ -66,11 +67,11 @@ namespace BugTracker
 					policy.Requirements.Add(new ModifyProfileRequirement()));
 			});
 
-			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
-			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>();
-			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>();
-			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>();
-			services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>();
+			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>(s => new ProjectAccessAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>(s => new ProjectAdministratorAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>(s => new ModifyReportAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>(s => new ModifyCommentAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>(s => new ModifyProfileAuthorizationHandler(connectionString));
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
@@ -85,6 +86,8 @@ namespace BugTracker
 		private void ConfigureRepositories(IServiceCollection services, IConfiguration configuration)
 		{
 			string connectionString = configuration.GetConnectionString("DBConnectionString");
+
+			services.AddTransient<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
 
 			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
 			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));

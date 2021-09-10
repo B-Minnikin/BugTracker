@@ -6,6 +6,7 @@ using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SmartBreadcrumbs.Attributes;
@@ -35,7 +36,8 @@ namespace BugTracker.Controllers
 									IActivityRepository activityRepository,
 									IAuthorizationService authorizationService,
 									IHttpContextAccessor httpContextAccessor,
-									IProjectInviter projectInvitation)
+									IProjectInviter projectInvitation,
+									ApplicationUserManager userManager)
 		{
 			this._logger = logger;
 			this.projectRepository = projectRepository;
@@ -44,7 +46,7 @@ namespace BugTracker.Controllers
 			this.authorizationService = authorizationService;
 			this.httpContextAccessor = httpContextAccessor;
 			this.projectInviter = projectInvitation;
-			this.userManager = new ApplicationUserManager();
+			this.userManager = userManager;
 		}
 
 		[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]

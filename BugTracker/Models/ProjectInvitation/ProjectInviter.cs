@@ -28,7 +28,8 @@ namespace BugTracker.Models.ProjectInvitation
 			IAuthorizationService authorizationService,
 			IEmailHelper emailHelper,
 			IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory,
-			ILogger<ProjectInviter> logger)
+			ILogger<ProjectInviter> logger,
+			ApplicationUserManager userManager)
 		{
 			this.projectRepository = projectRepository;
 			this.projectInvitationsRepository = projectInvitationsRepository;
@@ -36,7 +37,7 @@ namespace BugTracker.Models.ProjectInvitation
 			this.emailHelper = emailHelper;
 			this.userClaimsPrincipalFactory = userClaimsPrincipalFactory;
 			this.logger = logger;
-			userManager = new ApplicationUserManager();
+			this.userManager = userManager;
 		}
 
 		public async Task AddProjectInvitation(ProjectInvitation invitation)

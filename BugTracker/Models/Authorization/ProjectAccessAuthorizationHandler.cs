@@ -8,6 +8,13 @@ namespace BugTracker.Models.Authorization
 {
 	public class ProjectAccessAuthorizationHandler : AuthorizationHandler<ProjectAccessRequirement, int>
 	{
+		private readonly string connectionString;
+
+		public ProjectAccessAuthorizationHandler(string connectionString)
+		{
+			this.connectionString = connectionString;
+		}
+
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectAccessRequirement requirement, int projectId)
 		{
 			string userName = context.User.Identity.Name;
@@ -16,9 +23,9 @@ namespace BugTracker.Models.Authorization
 				return Task.CompletedTask;
 			}
 
-			bool userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName);
-			bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, Enum.GetName(typeof(Roles), Roles.Administrator), projectId);
-			bool userIsProjectMember = AuthorizationHelper.UserIsInProjectRole(userName, Enum.GetName(typeof(Roles), Roles.Member), projectId);
+			bool userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, connectionString);
+			bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, Enum.GetName(typeof(Roles), Roles.Administrator), projectId, connectionString);
+			bool userIsProjectMember = AuthorizationHelper.UserIsInProjectRole(userName, Enum.GetName(typeof(Roles), Roles.Member), projectId, connectionString);
 			
 			if(userIsSuperadministrator || userIsProjectAdministrator || userIsProjectMember)
 			{

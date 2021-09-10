@@ -8,6 +8,13 @@ namespace BugTracker.Models.Authorization
 {
 	public class ModifyProfileAuthorizationHandler : AuthorizationHandler<ModifyProfileRequirement, int>
 	{
+		private readonly string connectionString;
+
+		public ModifyProfileAuthorizationHandler(string connectionString)
+		{
+			this.connectionString = connectionString;
+		}
+
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyProfileRequirement requirement, int userId)
 		{
 			string userName = context.User.Identity.Name;
@@ -16,8 +23,8 @@ namespace BugTracker.Models.Authorization
 				return Task.CompletedTask;
 			}
 			
-			bool userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName);
-			bool userIsProfileOwner = AuthorizationHelper.UserIsProfileOwner(context.User.Identity.Name, userId).Result;
+			bool userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, connectionString);
+			bool userIsProfileOwner = AuthorizationHelper.UserIsProfileOwner(context.User.Identity.Name, userId, connectionString).Result;
 
 			if(userIsSuperadministrator || userIsProfileOwner)
 			{

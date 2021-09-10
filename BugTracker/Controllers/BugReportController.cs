@@ -7,6 +7,7 @@ using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,7 @@ namespace BugTracker.Controllers
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
 		private readonly LinkGenerator linkGenerator;
-		private readonly ApplicationUserManager userManager;
+		private readonly UserManager<IdentityUser> userManager;
 
 		public BugReportController(ILogger<BugReportController> logger,
 									        IProjectRepository projectRepository,
@@ -48,7 +49,8 @@ namespace BugTracker.Controllers
 										  IAuthorizationService authorizationService,
 										  IHttpContextAccessor httpContextAccessor,
 										  ISubscriptions subscriptions,
-										  LinkGenerator linkGenerator)
+										  LinkGenerator linkGenerator,
+										  UserManager<IdentityUser> userManager)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
@@ -62,7 +64,7 @@ namespace BugTracker.Controllers
 			this.httpContextAccessor = httpContextAccessor;
 			this.subscriptions = subscriptions;
 			this.linkGenerator = linkGenerator;
-			this.userManager = new ApplicationUserManager();
+			this.userManager = userManager;
 		}
 
 		[HttpGet]

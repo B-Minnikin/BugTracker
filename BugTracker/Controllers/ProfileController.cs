@@ -7,6 +7,7 @@ using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,7 @@ namespace BugTracker.Controllers
 		private readonly ISubscriptions subscriptions;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly LinkGenerator linkGenerator;
-		private readonly ApplicationUserManager userManager;
+		private readonly UserManager<IdentityUser> userManager;
 		private readonly IProjectRepository projectRepository;
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportRepository bugReportRepository;
@@ -45,14 +46,15 @@ namespace BugTracker.Controllers
 									IAuthorizationService authorizationService,
 									ISubscriptions subscriptions,
 									IHttpContextAccessor httpContextAccessor,
-									LinkGenerator linkGenerator)
+									LinkGenerator linkGenerator,
+									UserManager<IdentityUser> userManager)
 		{
 			this.logger = logger;
 			this.authorizationService = authorizationService;
 			this.subscriptions = subscriptions;
 			this.httpContextAccessor = httpContextAccessor;
 			this.linkGenerator = linkGenerator;
-			this.userManager = new ApplicationUserManager();
+			this.userManager = userManager;
 			this.projectRepository = projectRepository;
 			this.milestoneRepository = milestoneRepository;
 			this.bugReportRepository = bugReportRepository;

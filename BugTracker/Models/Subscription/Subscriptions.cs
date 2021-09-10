@@ -15,18 +15,19 @@ namespace BugTracker.Models.Database
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 		private readonly IEmailHelper emailHelper;
-		private readonly ApplicationUserManager userManager;
+		private readonly UserManager<IdentityUser> userManager;
 
 		public Subscriptions(IProjectRepository projectRepository,
 			IBugReportRepository bugReportRepository,
 			IUserSubscriptionsRepository userSubscriptionsRepository,
-			IEmailHelper emailHelper)
+			IEmailHelper emailHelper,
+			UserManager<IdentityUser> userManager)
 		{
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
 			this.userSubscriptionsRepository = userSubscriptionsRepository;
 			this.emailHelper = emailHelper;
-			userManager = new ApplicationUserManager();
+			this.userManager = userManager;
 		}
 
 		public bool IsSubscribed(int userId, int bugReportId)

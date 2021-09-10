@@ -12,8 +12,11 @@ namespace BugTracker.Models.Authorization
 {
 	public class ApplicationUserManager : UserManager<IdentityUser>
 	{
-		public ApplicationUserManager() : this(new UserStore(), null, null, null, null, null, null, null, null)
+		private readonly string connectionString;
+
+		public ApplicationUserManager(string connectionString) : this(new UserStore(connectionString), null, null, null, null, null, null, null, null)
 		{
+			this.connectionString = connectionString;
 		}
 
 		public ApplicationUserManager(IUserStore<IdentityUser> store, IOptions<IdentityOptions> optionsAccessor,
@@ -27,7 +30,7 @@ namespace BugTracker.Models.Authorization
 		public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore();
+			var userRoleStore = new UserStore(connectionString);
 			if(user == null)
 			{
 				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", user.Id));
@@ -47,7 +50,7 @@ namespace BugTracker.Models.Authorization
 		public async Task<IdentityResult> RemoveFromRoleAsync(int userId, string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore();
+			var userRoleStore = new UserStore(connectionString);
 			var user = await FindByIdAsync(userId.ToString());
 			if(user == null)
 			{
@@ -66,7 +69,7 @@ namespace BugTracker.Models.Authorization
 		public async Task<bool> IsInRoleAsync(int userId, string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore();
+			var userRoleStore = new UserStore(connectionString);
 			var user = await FindByIdAsync(userId.ToString());
 			if(user == null)
 			{
@@ -79,7 +82,7 @@ namespace BugTracker.Models.Authorization
 		public async Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore();
+			var userRoleStore = new UserStore(connectionString);
 			return await userRoleStore.GetUsersInRoleAsync(roleName, projectId, CancellationToken);
 		}
 	}
