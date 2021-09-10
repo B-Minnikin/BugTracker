@@ -138,5 +138,81 @@ namespace BugTracker.Helpers
 			};
 			return commentNode;
 		}
+
+		public static MvcBreadcrumbNode MilestoneEdit(Project project)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = project.ProjectId },
+				Parent = projectsNode
+			};
+			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+			{
+				RouteValues = new { projectId = project.ProjectId },
+				Parent = overviewNode
+			};
+			var editMilestoneNode = new MvcBreadcrumbNode("Edit", "Milestone", "Edit")
+			{
+				Parent = milestonesNode
+			};
+			return editMilestoneNode;
+		}
+
+		public static MvcBreadcrumbNode MilestoneCreate(Project project)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = project.ProjectId },
+				Parent = projectsNode
+			};
+			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+			{
+				RouteValues = new { projectId = project.ProjectId },
+				Parent = overviewNode
+			};
+			var newMilestoneNode = new MvcBreadcrumbNode("New", "Milestone", "New")
+			{
+				Parent = milestonesNode
+			};
+			return newMilestoneNode;
+		}
+
+		public static MvcBreadcrumbNode MilestoneOverview(Project project, string milestoneTitle)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = project.ProjectId },
+				Parent = projectsNode
+			};
+			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+			{
+				RouteValues = new { projectId = project.ProjectId },
+				Parent = overviewNode
+			};
+			var chosenMilestoneNode = new MvcBreadcrumbNode("Overview", "Milestone", milestoneTitle)
+			{
+				Parent = milestonesNode
+			};
+			return chosenMilestoneNode;
+		}
+
+		public static MvcBreadcrumbNode Milestones(Project project)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = project.ProjectId },
+				Parent = projectsNode
+			};
+			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
+			{
+				RouteValues = new { projectId = project.ProjectId },
+				Parent = overviewNode
+			};
+			return milestonesNode;
+		}
 	}
 }

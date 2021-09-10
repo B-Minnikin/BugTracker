@@ -51,21 +51,8 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult Milestones(int projectId)
 		{
-			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 			var currentProject = projectRepository.GetById(projectId);
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-			{
-				RouteValues = new { id = projectId },
-				Parent = projectsNode
-			};
-			var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
-			{
-				RouteValues = new { projectId = projectId },
-				Parent = overviewNode
-			};
-			ViewData["BreadcrumbNode"] = milestonesNode;
-			// --------------------------------------------------------------------------------------------
+			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.Milestones(currentProject);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
 			bool isAuthorized = authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded;
@@ -105,24 +92,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-				{
-					RouteValues = new { id = currentProject.ProjectId },
-					Parent = projectsNode
-				};
-				var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
-				{
-					RouteValues = new { projectId = currentProject.ProjectId },
-					Parent = overviewNode
-				};
-				var chosenMilestoneNode = new MvcBreadcrumbNode("Overview", "Milestone", model.Title)
-				{
-					Parent = milestonesNode
-				};
-				ViewData["BreadcrumbNode"] = chosenMilestoneNode;
-				// --------------------------------------------------------------------------------------------
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.MilestoneOverview(currentProject, model.Title);
 
 				//  Create view model
 				var bugReports = GenerateBugReportEntries(milestoneId).ToList();
@@ -153,24 +123,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-				{
-					RouteValues = new { id = currentProject.ProjectId },
-					Parent = projectsNode
-				};
-				var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
-				{
-					RouteValues = new { projectId = currentProject.ProjectId },
-					Parent = overviewNode
-				};
-				var newMilestoneNode = new MvcBreadcrumbNode("New", "Milestone", "New")
-				{
-					Parent = milestonesNode
-				};
-				ViewData["BreadcrumbNode"] = newMilestoneNode;
-				// --------------------------------------------------------------------------------------------
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.MilestoneCreate(currentProject);
 
 				NewMilestoneViewModel model = new NewMilestoneViewModel()
 				{
@@ -238,24 +191,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-				{
-					RouteValues = new { id = currentProject.ProjectId },
-					Parent = projectsNode
-				};
-				var milestonesNode = new MvcBreadcrumbNode("Milestones", "Milestone", "Milestones")
-				{
-					RouteValues = new { projectId = currentProject.ProjectId },
-					Parent = overviewNode
-				};
-				var editMilestoneNode = new MvcBreadcrumbNode("Edit", "Milestone", "Edit")
-				{
-					Parent = milestonesNode
-				};
-				ViewData["BreadcrumbNode"] = editMilestoneNode;
-				// --------------------------------------------------------------------------------------------
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.MilestoneEdit(currentProject);
 
 				var viewModel = new EditMilestoneViewModel
 				{
