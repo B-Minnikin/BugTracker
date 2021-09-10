@@ -1,4 +1,5 @@
-﻿using BugTracker.Models;
+﻿using BugTracker.Helpers;
+using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.ProjectInvitation;
 using BugTracker.Repository;
@@ -81,16 +82,8 @@ namespace BugTracker.Controllers
 					CommentCountHandler = bugReportRepository.GetCommentCountById
 				};
 
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
-				{
-					RouteValues = new { id },
-					Parent = projectsNode
-				};
-				ViewData["BreadcrumbNode"] = overviewNode;
-				// --------------------------------------------------------------------------------------------
-
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectOverview(project);
+				
 				// if project NULL -- redirect to error page !!
 
 				return View(overviewProjectViewModel);
@@ -167,20 +160,8 @@ namespace BugTracker.Controllers
 					Project = project
 				};
 
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
-				{
-					RouteValues = new { id },
-					Parent = projectsNode
-				};
-				var editProjectNode = new MvcBreadcrumbNode("Edit", "Projects", "Edit")
-				{
-					Parent = overviewNode
-				};
-				ViewData["BreadcrumbNode"] = editProjectNode;
-				// --------------------------------------------------------------------------------------------
-
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectEdit(project);
+				
 				return View(projectViewModel);
 			}
 			return RedirectToAction("Overview", new { id });
@@ -226,20 +207,8 @@ namespace BugTracker.Controllers
 					ProjectId = id
 				};
 
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
-				{
-					RouteValues = new { id },
-					Parent = projectsNode
-				};
-				var invitesProjectNode = new MvcBreadcrumbNode("Invites", "Projects", "Invites")
-				{
-					Parent = overviewNode
-				};
-				ViewData["BreadcrumbNode"] = invitesProjectNode;
-				// --------------------------------------------------------------------------------------------
-
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectInvites(project);
+				
 				return View(invitesViewModel);
 			}
 

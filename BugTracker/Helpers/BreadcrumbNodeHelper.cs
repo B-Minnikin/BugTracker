@@ -240,5 +240,46 @@ namespace BugTracker.Helpers
 			};
 			return subscriptionsNode;
 		}
+
+		public static MvcBreadcrumbNode ProjectInvites(Project project)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = project.ProjectId },
+				Parent = projectsNode
+			};
+			var invitesProjectNode = new MvcBreadcrumbNode("Invites", "Projects", "Invites")
+			{
+				Parent = overviewNode
+			};
+			return invitesProjectNode;
+		}
+
+		public static MvcBreadcrumbNode ProjectEdit(Project project)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = project.ProjectId },
+				Parent = projectsNode
+			};
+			var editProjectNode = new MvcBreadcrumbNode("Edit", "Projects", "Edit")
+			{
+				Parent = overviewNode
+			};
+			return editProjectNode;
+		}
+
+		public static MvcBreadcrumbNode ProjectOverview(Project project)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", project.Name)
+			{
+				RouteValues = new { id = project.ProjectId },
+				Parent = projectsNode
+			};
+			return overviewNode;
+		}
 	}
 }
