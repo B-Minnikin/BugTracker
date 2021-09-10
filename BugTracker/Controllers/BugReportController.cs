@@ -1,5 +1,5 @@
-﻿using BugTracker.Models;
-using BugTracker.Models.Authorization;
+﻿using BugTracker.Helpers;
+using BugTracker.Models;
 using BugTracker.Models.Database;
 using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
@@ -11,10 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -73,19 +70,7 @@ namespace BugTracker.Controllers
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = projectRepository.GetById(currentProjectId ?? 0);
 
-			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-			{
-				RouteValues = new { id = currentProjectId},
-				Parent = projectsNode
-			};
-			var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", "Create Bug Report")
-			{
-				Parent = overviewNode
-			};
-			ViewData["BreadcrumbNode"] = reportNode;
-			// --------------------------------------------------------------------------------------------
+			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportCreate(currentProject);
 
 			return View();
 		}
@@ -167,24 +152,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, PersonReporting = reportViewModel.BugReport.PersonReporting}, "CanModifyReportPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-				{
-					RouteValues = new { id = currentProjectId },
-					Parent = projectsNode
-				};
-				var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", reportViewModel.BugReport.Title)
-				{
-					RouteValues = new { id = reportViewModel.BugReport.BugReportId },
-					Parent = overviewNode
-				};
-				var editNode = new MvcBreadcrumbNode("Edit", "BugReport", "Edit")
-				{
-					Parent = reportNode
-				};
-				ViewData["BreadcrumbNode"] = editNode;
-				// --------------------------------------------------------------------------------------------
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportEdit(currentProject, reportViewModel.BugReport);
 
 				return View(reportViewModel);
 			}
@@ -264,25 +232,8 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var currentProject = projectRepository.GetById(currentProjectId);
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-				{
-					RouteValues = new { id = currentProjectId },
-					Parent = projectsNode
-				};
-				var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
-				{
-					RouteValues = new {id = bugReportId},
-					Parent = overviewNode
-				};
-				var assignMembersNode = new MvcBreadcrumbNode("AssignMember", "BugReport", "Assign Members")
-				{
-					Parent = reportNode
-				};
-				ViewData["BreadcrumbNode"] = assignMembersNode;
-				// --------------------------------------------------------------------------------------------
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportAssignMember(currentProject, bugReport);
 
 				AssignMemberViewModel viewModel = new AssignMemberViewModel()
 				{
@@ -345,25 +296,8 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
 				var currentProject = projectRepository.GetById(currentProjectId);
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-				{
-					RouteValues = new { id = currentProjectId },
-					Parent = projectsNode
-				};
-				var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
-				{
-					RouteValues = new { id = bugReportId },
-					Parent = overviewNode
-				};
-				var manageLinksNode = new MvcBreadcrumbNode("ManageLinks", "BugReport", "Manage Links")
-				{
-					Parent = reportNode
-				};
-				ViewData["BreadcrumbNode"] = manageLinksNode;
-				// --------------------------------------------------------------------------------------------
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportManageLinks(currentProject, bugReport);
 
 				ManageLinksViewModel model = new ManageLinksViewModel {
 					ProjectId = currentProjectId,
@@ -461,19 +395,7 @@ namespace BugTracker.Controllers
 
 				var currentProject = projectRepository.GetById(currentProjectId ?? 0);
 
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-				var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProject.Name)
-				{
-					RouteValues = new { id = currentProjectId },
-					Parent = projectsNode
-				};
-				var reportNode = new MvcBreadcrumbNode("CreateReport", "BugReport", bugReport.Title)
-				{
-					Parent = overviewNode
-				};
-				ViewData["BreadcrumbNode"] = reportNode;
-				// --------------------------------------------------------------------------------------------
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportOverview(currentProject, bugReport.Title);
 
 				return View(bugViewModel);
 			}
