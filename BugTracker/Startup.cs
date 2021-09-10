@@ -24,19 +24,16 @@ namespace BugTracker
 	public class Startup
 	{
 		public IConfiguration Configuration { get; }
-		public static string ConnectionString { get; private set; }
 
 		public Startup(IConfiguration configuration)
 		{
 			Configuration = configuration;
-			ConnectionString = this.Configuration.GetConnectionString("DBConnectionString");
 		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
-			services.AddSingleton<IConfiguration>(Configuration);
 			services.AddTransient<IEmailHelper, EmailHelper>();
 
 			ConfigureRepositories(services, Configuration);
