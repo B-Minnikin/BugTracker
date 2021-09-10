@@ -16,11 +16,16 @@ namespace BugTracker.Models.Database
 			this.connectionString = connectionString;
 		}
 
+		private System.Data.SqlClient.SqlConnection GetConnectionString()
+		{
+			return new System.Data.SqlClient.SqlConnection(connectionString);
+		}
+
 		public async Task<IdentityResult> CreateAsync(IdentityRole role, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				await connection.ExecuteScalarAsync("dbo.Roles_Insert", new
 				{
@@ -37,7 +42,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				await connection.ExecuteAsync("dbo.Roles_DeleteById @Id", new { Id = role.Id });
 			}
@@ -49,7 +54,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var role = await connection.QuerySingleOrDefaultAsync<IdentityRole>("dbo.Roles_FindById @RoleId", new { RoleId = roleId });
 				return role;
@@ -60,7 +65,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				var role = await connection.QuerySingleOrDefaultAsync<IdentityRole>("dbo.Roles_FindByName @NormalizedName", new { NormalizedName = normalizedRoleName });
 				return role;
@@ -99,7 +104,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				await connection.ExecuteAsync("dbo.Roles_Update", new
 				{
@@ -116,7 +121,7 @@ namespace BugTracker.Models.Database
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(connectionString))
+			using (IDbConnection connection = GetConnectionString())
 			{
 				await connection.ExecuteAsync("dbo.Roles_Update", new
 				{
