@@ -214,5 +214,31 @@ namespace BugTracker.Helpers
 			};
 			return milestonesNode;
 		}
+
+		public static MvcBreadcrumbNode ProfileEdit(int profileId)
+		{
+			var profileNode = new MvcBreadcrumbNode("View", "Profile", "My Profile")
+			{
+				RouteValues = new { id = profileId }
+			};
+			var editNode = new MvcBreadcrumbNode("Edit", "Profile", "Edit")
+			{
+				Parent = profileNode
+			};
+			return editNode;
+		}
+
+		public static MvcBreadcrumbNode ProfileSubscriptions(int profileId)
+		{
+			var profileNode = new MvcBreadcrumbNode("View", "Profile", "My Profile")
+			{
+				RouteValues = new { id = profileId }
+			};
+			var subscriptionsNode = new MvcBreadcrumbNode("Subscriptions", "Profile", "Subscriptions")
+			{
+				Parent = profileNode
+			};
+			return subscriptionsNode;
+		}
 	}
 }

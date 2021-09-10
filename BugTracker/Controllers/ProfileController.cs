@@ -1,4 +1,5 @@
-﻿using BugTracker.Models;
+﻿using BugTracker.Helpers;
+using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
 using BugTracker.Repository;
@@ -89,16 +90,7 @@ namespace BugTracker.Controllers
 				BugReports = userSubscriptionsRepository.GetSubscribedReports(id).ToList()
 			};
 
-			// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-			var profileNode = new MvcBreadcrumbNode("View", "Profile", "My Profile")
-			{
-				RouteValues = new { id = id }
-			};
-			var subscriptionsNode = new MvcBreadcrumbNode("Subscriptions", "Profile", "Subscriptions")
-			{
-				Parent = profileNode
-			};
-			ViewData["BreadcrumbNode"] = subscriptionsNode;
+			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProfileSubscriptions(id);
 
 			return View(subscriptionsViewModel);
 		}
@@ -125,16 +117,7 @@ namespace BugTracker.Controllers
 					User = user
 				};
 
-				// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-				var profileNode = new MvcBreadcrumbNode("View", "Profile", "My Profile")
-				{
-					RouteValues = new { id = id }
-				};
-				var editNode = new MvcBreadcrumbNode("Edit", "Profile", "Edit")
-				{
-					Parent = profileNode
-				};
-				ViewData["BreadcrumbNode"] = editNode;
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProfileEdit(id);
 
 				return View(profileViewModel);
 			}
