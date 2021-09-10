@@ -281,5 +281,20 @@ namespace BugTracker.Helpers
 			};
 			return overviewNode;
 		}
+
+		public static MvcBreadcrumbNode SearchResult(int projectId, string projectName)
+		{
+			var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
+			var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", projectName)
+			{
+				RouteValues = new { id = projectId },
+				Parent = projectsNode
+			};
+			var searchNode = new MvcBreadcrumbNode("Result", "SearchController", "Search")
+			{
+				Parent = overviewNode
+			};
+			return searchNode;
+		}
 	}
 }

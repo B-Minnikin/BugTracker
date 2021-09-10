@@ -1,4 +1,5 @@
-﻿using BugTracker.Models;
+﻿using BugTracker.Helpers;
+using BugTracker.Models;
 using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
@@ -41,44 +42,30 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public ViewResult Result(SearchResultsViewModel searchModel)
 		{
-			int? currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			if(currentProjectId != null)
+			int currentProjectId = HttpContext.Session.GetInt32("currentProject") ?? 0;
+			logger.LogInformation("currentProjectId = " + currentProjectId);
+
+			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				logger.LogInformation("currentProjectId = " + currentProjectId);
+				var bugReports = bugReportRepository.GetAllById(currentProjectId);
 
-				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
-				if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+				// set default start date to the project's creation date - if user has not entered more recent date
+				DateTime projectCreationTime = GetProjectCreationTime((int)currentProjectId);
+				if (searchModel.SearchExpression.DateRangeBegin < projectCreationTime)
+					searchModel.SearchExpression.DateRangeBegin = projectCreationTime;
+
+				if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
 				{
-					var bugReports = bugReportRepository.GetAllById(currentProjectId.Value);
-
-					// set default start date to the project's creation date - if user has not entered more recent date
-					DateTime projectCreationTime = GetProjectCreationTime((int)currentProjectId);
-					if (searchModel.SearchExpression.DateRangeBegin < projectCreationTime)
-						searchModel.SearchExpression.DateRangeBegin = projectCreationTime;
-
-					if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
-					{
-						searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
-							&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
-					}
-
-					// --------------------- CONFIGURE BREADCRUMB NODES ----------------------------
-					string currentProjectName = projectRepository.GetById(currentProjectId.Value).Name;
-					var projectsNode = new MvcBreadcrumbNode("Projects", "Projects", "Projects");
-					var overviewNode = new MvcBreadcrumbNode("Overview", "Projects", currentProjectName)
-					{
-						RouteValues = new { id = currentProjectId.Value },
-						Parent = projectsNode
-					};
-					var searchNode = new MvcBreadcrumbNode("Result", "SearchController", "Search")
-					{
-						Parent = overviewNode
-					};
-					ViewData["BreadcrumbNode"] = searchNode;
-					// --------------------------------------------------------------------------------------------
-
-					return View(searchModel);
+					searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
+						&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
 				}
+
+				string currentProjectName = projectRepository.GetById(currentProjectId).Name;
+					
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.SearchResult(currentProjectId, currentProjectName);
+					
+				return View(searchModel);
 			}
 
 			return View();
