@@ -33,15 +33,16 @@ namespace BugTracker
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			string connectionString = Configuration.GetConnectionString("DBConnectionString");
+
 			services.AddControllersWithViews();
 			services.AddTransient<IEmailHelper, EmailHelper>();
 
-			ConfigureRepositories(services, Configuration);
+			ConfigureRepositories(services, connectionString);
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();
 
-			string connectionString = Configuration.GetConnectionString("DBConnectionString");
 			services.AddTransient<IUserStore<IdentityUser>, UserStore>(s => new UserStore(connectionString));
 			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>(s => new RoleStore(connectionString));
 			services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -64,11 +65,7 @@ namespace BugTracker
 					policy.Requirements.Add(new ModifyProfileRequirement()));
 			});
 
-			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>(s => new ProjectAccessAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>(s => new ProjectAdministratorAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>(s => new ModifyReportAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>(s => new ModifyCommentAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>(s => new ModifyProfileAuthorizationHandler(connectionString));
+			ConfigureAuthorizationHandlers(services, connectionString);
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
@@ -80,10 +77,8 @@ namespace BugTracker
 			services.AddBreadcrumbs(GetType().Assembly);
 		}
 
-		private void ConfigureRepositories(IServiceCollection services, IConfiguration configuration)
+		private void ConfigureRepositories(IServiceCollection services, string connectionString)
 		{
-			string connectionString = configuration.GetConnectionString("DBConnectionString");
-
 			services.AddTransient<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
 
 			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
@@ -95,6 +90,15 @@ namespace BugTracker
 			services.AddTransient<ICommentRepository, DapperCommentRepository>(s => new DapperCommentRepository(connectionString));
 			services.AddTransient<IProjectInvitationsRepository, DapperProjectInvitationsRepository>(s => new DapperProjectInvitationsRepository(connectionString));
 			services.AddTransient<ISearchRepository, DapperSearchRepository>(s => new DapperSearchRepository(connectionString));
+		}
+
+		private void ConfigureAuthorizationHandlers(IServiceCollection services, string connectionString)
+		{
+			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>(s => new ProjectAccessAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>(s => new ProjectAdministratorAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>(s => new ModifyReportAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>(s => new ModifyCommentAuthorizationHandler(connectionString));
+			services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>(s => new ModifyProfileAuthorizationHandler(connectionString));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
