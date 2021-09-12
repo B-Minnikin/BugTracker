@@ -36,7 +36,7 @@ namespace BugTracker.Tests
 			mockBugReportRepository = new Mock<IBugReportRepository>();
 			mockMilestoneRepository = new Mock<IMilestoneRepository>();
 			mockBugReportStatesRepository = new Mock<IBugReportStatesRepository>();
-			mockUserManager = new Mock<ApplicationUserManager>();
+			mockUserManager = new Mock<ApplicationUserManager>("dummy connection string");
 
 			// inject mocked dependencies
 			builder = new ActivityMessageBuilder(
