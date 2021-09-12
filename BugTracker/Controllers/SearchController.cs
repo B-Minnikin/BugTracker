@@ -40,12 +40,16 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public ViewResult Result(SearchResultsViewModel searchModel)
+		public IActionResult Result(SearchResultsViewModel searchModel)
 		{
-			int currentProjectId = HttpContext.Session.GetInt32("currentProject") ?? 0;
+			int currentProjectId = httpContextAccessor.HttpContext.Session.GetInt32("currentProject") ?? 0;
 			logger.LogInformation("currentProjectId = " + currentProjectId);
+			if(currentProjectId <= 0) {
+				logger.LogWarning($"currentProjectId ({currentProjectId}) not set to a valid value: Redirecting to Home controller.");
+				return RedirectToAction("Index", "Home");
+			}
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				var bugReports = bugReportRepository.GetAllById(currentProjectId);
