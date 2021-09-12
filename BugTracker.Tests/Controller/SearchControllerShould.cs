@@ -80,5 +80,30 @@ namespace BugTracker.Tests.Controller
 			IActionResult actual = controller.Result(viewModel);
 			Assert.IsType<RedirectToActionResult>(actual);
 		}
+
+		[Fact]
+		public void ReturnView_WhenNotAuthorized()
+		{
+			MockHttpSession mockSession = new MockHttpSession();
+			mockSession.SetInt32("currentProject", 1);
+
+			var identity = new GenericIdentity("Test user");
+			var contextUser = new ClaimsPrincipal(identity);
+			var httpContext = new DefaultHttpContext()
+			{
+				User = contextUser,
+				Session = mockSession
+			};
+			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			// force the authorization failure
+			mockAuthorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Failed);
+
+			IActionResult actual = controller.Result(viewModel);
+			var viewResult = Assert.IsType<ViewResult>(actual);
+
+			// view model is not passed back to view
+			Assert.IsNotType<SearchResultsViewModel>(viewResult.Model);
+		}
 	}
 }

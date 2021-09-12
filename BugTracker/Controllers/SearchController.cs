@@ -52,26 +52,25 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var bugReports = bugReportRepository.GetAllById(currentProjectId);
+				var project = projectRepository.GetById(currentProjectId);
+				var bugReports = bugReportRepository.GetAllById(project.ProjectId);
 
 				// set default start date to the project's creation date - if user has not entered more recent date
-				DateTime projectCreationTime = GetProjectCreationTime((int)currentProjectId);
-				if (searchModel.SearchExpression.DateRangeBegin < projectCreationTime)
-					searchModel.SearchExpression.DateRangeBegin = projectCreationTime;
+				if (searchModel.SearchExpression.DateRangeBegin < project.CreationTime)
+					searchModel.SearchExpression.DateRangeBegin = project.CreationTime;
 
 				if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
 				{
 					searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
 						&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
 				}
-
-				string currentProjectName = projectRepository.GetById(currentProjectId).Name;
 					
-				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.SearchResult(currentProjectId, currentProjectName);
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.SearchResult(project.ProjectId, project.Name);
 					
 				return View(searchModel);
 			}
 
+			logger.LogError("Authorization failed for user: {0} inside SearchController.Results", httpContextAccessor.HttpContext.User);
 			return View();
 		}
 
@@ -110,12 +109,6 @@ namespace BugTracker.Controllers
 			}
 
 			return Json(bugReportSearchResults);
-		}
-
-		private DateTime GetProjectCreationTime(int projectId)
-		{
-			Project currentProject = projectRepository.GetById(projectId);
-			return currentProject.CreationTime;
 		}
 	}
 }
