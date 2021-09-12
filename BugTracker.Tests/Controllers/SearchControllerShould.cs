@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using BugTracker.Controllers;
 using BugTracker.Models;
-using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
+using BugTracker.Tests.Mocks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace BugTracker.Tests.Controller
+namespace BugTracker.Tests.Controllers
 {
 	public class SearchControllerShould
 	{
@@ -65,16 +59,7 @@ namespace BugTracker.Tests.Controller
 		[Fact]
 		public void RedirectToHome_IfProjectIdZero()
 		{
-			MockHttpSession mockSession = new MockHttpSession();
-			mockSession.SetInt32("currentProject", 0);
-
-			var identity = new GenericIdentity("Test user");
-			var contextUser = new ClaimsPrincipal(identity);
-			var httpContext = new DefaultHttpContext()
-			{
-				User = contextUser,
-				Session = mockSession
-			};
+			var httpContext = MockHttpContextFactory.GetHttpContext(0);
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 			IActionResult actual = controller.Result(viewModel);
@@ -84,16 +69,7 @@ namespace BugTracker.Tests.Controller
 		[Fact]
 		public void ReturnView_WhenNotAuthorized()
 		{
-			MockHttpSession mockSession = new MockHttpSession();
-			mockSession.SetInt32("currentProject", 1);
-
-			var identity = new GenericIdentity("Test user");
-			var contextUser = new ClaimsPrincipal(identity);
-			var httpContext = new DefaultHttpContext()
-			{
-				User = contextUser,
-				Session = mockSession
-			};
+			var httpContext = MockHttpContextFactory.GetHttpContext(1, "Test User");
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 			// force the authorization failure

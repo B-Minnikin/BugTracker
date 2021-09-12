@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BugTracker.Tests
+namespace BugTracker.Tests.Mocks
 {
 	internal class MockHttpSession : ISession
 	{
