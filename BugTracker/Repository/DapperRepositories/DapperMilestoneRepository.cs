@@ -1,13 +1,11 @@
 ﻿using BugTracker.Models;
-using BugTracker.Repository.DapperRepositories;
+using BugTracker.Repository.Interfaces;
 using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.Repository
+namespace BugTracker.Repository.DapperRepositories
 {
 	public class DapperMilestoneRepository: DapperBaseRepository, IMilestoneRepository
 	{

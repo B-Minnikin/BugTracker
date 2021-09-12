@@ -1,13 +1,8 @@
-﻿using BugTracker.Repository;
+﻿using BugTracker.Models;
 using BugTracker.Repository.Common;
-using Microsoft.AspNetCore.Identity;
-using Org.BouncyCastle.Bcpg;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.Models
+namespace BugTracker.Repository.Interfaces
 {
 	public interface IProjectRepository : IAdd<Project>,
 		IUpdate<Project>, IDelete<Project>,

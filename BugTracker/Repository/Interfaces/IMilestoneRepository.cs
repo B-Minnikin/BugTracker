@@ -1,11 +1,8 @@
 ﻿using BugTracker.Models;
 using BugTracker.Repository.Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.Repository
+namespace BugTracker.Repository.Interfaces
 {
 	public interface IMilestoneRepository : IAdd<Milestone>,
 		IUpdate<Milestone>, IDelete<Milestone>,

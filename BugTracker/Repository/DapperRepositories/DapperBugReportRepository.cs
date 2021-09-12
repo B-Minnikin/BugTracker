@@ -1,11 +1,9 @@
 ﻿using BugTracker.Models;
+using BugTracker.Repository.Interfaces;
 using Dapper;
 using Microsoft.AspNetCore.Identity;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {

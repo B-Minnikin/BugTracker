@@ -1,14 +1,10 @@
-﻿using BugTracker.Extension_Methods;
-using BugTracker.Repository.DapperRepositories;
+﻿using BugTracker.Models;
+using BugTracker.Repository.Interfaces;
 using Dapper;
-using Microsoft.AspNetCore.Identity;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.Models
+namespace BugTracker.Repository.DapperRepositories
 {
 	public class DapperProjectRepository : DapperBaseRepository, IProjectRepository
 	{

@@ -1,12 +1,9 @@
 ﻿using BugTracker.Models;
 using BugTracker.Repository.Common;
 using Microsoft.AspNetCore.Identity;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.Repository
+namespace BugTracker.Repository.Interfaces
 {
 	public interface IBugReportRepository : IAdd<BugReport>,
 		IUpdate<BugReport>, IDelete<BugReport>,
