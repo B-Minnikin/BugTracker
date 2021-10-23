@@ -59,7 +59,8 @@ namespace BugTracker.Tests.Controllers
 		[Fact]
 		public void RedirectToHome_IfProjectIdZero()
 		{
-			var httpContext = MockHttpContextFactory.GetHttpContext(0);
+			var projectId = 0;
+			var httpContext = MockHttpContextFactory.GetHttpContext(projectId);
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 			IActionResult actual = controller.Result(viewModel);
@@ -69,7 +70,9 @@ namespace BugTracker.Tests.Controllers
 		[Fact]
 		public void ReturnView_WhenNotAuthorized()
 		{
-			var httpContext = MockHttpContextFactory.GetHttpContext(1, "Test User");
+			var projectId = 1;
+			var userName = "Test User";
+			var httpContext = MockHttpContextFactory.GetHttpContext(projectId, userName);
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 			// force the authorization failure
