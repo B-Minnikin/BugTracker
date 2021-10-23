@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using System;
 
 namespace BugTracker.Tests.Controllers
 {
@@ -65,6 +66,13 @@ namespace BugTracker.Tests.Controllers
 
 			IActionResult actual = controller.Result(viewModel);
 			Assert.IsType<RedirectToActionResult>(actual);
+		}
+
+		[Fact]
+		public void ThrowException_IfResultsViewModel_IsNull()
+		{
+			//var httpContext = MockHttpContextFactory.GetHttpContext();
+			Assert.Throws<ArgumentNullException>(() => controller.Result(null));
 		}
 
 		[Fact]
