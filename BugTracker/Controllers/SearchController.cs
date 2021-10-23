@@ -52,20 +52,23 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var project = projectRepository.GetById(currentProjectId);
-				var bugReports = bugReportRepository.GetAllById(project.ProjectId);
-
-				// set default start date to the project's creation date - if user has not entered more recent date
-				if (searchModel.SearchExpression.DateRangeBegin < project.CreationTime)
-					searchModel.SearchExpression.DateRangeBegin = project.CreationTime;
-
-				if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
+				if (ModelState.IsValid)
 				{
-					searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
-						&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
+					var project = projectRepository.GetById(currentProjectId);
+					var bugReports = bugReportRepository.GetAllById(project.ProjectId);
+
+					// set default start date to the project's creation date - if user has not entered more recent date
+					if (searchModel.SearchExpression.DateRangeBegin < project.CreationTime)
+						searchModel.SearchExpression.DateRangeBegin = project.CreationTime;
+
+					if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
+					{
+						searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
+							&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
+					}
+
+					ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.SearchResult(project.ProjectId, project.Name);
 				}
-					
-				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.SearchResult(project.ProjectId, project.Name);
 					
 				return View(searchModel);
 			}
