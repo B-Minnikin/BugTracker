@@ -58,7 +58,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void RedirectToHome_IfProjectIdZero()
+		public void Result_RedirectToHome_IfProjectIdZero()
 		{
 			var projectId = 0;
 			var httpContext = MockHttpContextFactory.GetHttpContext(projectId);
@@ -69,14 +69,13 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void ThrowException_IfResultsViewModel_IsNull()
+		public void Result_ThrowException_IfResultsViewModel_IsNull()
 		{
-			//var httpContext = MockHttpContextFactory.GetHttpContext();
 			Assert.Throws<ArgumentNullException>(() => controller.Result(null));
 		}
 
 		[Fact]
-		public void ReturnView_WhenNotAuthorized()
+		public void Result_ReturnView_WhenNotAuthorized()
 		{
 			var projectId = 1;
 			var userName = "Test User";
@@ -94,7 +93,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void ReturnView_WhenInvalidModel()
+		public void Result_ReturnView_WhenInvalidModel()
 		{
 			var httpContext = MockHttpContextFactory.GetHttpContext();
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);

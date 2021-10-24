@@ -42,6 +42,11 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public IActionResult Result(SearchResultsViewModel searchModel)
 		{
+			if(searchModel == null)
+			{
+				throw new ArgumentNullException("Search model is null");
+			}
+
 			int currentProjectId = httpContextAccessor.HttpContext.Session.GetInt32("currentProject") ?? 0;
 			logger.LogInformation("currentProjectId = " + currentProjectId);
 			if(currentProjectId <= 0) {
