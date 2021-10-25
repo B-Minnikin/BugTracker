@@ -42,7 +42,7 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public IActionResult Result(SearchResultsViewModel searchModel)
 		{
-			if(searchModel == null)
+			if(searchModel is null)
 			{
 				throw new ArgumentNullException("Search model is null");
 			}
@@ -85,6 +85,11 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public IActionResult GetProjectMembers(string query, int projectId)
 		{
+			if (query is null)
+			{
+				throw new ArgumentNullException("Search query is null");
+			}
+
 			List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
 
 			if(!string.IsNullOrEmpty(query) && projectId > 0)

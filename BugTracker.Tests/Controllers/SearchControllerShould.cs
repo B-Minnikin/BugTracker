@@ -116,5 +116,11 @@ namespace BugTracker.Tests.Controllers
 			var model = Assert.IsType<SearchResultsViewModel>(viewResult.Model);
 			Assert.Equal(viewModel.SearchExpression.SearchText, model.SearchExpression.SearchText);
 		}
+
+		[Fact]
+		public void GetProjectMembers_ThrowException_IfResultsViewModel_IsNull()
+		{
+			Assert.Throws<ArgumentNullException>(() => controller.GetProjectMembers(null, 1));
+		}
 	}
 }
