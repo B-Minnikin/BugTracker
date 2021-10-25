@@ -122,5 +122,20 @@ namespace BugTracker.Tests.Controllers
 		{
 			Assert.Throws<ArgumentNullException>(() => controller.GetProjectMembers(null, 1));
 		}
+
+		[Fact]
+		public void GetProjectMembers_ReturnZeroResults_IfProjectZero()
+		{
+			int projectId = 0;
+			string query = "admin";
+
+			var jsonResult = (JsonResult)controller.GetProjectMembers(query, projectId);
+			var resultList = (List<UserTypeaheadSearchResult>)jsonResult.Value;
+			int actual = resultList.Count;
+
+			var expected = 0;
+
+			Assert.Equal(expected, actual);
+		}
 	}
 }
