@@ -83,7 +83,7 @@ namespace BugTracker.Tests.Controllers
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 			// force the authorization failure
-			mockAuthorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Failed);
+			Authorize(mockAuthorizationService, false);
 
 			IActionResult actual = controller.Result(viewModel);
 			var viewResult = Assert.IsType<ViewResult>(actual);
@@ -97,7 +97,7 @@ namespace BugTracker.Tests.Controllers
 		{
 			var httpContext = MockHttpContextFactory.GetHttpContext();
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-			mockAuthorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Success);
+			Authorize(mockAuthorizationService, true);
 
 			controller.ModelState.AddModelError("x", "Test error");
 			viewModel.SearchExpression.SearchText = "Test expression";
@@ -137,5 +137,18 @@ namespace BugTracker.Tests.Controllers
 
 			Assert.Equal(expected, actual);
 		}
+
+		private void Authorize(Mock<IAuthorizationService> authorizationService, bool willSucceed = true)
+		{
+			if (willSucceed)
+			{
+				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Success);
+			}
+			else
+			{
+				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Failed);
+			}
+		}
+			
 	}
 }
