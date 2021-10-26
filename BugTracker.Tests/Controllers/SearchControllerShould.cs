@@ -118,7 +118,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void GetProjectMembers_ThrowException_IfResultsViewModel_IsNull()
+		public void GetProjectMembers_ThrowException_IfQuery_IsNull()
 		{
 			Assert.Throws<ArgumentNullException>(() => controller.GetProjectMembers(null, 1));
 		}
