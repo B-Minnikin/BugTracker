@@ -168,6 +168,26 @@ namespace BugTracker.Tests.Controllers
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		public void GetBugReports_ReturnZeroResults_IfProjectZero()
+		{
+			int projectId = 0;
+			string query = "admin";
+
+			// Setup authorisation success
+			var httpContext = MockHttpContextFactory.GetHttpContext();
+			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			Authorize(mockAuthorizationService, true);
+
+			var jsonResult = (JsonResult)controller.GetBugReports(query, projectId);
+			var resultList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
+			int actual = resultList.Count;
+
+			var expected = 0;
+
+			Assert.Equal(expected, actual);
+		}
+
 		private void Authorize(Mock<IAuthorizationService> authorizationService, bool willSucceed = true)
 		{
 			if (willSucceed)
