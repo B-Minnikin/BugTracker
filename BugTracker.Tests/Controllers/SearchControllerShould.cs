@@ -138,6 +138,27 @@ namespace BugTracker.Tests.Controllers
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		public void GetProjectMembers_ReturnZeroResults_IfNotAuthorized()
+		{
+			int projectId = 2;
+			string query = "admin";
+
+			// Create a single search result from the search repo
+			List<UserTypeaheadSearchResult> searchResult = new List<UserTypeaheadSearchResult>();
+			searchResult.Add(new UserTypeaheadSearchResult { UserName = "Test name", Email = "test@email.com" });
+			mockSearchRepo.Setup(_ => _.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId)).Returns(searchResult);
+			Authorize(mockAuthorizationService, false);
+
+			var jsonResult = (JsonResult)controller.GetProjectMembers(query, projectId);
+			var actualList = (List<UserTypeaheadSearchResult>)jsonResult.Value;
+			int actual = actualList.Count;
+
+			var expected = 0;
+
+			Assert.Equal(expected, actual);
+		}
+
 		private void Authorize(Mock<IAuthorizationService> authorizationService, bool willSucceed = true)
 		{
 			if (willSucceed)
