@@ -129,6 +129,11 @@ namespace BugTracker.Tests.Controllers
 			int projectId = 0;
 			string query = "admin";
 
+			// Setup authorisation success
+			var httpContext = MockHttpContextFactory.GetHttpContext();
+			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			Authorize(mockAuthorizationService, true);
+
 			var jsonResult = (JsonResult)controller.GetProjectMembers(query, projectId);
 			var resultList = (List<UserTypeaheadSearchResult>)jsonResult.Value;
 			int actual = resultList.Count;
