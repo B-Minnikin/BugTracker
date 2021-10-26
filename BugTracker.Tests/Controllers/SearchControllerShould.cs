@@ -148,6 +148,10 @@ namespace BugTracker.Tests.Controllers
 			List<UserTypeaheadSearchResult> searchResult = new List<UserTypeaheadSearchResult>();
 			searchResult.Add(new UserTypeaheadSearchResult { UserName = "Test name", Email = "test@email.com" });
 			mockSearchRepo.Setup(_ => _.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId)).Returns(searchResult);
+			
+			// Setup authorisation failure
+			var httpContext = MockHttpContextFactory.GetHttpContext();
+			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 			Authorize(mockAuthorizationService, false);
 
 			var jsonResult = (JsonResult)controller.GetProjectMembers(query, projectId);

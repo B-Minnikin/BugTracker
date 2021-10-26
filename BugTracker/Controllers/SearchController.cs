@@ -92,8 +92,12 @@ namespace BugTracker.Controllers
 
 			List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
 
-			if(!string.IsNullOrEmpty(query) && projectId > 0)
-				userSearchResults = searchRepository.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId).ToList();
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				if (!string.IsNullOrEmpty(query) && projectId > 0)
+					userSearchResults = searchRepository.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId).ToList();
+			}
 
 			return Json(userSearchResults);
 		}
