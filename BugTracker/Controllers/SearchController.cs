@@ -107,7 +107,9 @@ namespace BugTracker.Controllers
 		{
 			List<BugReportTypeaheadSearchResult> bugReportSearchResults = new List<BugReportTypeaheadSearchResult>();
 
-			if (!string.IsNullOrEmpty(query) && projectId > 0)
+
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
+			if ((!string.IsNullOrEmpty(query) && projectId > 0) & (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded))
 			{
 				query = query.TrimStart('#'); // remove leading # for local report ID queries
 				int localBugReportId;
