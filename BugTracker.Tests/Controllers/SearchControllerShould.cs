@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using System;
+using BugTracker.Services;
 
 namespace BugTracker.Tests.Controllers
 {
@@ -23,6 +24,7 @@ namespace BugTracker.Tests.Controllers
 		private readonly Mock<ISearchRepository> mockSearchRepo;
 		private readonly Mock<IHttpContextAccessor> mockContextAccessor;
 		private readonly Mock<IAuthorizationService> mockAuthorizationService;
+		private readonly Mock<ILinkGenerator> mockLinkGenerator;
 		private readonly SearchResultsViewModel viewModel;
 		private SearchController controller;
 
@@ -34,6 +36,7 @@ namespace BugTracker.Tests.Controllers
 			mockSearchRepo = new Mock<ISearchRepository>();
 			mockContextAccessor = new Mock<IHttpContextAccessor>();
 			mockAuthorizationService = new Mock<IAuthorizationService>();
+			mockLinkGenerator = new Mock<ILinkGenerator>();
 
 			viewModel = new SearchResultsViewModel
 			{
@@ -53,7 +56,8 @@ namespace BugTracker.Tests.Controllers
 					mockBugReportRepo.Object,
 					mockSearchRepo.Object,
 					mockContextAccessor.Object,
-					mockAuthorizationService.Object
+					mockAuthorizationService.Object,
+					mockLinkGenerator.Object
 				);
 		}
 
@@ -186,6 +190,32 @@ namespace BugTracker.Tests.Controllers
 			var expected = 0;
 
 			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetBugReports_ReturnSingleResult_FromLocalId()
+		{
+			int projectId = 2;
+			string query = "#1";
+
+			// Create a single search result from the search repo
+			List<BugReportTypeaheadSearchResult> searchResult = new List<BugReportTypeaheadSearchResult>();
+			searchResult.Add(new BugReportTypeaheadSearchResult { BugReportId = 3, LocalBugReportId = 1, Title = "Test Title"});
+			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(1, projectId)).Returns(searchResult);
+			mockLinkGenerator.Setup(lnk => lnk.GetPathByAction("ReportOverview", "BugReport", It.IsAny<object>())).Returns("Dummy Url");
+
+			// Setup authorisation success
+			var httpContext = MockHttpContextFactory.GetHttpContext();
+			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			Authorize(mockAuthorizationService, true);
+
+			var jsonResult = (JsonResult)controller.GetBugReports(query, projectId);
+			var actualList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
+			int actualListCount = actualList.Count;
+
+			var expectedListCount = 1;
+
+			Assert.Equal(expectedListCount, actualListCount);
 		}
 
 		[Fact]

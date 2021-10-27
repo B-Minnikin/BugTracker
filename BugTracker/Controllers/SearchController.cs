@@ -2,16 +2,15 @@
 using BugTracker.Models;
 using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
+using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SmartBreadcrumbs.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
 {
@@ -23,13 +22,15 @@ namespace BugTracker.Controllers
 		private readonly ISearchRepository searchRepository;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IAuthorizationService authorizationService;
+		private readonly ILinkGenerator linkGenerator;
 
 		public SearchController(ILogger<SearchController> logger,
 									  IProjectRepository projectRepository,
 									  IBugReportRepository bugReportRepository,
 									  ISearchRepository searchRepository,
 									  IHttpContextAccessor httpContextAccessor,
-									  IAuthorizationService authorizationService)
+									  IAuthorizationService authorizationService,
+									  ILinkGenerator linkGenerator)
 		{
 			this.logger = logger;
 			this.projectRepository = projectRepository;
@@ -37,6 +38,7 @@ namespace BugTracker.Controllers
 			this.searchRepository = searchRepository;
 			this.httpContextAccessor = httpContextAccessor;
 			this.authorizationService = authorizationService;
+			this.linkGenerator = linkGenerator;
 		}
 
 		[HttpPost]
@@ -107,7 +109,6 @@ namespace BugTracker.Controllers
 		{
 			List<BugReportTypeaheadSearchResult> bugReportSearchResults = new List<BugReportTypeaheadSearchResult>();
 
-
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
 			if ((!string.IsNullOrEmpty(query) && projectId > 0) & (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded))
 			{
@@ -124,10 +125,15 @@ namespace BugTracker.Controllers
 			// Generate an URL for each bug report
 			foreach(var result in bugReportSearchResults)
 			{
-				result.Url = Url.Action("ReportOverview", "BugReport", new { id = result.BugReportId }, Request.Scheme);
+				result.Url = GetUrl(result.BugReportId);
 			}
 
 			return Json(bugReportSearchResults);
+		}
+
+		private string GetUrl(int bugReportId)
+		{
+			return linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { id = bugReportId });
 		}
 	}
 }
