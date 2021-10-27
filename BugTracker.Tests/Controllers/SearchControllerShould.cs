@@ -188,6 +188,32 @@ namespace BugTracker.Tests.Controllers
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		public void GetBugReports_ReturnZeroResults_IfNotAuthorized()
+		{
+			int projectId = 2;
+			string query = "admin";
+
+			// Create a single search result from the search repo
+			List<BugReportTypeaheadSearchResult> searchResult = new List<BugReportTypeaheadSearchResult>();
+			searchResult.Add(new BugReportTypeaheadSearchResult());
+			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(It.IsAny<int>(), It.IsAny<int>())).Returns(searchResult);
+			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByTitleSearchQuery(It.IsAny<string>(), It.IsAny<int>())).Returns(searchResult);
+
+			// Setup authorisation failure
+			var httpContext = MockHttpContextFactory.GetHttpContext();
+			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			Authorize(mockAuthorizationService, false);
+
+			var jsonResult = (JsonResult)controller.GetBugReports(query, projectId);
+			var actualList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
+			int actual = actualList.Count;
+
+			var expected = 0;
+
+			Assert.Equal(expected, actual);
+		}
+
 		private void Authorize(Mock<IAuthorizationService> authorizationService, bool willSucceed = true)
 		{
 			if (willSucceed)
