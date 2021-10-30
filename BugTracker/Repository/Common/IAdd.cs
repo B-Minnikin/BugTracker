@@ -1,8 +1,10 @@
 ﻿
+using System.Threading.Tasks;
+
 namespace BugTracker.Repository.Common
 {
 	public interface IAdd<T>
 	{
-		T Add(T model);
+		Task<T> Add(T model);
 	}
 }

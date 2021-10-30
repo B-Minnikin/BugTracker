@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {
@@ -13,7 +14,7 @@ namespace BugTracker.Repository.DapperRepositories
 	{
 		public DapperActivityRepository(string connectionString) : base(connectionString) { }
 
-		public Activity Add(Activity activity)
+		public async Task<Activity> Add(Activity activity)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
@@ -35,7 +36,7 @@ namespace BugTracker.Repository.DapperRepositories
 					MilestoneId = GetDerivedPropertyOrNull(activity, nameof(ActivityMilestone.MilestoneId))
 				};
 
-				var insertedActivityId = connection.ExecuteScalar<int>(sql, parameters);
+				var insertedActivityId = await connection.ExecuteScalarAsync<int>(sql, parameters);
 				var insertedActivity = GetActivities("ActivityId", insertedActivityId).ToList().FirstOrDefault();
 				return insertedActivity;
 			}
@@ -46,7 +47,7 @@ namespace BugTracker.Repository.DapperRepositories
 			return activity.HasProperty(propertyName) ? activity.GetDerivedProperty<int?>(propertyName) : null;
 		}
 
-		public Activity Delete(int activityId)
+		public async Task<Activity> Delete(int activityId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
@@ -57,7 +58,7 @@ namespace BugTracker.Repository.DapperRepositories
 					ActivityId = activityId
 				};
 
-				connection.Execute(sql, parameters);
+				await connection.ExecuteAsync(sql, parameters);
 				return activityToDelete;
 			}
 		}

@@ -1,8 +1,10 @@
 ﻿
+using System.Threading.Tasks;
+
 namespace BugTracker.Repository.Common
 {
 	public interface IDelete<T>
 	{
-		T Delete(int id);
+		Task<T> Delete(int id);
 	}
 }
