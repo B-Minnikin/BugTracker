@@ -7,6 +7,7 @@ using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -133,7 +134,8 @@ namespace BugTracker.Controllers
 
 		private string GetUrl(int bugReportId)
 		{
-			return linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { id = bugReportId });
+			var result = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { id = bugReportId });
+			return result;
 		}
 	}
 }

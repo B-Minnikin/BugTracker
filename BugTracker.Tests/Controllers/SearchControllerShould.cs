@@ -198,16 +198,15 @@ namespace BugTracker.Tests.Controllers
 			int projectId = 2;
 			string query = "#1";
 
-			// Create a single search result from the search repo
-			List<BugReportTypeaheadSearchResult> searchResult = new List<BugReportTypeaheadSearchResult>();
-			searchResult.Add(new BugReportTypeaheadSearchResult { BugReportId = 3, LocalBugReportId = 1, Title = "Test Title"});
-			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(1, projectId)).Returns(searchResult);
-			mockLinkGenerator.Setup(lnk => lnk.GetPathByAction("ReportOverview", "BugReport", It.IsAny<object>())).Returns("Dummy Url");
-
 			// Setup authorisation success
 			var httpContext = MockHttpContextFactory.GetHttpContext();
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 			Authorize(mockAuthorizationService, true);
+
+			// Get a single search result
+			List<BugReportTypeaheadSearchResult> searchResult = new List<BugReportTypeaheadSearchResult>();
+			searchResult.Add(new BugReportTypeaheadSearchResult { BugReportId = 3, LocalBugReportId = 1, Title = "Test Title"});
+			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(1, projectId)).Returns(searchResult);
 
 			var jsonResult = (JsonResult)controller.GetBugReports(query, projectId);
 			var actualList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;

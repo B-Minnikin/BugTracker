@@ -9,6 +9,7 @@ using BugTracker.Models.ProjectInvitation;
 using BugTracker.Repository;
 using BugTracker.Repository.DapperRepositories;
 using BugTracker.Repository.Interfaces;
+using BugTracker.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,6 +40,8 @@ namespace BugTracker
 			services.AddTransient<IEmailHelper, EmailHelper>();
 
 			ConfigureRepositories(services, connectionString);
+
+			services.AddTransient<ILinkGenerator, ApplicationLinkGenerator>();
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();
