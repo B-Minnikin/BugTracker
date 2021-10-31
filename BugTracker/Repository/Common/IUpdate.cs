@@ -1,8 +1,10 @@
 ﻿
+using System.Threading.Tasks;
+
 namespace BugTracker.Repository.Common
 {
 	public interface IUpdate<T>
 	{
-		T Update(T model);
+		Task<T> Update(T model);
 	}
 }

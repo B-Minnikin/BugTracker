@@ -49,9 +49,9 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Milestones(int projectId)
+		public async Task<IActionResult> Milestones(int projectId)
 		{
-			var currentProject = projectRepository.GetById(projectId);
+			var currentProject = await projectRepository.GetById(projectId);
 			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.Milestones(currentProject);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
@@ -64,13 +64,13 @@ namespace BugTracker.Controllers
 				ProjectMilestones = new List<MilestoneContainer>()
 			};
 
-			var milestones = milestoneRepository.GetAllById(projectId);
+			var milestones = await milestoneRepository.GetAllById(projectId);
 			foreach (var milestone in milestones)
 			{
-				var bugReportEntries = milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
+				var bugReportEntries = await milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId);
 				foreach (var bugReport in bugReportEntries) // <------- REFACTOR NEEDED
 				{
-					bugReport.CurrentState = bugReportStatesRepository.GetLatestState(bugReport.BugReportId);
+					bugReport.CurrentState = await bugReportStatesRepository.GetLatestState(bugReport.BugReportId);
 				}
 
 				model.ProjectMilestones.Add(new MilestoneContainer
@@ -84,10 +84,10 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Overview(int milestoneId)
+		public async Task<IActionResult> Overview(int milestoneId)
 		{
-			Milestone model = milestoneRepository.GetById(milestoneId);
-			var currentProject = projectRepository.GetById(model.ProjectId);
+			Milestone model = await milestoneRepository .GetById(milestoneId);
+			var currentProject = await projectRepository.GetById(model.ProjectId);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -116,9 +116,9 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult New(int projectId)
+		public async Task<IActionResult> New(int projectId)
 		{
-			var currentProject = projectRepository.GetById(projectId);
+			var currentProject = await projectRepository.GetById(projectId);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -137,7 +137,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult New(NewMilestoneViewModel model)
+		public async Task<IActionResult> New(NewMilestoneViewModel model)
 		{
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -153,24 +153,24 @@ namespace BugTracker.Controllers
 						DueDate = model.DueDate
 					};
 
-					var createdMilestone = milestoneRepository.Add(newMilestone);
+					var createdMilestone = await milestoneRepository.Add(newMilestone);
 
 					// Create activity event
 					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 					var milestoneActivityEvent = new ActivityMilestone(DateTime.Now, createdMilestone.ProjectId, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
-					activityRepository.Add(milestoneActivityEvent);
+					await activityRepository.Add(milestoneActivityEvent);
 
 					// handle bug report ids
 					foreach (var reportEntry in model.MilestoneBugReportEntries)
 					{
-						BugReport report = bugReportRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
+						BugReport report = await bugReportRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
 						
-						milestoneRepository.AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
+						await milestoneRepository .AddMilestoneBugReport(createdMilestone.MilestoneId, report.BugReportId);
 
 						// Create activity event
 						var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 						var bugReportActivityEvent = new ActivityMilestone(DateTime.Now, currentProjectId.Value, ActivityMessage.MilestonePosted, userId, createdMilestone.MilestoneId);
-						activityRepository.Add(bugReportActivityEvent);
+						await activityRepository .Add(bugReportActivityEvent);
 					}
 
 					return RedirectToAction("Overview", "Milestone", new { milestoneId = createdMilestone.MilestoneId });
@@ -184,10 +184,10 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Edit(int milestoneId)
+		public async Task<IActionResult> Edit(int milestoneId)
 		{
 			var currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetById(currentProjectId);
+			var currentProject = await projectRepository .GetById(currentProjectId);
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
@@ -195,7 +195,7 @@ namespace BugTracker.Controllers
 
 				var viewModel = new EditMilestoneViewModel
 				{
-					Milestone = milestoneRepository.GetById(milestoneId),
+					Milestone = await milestoneRepository .GetById(milestoneId),
 					ProjectId = currentProjectId,
 					MilestoneBugReportEntries = GenerateBugReportEntries(milestoneId).ToList()
 				};
@@ -232,9 +232,9 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
-		private void UpdateEditedMilestoneBugReports(Milestone milestone, List<MilestoneBugReportEntry> editedBugReports)
+		private async Task UpdateEditedMilestoneBugReports(Milestone milestone, List<MilestoneBugReportEntry> editedBugReports)
 		{
-			List<MilestoneBugReportEntry> existingBugReports = milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
+			List<MilestoneBugReportEntry> existingBugReports = await milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
 
 			// if bug report only present in entries - add to repo
 			IEnumerable<MilestoneBugReportEntry> toAdd = editedBugReports.Except(existingBugReports, new MilestoneBugReportEntryEqualityComparer());
@@ -248,22 +248,24 @@ namespace BugTracker.Controllers
 
 			foreach (var entry in toAdd)
 			{
-				int bugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
-				milestoneRepository.AddMilestoneBugReport(milestone.MilestoneId, bugReportId);
+				var bugReport = await bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId);
+				int bugReportId = bugReport.BugReportId;
+				await milestoneRepository.AddMilestoneBugReport(milestone.MilestoneId, bugReportId);
 
 				// Create activity event
 				var activityEvent = new ActivityMilestoneBugReport(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAddedToMilestone, userId, milestone.MilestoneId, entry.BugReportId);
-				activityRepository.Add(activityEvent);
+				await activityRepository.Add(activityEvent);
 			}
 
 			foreach(var entry in toDelete)
 			{
-				int bugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
-				milestoneRepository.RemoveMilestoneBugReport(milestone.MilestoneId, bugReportId);
+				var bugReport = await bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId);
+				int bugReportId = bugReport.BugReportId;
+				await milestoneRepository.RemoveMilestoneBugReport(milestone.MilestoneId, bugReportId);
 
 				// Create activity event
 				var activityEvent = new ActivityMilestoneBugReport(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportRemovedFromMilestone, userId, milestone.MilestoneId, entry.BugReportId);
-				activityRepository.Add(activityEvent);
+				await activityRepository .Add(activityEvent);
 			}
 		}
 
@@ -281,25 +283,27 @@ namespace BugTracker.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
-		private IEnumerable<MilestoneBugReportEntry> GenerateBugReportEntries(int milestoneId)
+		private async Task<IEnumerable<MilestoneBugReportEntry>> GenerateBugReportEntries(int milestoneId)
 		{
-			Milestone milestone = milestoneRepository.GetById(milestoneId);
-			IEnumerable<MilestoneBugReportEntry> entries = milestoneRepository.GetMilestoneBugReportEntries(milestoneId);
+			Milestone milestone = await milestoneRepository.GetById(milestoneId);
+			IEnumerable<MilestoneBugReportEntry> entries = await milestoneRepository.GetMilestoneBugReportEntries(milestoneId);
 
 			foreach(var entry in entries)
 			{
-				entry.BugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId).BugReportId;
+				var bugReport = await bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId);
+				entry.BugReportId = bugReport.BugReportId;
 				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = entry.BugReportId });
-				entry.CurrentState = bugReportStatesRepository.GetLatestState(entry.BugReportId);
+				entry.CurrentState = await bugReportStatesRepository.GetLatestState(entry.BugReportId);
 			}
 
 			return entries;
 		}
 
-		private MilestoneBugReportEntry GenerateBugReportUrl(MilestoneBugReportEntry entry)
+		private async Task<MilestoneBugReportEntry> GenerateBugReportUrl(MilestoneBugReportEntry entry)
 		{
 			int currentProjectId = (int)HttpContext.Session.GetInt32("currentProject");
-			int bugReportId = bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, currentProjectId).BugReportId;
+			var bugReport = await bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, currentProjectId);
+			int bugReportId = bugReport.BugReportId;
 			return GenerateBugReportUrl(entry, bugReportId);
 		}
 

@@ -2,6 +2,7 @@
 using BugTracker.Repository.Common;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BugTracker.Repository.Interfaces
 {
@@ -9,24 +10,24 @@ namespace BugTracker.Repository.Interfaces
 		IUpdate<BugReport>, IDelete<BugReport>,
 		IGetById<BugReport>, IGetAllById<BugReport>
 	{
-		BugReport GetBugReportByLocalId(int localBugReportId, int projectId);
-		int GetCommentCountById(int bugReportId);
+		Task<BugReport> GetBugReportByLocalId(int localBugReportId, int projectId);
+		Task<int> GetCommentCountById(int bugReportId);
 
 		// Bug Reports - Local IDs
-		void AddLocalBugReportId(int projectId);
+		Task AddLocalBugReportId(int projectId);
 
 		// Users assigned to bug reports
-		void AddUserAssignedToBugReport(int userId, int bugReportId);
-		void DeleteUserAssignedToBugReport(int userId, int bugReportId);
-		IEnumerable<BugReport> GetBugReportsForAssignedUser(int userId);
-		IEnumerable<IdentityUser> GetAssignedUsersForBugReport(int bugReportId);
+		Task AddUserAssignedToBugReport(int userId, int bugReportId);
+		Task DeleteUserAssignedToBugReport(int userId, int bugReportId);
+		Task<IEnumerable<BugReport>> GetBugReportsForAssignedUser(int userId);
+		Task<IEnumerable<IdentityUser>> GetAssignedUsersForBugReport(int bugReportId);
 
 		// Bug Report Linking
-		void AddBugReportLink(int bugReportId, int linkToBugReportId);
-		void DeleteBugReportLink(int bugReportId, int linkToBugReportId);
-		IEnumerable<BugReport> GetLinkedReports(int bugReportId);
+		Task AddBugReportLink(int bugReportId, int linkToBugReportId);
+		Task DeleteBugReportLink(int bugReportId, int linkToBugReportId);
+		Task<IEnumerable<BugReport>> GetLinkedReports(int bugReportId);
 
 		// Attachment Paths
-		IEnumerable<AttachmentPath> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
+		Task<IEnumerable<AttachmentPath>> GetAttachmentPaths(AttachmentParentType parentType, int parentId);
 	}
 }

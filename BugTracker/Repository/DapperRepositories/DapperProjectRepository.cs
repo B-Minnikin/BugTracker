@@ -3,6 +3,7 @@ using BugTracker.Repository.Interfaces;
 using Dapper;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {
@@ -10,25 +11,25 @@ namespace BugTracker.Repository.DapperRepositories
 	{
 		public DapperProjectRepository(string connectionString) : base(connectionString) { }
 
-		public Project Add(Project project)
+		public async Task<Project> Add(Project project)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var insertedProjectId = connection.ExecuteScalar("dbo.Projects_Insert", new {
+				var insertedProjectId = await connection.ExecuteScalarAsync("dbo.Projects_Insert", new {
 					Name = project.Name, Description = project.Description, CreationTime = project.CreationTime,
 					LastUpdateTime = project.LastUpdateTime, Hidden = project.Hidden },
 					commandType: CommandType.StoredProcedure);
-				var insertedProject = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = insertedProjectId });
+				var insertedProject = await connection.QueryFirstAsync<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = insertedProjectId });
 				return insertedProject;
 			}
 		}
 
-		public Project Delete(int id)
+		public async Task<Project> Delete(int id)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var deletedProject = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
-				var result = connection.Execute("dbo.Projects_Delete @ProjectId", new { ProjectId = id });
+				var deletedProject = await connection.QueryFirstAsync<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
+				var result = await connection.ExecuteAsync("dbo.Projects_Delete @ProjectId", new { ProjectId = id });
 
 				return deletedProject;
 			}
@@ -43,20 +44,20 @@ namespace BugTracker.Repository.DapperRepositories
 			}
 		}
 
-		public Project GetById(int id)
+		public async Task<Project> GetById(int id)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var project = connection.QueryFirst<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
+				var project = await connection.QueryFirstAsync<Project>("dbo.Projects_GetById @ProjectId", new { ProjectId = id });
 				return project;
 			}
 		}
 
-		public Project Update(Project projectChanges)
+		public async Task<Project> Update(Project projectChanges)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var projectId = connection.Execute("dbo.Projects_Update", new
+				var projectId = await connection.ExecuteAsync("dbo.Projects_Update", new
 				{
 					ProjectId = projectChanges.ProjectId,
 					Name = projectChanges.Name,
@@ -65,7 +66,7 @@ namespace BugTracker.Repository.DapperRepositories
 					LastUpdateTime = projectChanges.LastUpdateTime,
 					Hidden = projectChanges.Hidden
 				}, commandType: CommandType.StoredProcedure);
-				var project = GetById(projectChanges.ProjectId);
+				var project = await GetById(projectChanges.ProjectId);
 				return project;
 			}
 		}

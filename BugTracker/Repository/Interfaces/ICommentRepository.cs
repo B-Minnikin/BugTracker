@@ -1,5 +1,6 @@
 ﻿using BugTracker.Models;
 using BugTracker.Repository.Common;
+using System.Threading.Tasks;
 
 namespace BugTracker.Repository.Interfaces
 {
@@ -7,6 +8,6 @@ namespace BugTracker.Repository.Interfaces
 		IUpdate<Comment>, IDelete<Comment>,
 		IGetById<Comment>, IGetAllById<Comment>
 	{
-		int GetCommentParentId(int commentId);
+		Task<int> GetCommentParentId(int commentId);
 	}
 }

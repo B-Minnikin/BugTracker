@@ -83,11 +83,11 @@ namespace BugTracker.Controllers
 		}
 
 		[Authorize]
-		public ViewResult Subscriptions(int id)
+		public async Task<ViewResult> Subscriptions(int id)
 		{
 			SubscriptionsViewModel subscriptionsViewModel = new SubscriptionsViewModel
 			{
-				BugReports = userSubscriptionsRepository.GetSubscribedReports(id).ToList()
+				BugReports = await userSubscriptionsRepository.GetSubscribedReports(id).ToList()
 			};
 
 			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProfileSubscriptions(id);

@@ -1,6 +1,7 @@
 ﻿using BugTracker.Models;
 using BugTracker.Repository.Common;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BugTracker.Repository.Interfaces
 {
@@ -8,6 +9,6 @@ namespace BugTracker.Repository.Interfaces
 		IUpdate<Project>, IDelete<Project>,
 		IGetById<Project>
 	{
-		IEnumerable<Project> GetAll();
+		Task<IAsyncEnumerable<Project>> GetAll();
 	}
 }

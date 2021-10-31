@@ -51,9 +51,9 @@ namespace BugTracker.Controllers
 		}
 
 		[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]
-		public ViewResult Projects()
+		public async Task<ViewResult> Projects()
 		{
-			var model = projectRepository.GetAll().Where(project =>
+			var model = await projectRepository.GetAll().Where(project =>
 					{
 						Task<AuthorizationResult> authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, project.ProjectId, "CanAccessProjectPolicy");
 						if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)

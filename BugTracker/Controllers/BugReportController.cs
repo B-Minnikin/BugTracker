@@ -65,10 +65,10 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public ViewResult CreateReport()
+		public async Task<ViewResult> CreateReport()
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var currentProject = projectRepository.GetById(currentProjectId ?? 0);
+			var currentProject = await projectRepository .GetById(currentProjectId ?? 0);
 
 			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportCreate(currentProject);
 

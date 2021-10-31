@@ -1,6 +1,7 @@
 ﻿using BugTracker.Models;
 using BugTracker.Repository.Common;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BugTracker.Repository.Interfaces
 {
@@ -8,9 +9,9 @@ namespace BugTracker.Repository.Interfaces
 		IUpdate<Milestone>, IDelete<Milestone>,
 		IGetById<Milestone>, IGetAllById<Milestone>
 	{
-		void AddMilestoneBugReport(int milestoneId, int bugReportId);
-		void RemoveMilestoneBugReport(int milestoneId, int bugReportId);
-		IEnumerable<MilestoneBugReportEntry> GetMilestoneBugReportEntries(int milestoneId);
-		IEnumerable<BugReport> GetMilestoneBugReports(int milestoneId);
+		Task AddMilestoneBugReport(int milestoneId, int bugReportId);
+		Task RemoveMilestoneBugReport(int milestoneId, int bugReportId);
+		Task<IEnumerable<MilestoneBugReportEntry>> GetMilestoneBugReportEntries(int milestoneId);
+		Task<IEnumerable<BugReport>> GetMilestoneBugReports(int milestoneId);
 	}
 }

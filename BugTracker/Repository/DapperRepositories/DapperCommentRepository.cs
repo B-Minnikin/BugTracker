@@ -3,6 +3,7 @@ using BugTracker.Repository.Interfaces;
 using Dapper;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace BugTracker.Repository.DapperRepositories
 {
@@ -10,11 +11,11 @@ namespace BugTracker.Repository.DapperRepositories
 	{
 		public DapperCommentRepository(string connectionString) : base(connectionString) { }
 
-		public Comment Add(Comment comment)
+		public async Task<Comment> Add(Comment comment)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var insertedCommentId = connection.ExecuteScalar("dbo.Comments_Insert", new
+				var insertedCommentId = await connection.ExecuteScalarAsync("dbo.Comments_Insert", new
 				{
 					AuthorId = comment.AuthorId,
 					Date = comment.Date,
@@ -22,12 +23,12 @@ namespace BugTracker.Repository.DapperRepositories
 					BugReportId = comment.BugReportId
 				},
 					commandType: CommandType.StoredProcedure);
-				Comment insertedComment = connection.QueryFirst<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = insertedCommentId });
+				Comment insertedComment = await connection.QueryFirstAsync<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = insertedCommentId });
 				return insertedComment;
 			}
 		}
 
-		public Comment Update(Comment commentChanges)
+		public async Task<Comment> Update(Comment commentChanges)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
@@ -37,45 +38,45 @@ namespace BugTracker.Repository.DapperRepositories
 					AuthorId = commentChanges.AuthorId,
 					MainText = commentChanges.MainText
 				}, commandType: CommandType.StoredProcedure);
-				Comment updatedComment = connection.QueryFirst<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = commentChanges.CommentId });
+				Comment updatedComment = await connection.QueryFirstAsync<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = commentChanges.CommentId });
 				return updatedComment;
 			}
 		}
 
-		public Comment Delete(int commentId)
+		public async Task<Comment> Delete(int commentId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var commentToDelete = this.GetById(commentId);
-				connection.Execute("dbo.Comments_DeleteById", new { CommentId = commentId },
+				var commentToDelete = await this.GetById(commentId);
+				await connection.ExecuteAsync("dbo.Comments_DeleteById", new { CommentId = commentId },
 					commandType: CommandType.StoredProcedure);
 				return commentToDelete;
 			}
 		}
 
-		public Comment GetById(int commentId)
+		public async Task<Comment> GetById(int commentId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var comment = connection.QueryFirst<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = commentId });
+				var comment = await connection.QueryFirstAsync<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = commentId });
 				return comment;
 			}
 		}
 
-		public IEnumerable<Comment> GetAllById(int bugReportId)
+		public async Task<IEnumerable<Comment>> GetAllById(int bugReportId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var comments = connection.Query<Comment>("dbo.Comments_GetAll @BugReportId", new { BugReportId = bugReportId });
+				var comments = await connection.QueryAsync<Comment>("dbo.Comments_GetAll @BugReportId", new { BugReportId = bugReportId });
 				return comments;
 			}
 		}
 
-		public int GetCommentParentId(int commentId)
+		public async Task<int> GetCommentParentId(int commentId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var parentId = connection.QueryFirst<int>("dbo.Comments_GetParentId @CommentId", new { CommentId = commentId });
+				var parentId = await connection.QueryFirstAsync<int>("dbo.Comments_GetParentId @CommentId", new { CommentId = commentId });
 				return parentId;
 			}
 		}
