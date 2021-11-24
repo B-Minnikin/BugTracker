@@ -92,7 +92,7 @@ namespace BugTracker.Controllers
 				var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportId, addedComment.CommentId);
 				await activityRepository.Add(commentActivity);
 
-				if (model.Subscribe && !subscriptions.IsSubscribed(userId, addedComment.BugReportId))
+				if (model.Subscribe && !await subscriptions.IsSubscribed(userId, addedComment.BugReportId))
 				{
 					await userSubscriptionsRepository.AddSubscription(userId, addedComment.BugReportId);
 				}

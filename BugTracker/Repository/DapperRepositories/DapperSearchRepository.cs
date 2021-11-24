@@ -35,8 +35,11 @@ namespace BugTracker.Repository.DapperRepositories
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var searchResults = await connection.QueryAsync<BugReportTypeaheadSearchResult>("dbo.BugReports_MatchByLocalIdAndProject", new { Query = localBugReportId, ProjectId = projectId },
-					commandType: CommandType.StoredProcedure);
+				var searchResults = await connection.QueryAsync<BugReportTypeaheadSearchResult>("dbo.BugReports_MatchByLocalIdAndProject", new
+				{
+					Query = localBugReportId,
+					ProjectId = projectId
+				}, commandType: CommandType.StoredProcedure);
 				return searchResults;
 			}
 		}

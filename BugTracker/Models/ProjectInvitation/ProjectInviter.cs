@@ -45,13 +45,13 @@ namespace BugTracker.Models.ProjectInvitation
 			invitation.ToUser = await userManager.FindByEmailAsync(invitation.EmailAddress);
 
 			bool userAlreadyExists = invitation.ToUser != null;
-			bool emailAddressIsPendingRegistration = EmailAddressPendingRegistration(invitation.EmailAddress, invitation.Project.ProjectId);
+			bool emailAddressIsPendingRegistration = await EmailAddressPendingRegistration(invitation.EmailAddress, invitation.Project.ProjectId);
 
 			if (!userAlreadyExists)
 			{
 				if(!emailAddressIsPendingRegistration)
 				{
-					projectInvitationsRepository.AddPendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
+					await projectInvitationsRepository.AddPendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
 					SendProjectInvitationEmail(invitation);
 				}
 			}
@@ -63,15 +63,15 @@ namespace BugTracker.Models.ProjectInvitation
 					SendProjectRoleNotificationEmail(invitation);
 				}
 
-				RemovePendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
+				await RemovePendingProjectInvitation(invitation.EmailAddress, invitation.Project.ProjectId);
 			}
 		}
 
-		public void RemovePendingProjectInvitation(string emailAddress, int projectId)
+		public async Task RemovePendingProjectInvitation(string emailAddress, int projectId)
 		{
-			if(EmailAddressPendingRegistration(emailAddress, projectId))
+			if(await EmailAddressPendingRegistration (emailAddress, projectId))
 			{
-				projectInvitationsRepository.DeletePendingProjectInvitation(emailAddress, projectId);
+				await projectInvitationsRepository .DeletePendingProjectInvitation(emailAddress, projectId);
 			}
 			else
 			{
@@ -80,24 +80,24 @@ namespace BugTracker.Models.ProjectInvitation
 			}
 		}
 
-		public async void AddUserToProjectMemberRoleForAllPendingInvitations(string emailAddress)
+		public async Task AddUserToProjectMemberRoleForAllPendingInvitations(string emailAddress)
 		{
 			var user = await userManager.FindByEmailAsync(emailAddress);
 
 			if(user != null)
 			{
-				List<int> projectIds = projectInvitationsRepository.GetProjectInvitationsForEmailAddress(emailAddress).ToList();
-				foreach (int projectId in projectIds)
+				var projectIds = await projectInvitationsRepository.GetProjectInvitationsForEmailAddress(emailAddress);
+				foreach (int projectId in projectIds.ToList())
 				{
 					await userManager.AddToRoleAsync(user, "Member", projectId);
-					RemovePendingProjectInvitation(emailAddress, projectId);
+					await RemovePendingProjectInvitation (emailAddress, projectId);
 				}
 			}
 		}
 
-		private bool EmailAddressPendingRegistration(string emailAddress, int projectId)
+		private async Task<bool> EmailAddressPendingRegistration(string emailAddress, int projectId)
 		{
-			return projectInvitationsRepository.IsEmailAddressPendingRegistration(emailAddress, projectId);
+			return await projectInvitationsRepository.IsEmailAddressPendingRegistration(emailAddress, projectId);
 		}
 
 		private async Task<bool> UserHasProjectAuthorization(string emailAddress, int projectId)
@@ -117,7 +117,7 @@ namespace BugTracker.Models.ProjectInvitation
 			return false;
 		}
 
-		private async void AddUserToProjectMemberRole(string emailAddress, int projectId)
+		private async Task AddUserToProjectMemberRole(string emailAddress, int projectId)
 		{
 			var user = await userManager.FindByEmailAsync(emailAddress);
 

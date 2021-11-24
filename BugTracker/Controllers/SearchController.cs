@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
 {
@@ -43,7 +44,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Result(SearchResultsViewModel searchModel)
+		public async Task<IActionResult> Result(SearchResultsViewModel searchModel)
 		{
 			if(searchModel is null)
 			{
@@ -62,8 +63,8 @@ namespace BugTracker.Controllers
 			{
 				if (ModelState.IsValid)
 				{
-					var project = projectRepository.GetById(currentProjectId);
-					var bugReports = bugReportRepository.GetAllById(project.ProjectId);
+					var project = await projectRepository.GetById(currentProjectId);
+					var bugReports = await bugReportRepository.GetAllById(project.ProjectId);
 
 					// set default start date to the project's creation date - if user has not entered more recent date
 					if (searchModel.SearchExpression.DateRangeBegin < project.CreationTime)
@@ -86,29 +87,31 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetProjectMembers(string query, int projectId)
+		public async Task<IActionResult> GetProjectMembers(string query, int projectId)
 		{
 			if (query is null)
 			{
 				throw new ArgumentNullException("Search query is null");
 			}
 
-			List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
+			//List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
+			IEnumerable<UserTypeaheadSearchResult> userSearchResults = null;
 
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				if (!string.IsNullOrEmpty(query) && projectId > 0)
-					userSearchResults = searchRepository.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId).ToList();
+					userSearchResults = await searchRepository.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId);
 			}
 
-			return Json(userSearchResults);
+			return Json(userSearchResults.ToList());
 		}
 
 		[HttpGet]
-		public IActionResult GetBugReports(string query, int projectId)
+		public async Task<IActionResult> GetBugReports(string query, int projectId)
 		{
-			List<BugReportTypeaheadSearchResult> bugReportSearchResults = new List<BugReportTypeaheadSearchResult>();
+			//List<BugReportTypeaheadSearchResult> bugReportSearchResults = new List<BugReportTypeaheadSearchResult>();
+			IEnumerable<BugReportTypeaheadSearchResult> bugReportSearchResults = null;
 
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
 			if ((!string.IsNullOrEmpty(query) && projectId > 0) & (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded))
@@ -118,13 +121,13 @@ namespace BugTracker.Controllers
 				bool intParseSuccess = Int32.TryParse(query, out localBugReportId);
 
 				if(intParseSuccess)
-					bugReportSearchResults = searchRepository.GetMatchingBugReportsByLocalIdSearchQuery(localBugReportId, projectId).ToList();
+					bugReportSearchResults = await searchRepository.GetMatchingBugReportsByLocalIdSearchQuery(localBugReportId, projectId);
 				else
-					bugReportSearchResults = searchRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId).ToList();
+					bugReportSearchResults = await searchRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId);
 			}
 
 			// Generate an URL for each bug report
-			foreach(var result in bugReportSearchResults)
+			foreach(var result in bugReportSearchResults.ToList())
 			{
 				result.Url = GetUrl(result.BugReportId);
 			}

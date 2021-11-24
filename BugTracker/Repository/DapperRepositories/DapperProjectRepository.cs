@@ -35,7 +35,7 @@ namespace BugTracker.Repository.DapperRepositories
 			}
 		}
 
-		public IEnumerable<Project> GetAll()
+		public async Task<IEnumerable<Project>> GetAll()
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{

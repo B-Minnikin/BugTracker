@@ -8,8 +8,8 @@ namespace BugTracker.Models.ProjectInvitation
 	public interface IProjectInviter
 	{
 		Task AddProjectInvitation(ProjectInvitation projectInvitation);
-		void RemovePendingProjectInvitation(string emailAddress, int projectId);
+		Task RemovePendingProjectInvitation(string emailAddress, int projectId);
 
-		void AddUserToProjectMemberRoleForAllPendingInvitations(string emailAddress);
+		Task AddUserToProjectMemberRoleForAllPendingInvitations(string emailAddress);
 	}
 }

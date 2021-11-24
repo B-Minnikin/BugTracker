@@ -8,7 +8,7 @@ namespace BugTracker.Services
 {
 	interface IActivityMessageBuilder
 	{
-		void GenerateMessages(IEnumerable<Activity> activities);
-		string GetMessage(Activity activity);
+		Task GenerateMessages(IEnumerable<Activity> activities);
+		Task<string> GetMessage(Activity activity);
 	}
 }

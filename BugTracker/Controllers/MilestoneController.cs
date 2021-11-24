@@ -95,12 +95,12 @@ namespace BugTracker.Controllers
 				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.MilestoneOverview(currentProject, model.Title);
 
 				//  Create view model
-				var bugReports = GenerateBugReportEntries(milestoneId).ToList();
+				var bugReports = await GenerateBugReportEntries(milestoneId);
 
 				MilestoneOverviewViewModel viewModel = new MilestoneOverviewViewModel
 				{
 					Milestone = model,
-					MilestoneBugReportEntries = bugReports,
+					MilestoneBugReportEntries = bugReports.ToList(),
 
 					ProjectMilestone = new MilestoneContainer
 					{
@@ -193,11 +193,13 @@ namespace BugTracker.Controllers
 			{
 				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.MilestoneEdit(currentProject);
 
+				var milestoneBugReportEntries = await GenerateBugReportEntries(milestoneId);
+
 				var viewModel = new EditMilestoneViewModel
 				{
-					Milestone = await milestoneRepository .GetById(milestoneId),
+					Milestone = await milestoneRepository.GetById(milestoneId),
 					ProjectId = currentProjectId,
-					MilestoneBugReportEntries = GenerateBugReportEntries(milestoneId).ToList()
+					MilestoneBugReportEntries = milestoneBugReportEntries.ToList()
 				};
 
 				return View(viewModel);
@@ -234,13 +236,14 @@ namespace BugTracker.Controllers
 
 		private async Task UpdateEditedMilestoneBugReports(Milestone milestone, List<MilestoneBugReportEntry> editedBugReports)
 		{
-			List<MilestoneBugReportEntry> existingBugReports = await milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId).ToList();
+			var existingBugReports = await milestoneRepository.GetMilestoneBugReportEntries(milestone.MilestoneId);
+			List<MilestoneBugReportEntry> existingBugReportsList = existingBugReports.ToList();
 
 			// if bug report only present in entries - add to repo
-			IEnumerable<MilestoneBugReportEntry> toAdd = editedBugReports.Except(existingBugReports, new MilestoneBugReportEntryEqualityComparer());
+			IEnumerable<MilestoneBugReportEntry> toAdd = editedBugReports.Except(existingBugReportsList, new MilestoneBugReportEntryEqualityComparer());
 
 			// if bug report missing from entries, but exists in repo - delete in repo
-			IEnumerable<MilestoneBugReportEntry> toDelete = existingBugReports.Except(editedBugReports, new MilestoneBugReportEntryEqualityComparer());
+			IEnumerable<MilestoneBugReportEntry> toDelete = existingBugReportsList.Except(editedBugReports, new MilestoneBugReportEntryEqualityComparer());
 
 			// preparation data for creating activity events
 			int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -269,13 +272,13 @@ namespace BugTracker.Controllers
 			}
 		}
 
-		public IActionResult Delete(int milestoneId)
+		public async Task<IActionResult> Delete(int milestoneId)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				milestoneRepository.Delete(milestoneId);
+				await milestoneRepository.Delete(milestoneId);
 
 				return RedirectToAction("Milestones", "Milestone", new { projectId = currentProjectId});
 			}
@@ -286,7 +289,7 @@ namespace BugTracker.Controllers
 		private async Task<IEnumerable<MilestoneBugReportEntry>> GenerateBugReportEntries(int milestoneId)
 		{
 			Milestone milestone = await milestoneRepository.GetById(milestoneId);
-			IEnumerable<MilestoneBugReportEntry> entries = await milestoneRepository.GetMilestoneBugReportEntries(milestoneId);
+			IEnumerable<MilestoneBugReportEntry> entries = await milestoneRepository .GetMilestoneBugReportEntries(milestoneId);
 
 			foreach(var entry in entries)
 			{

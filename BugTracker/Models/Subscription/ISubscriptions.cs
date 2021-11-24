@@ -7,9 +7,9 @@ namespace BugTracker.Models.Database
 {
 	public interface ISubscriptions
 	{
-		bool IsSubscribed(int userId, int bugReportId);
-		void CreateSubscriptionIfNotSubscribed(int userId, int bugReportId);
-		void DeleteSubscription(int userId, int bugReportId);
+		Task<bool> IsSubscribed(int userId, int bugReportId);
+		Task CreateSubscriptionIfNotSubscribed(int userId, int bugReportId);
+		Task DeleteSubscription(int userId, int bugReportId);
 
 		Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl);
 		Task NotifyBugReportNewComment(Comment comment, string bugReportUrl);

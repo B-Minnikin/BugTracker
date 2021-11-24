@@ -38,20 +38,20 @@ namespace BugTracker.Repository.DapperRepositories
 			}
 		}
 
-		public async Task<int> GetCommentCountById(int bugReportId)
+		public int GetCommentCountById(int bugReportId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				int count = await connection.ExecuteScalarAsync<int>("dbo.BugReports_CommentCount @BugReportId", new { BugReportId = bugReportId });
+				int count = connection.ExecuteScalar<int>("dbo.BugReports_CommentCount @BugReportId", new { BugReportId = bugReportId });
 				return count;
 			}
 		}
 
-		public IEnumerable<BugReport> GetAllById(int projectId)
+		public async Task<IEnumerable<BugReport>> GetAllById(int projectId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var bugReports = connection.Query<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = projectId });
+				var bugReports = await connection.QueryAsync<BugReport>("dbo.BugReports_GetAll @ProjectId", new { ProjectId = projectId });
 				return bugReports;
 			}
 		}

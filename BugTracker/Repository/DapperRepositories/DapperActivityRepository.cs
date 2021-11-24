@@ -37,8 +37,8 @@ namespace BugTracker.Repository.DapperRepositories
 				};
 
 				var insertedActivityId = await connection.ExecuteScalarAsync<int>(sql, parameters);
-				var insertedActivity = GetActivities("ActivityId", insertedActivityId).ToList().FirstOrDefault();
-				return insertedActivity;
+				var insertedActivity = await GetActivities("ActivityId", insertedActivityId);
+				return insertedActivity.ToList().FirstOrDefault();
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace BugTracker.Repository.DapperRepositories
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var activityToDelete = GetActivities("ActivityId", activityId).ToList().FirstOrDefault();
+				var activityToDelete = await GetActivities("ActivityId", activityId);
 				var sql = @"DELETE FROM dbo.ActivityEvents WHERE ActivityId = @activityId";
 				var parameters = new
 				{
@@ -59,21 +59,21 @@ namespace BugTracker.Repository.DapperRepositories
 				};
 
 				await connection.ExecuteAsync(sql, parameters);
-				return activityToDelete;
+				return activityToDelete.ToList().FirstOrDefault();
 			}
 		}
 
-		public IEnumerable<Activity> GetUserActivities(int userId)
+		public async Task<IEnumerable<Activity>> GetUserActivities(int userId)
 		{
-			return GetActivities(nameof(Activity.UserId), userId);
+			return await GetActivities(nameof(Activity.UserId), userId);
 		}
 
-		public IEnumerable<Activity> GetBugReportActivities(int bugReportId)
+		public async Task<IEnumerable<Activity>> GetBugReportActivities(int bugReportId)
 		{
-			return GetActivities(nameof(ActivityBugReport.BugReportId), bugReportId);
+			return await GetActivities(nameof(ActivityBugReport.BugReportId), bugReportId);
 		}
 
-		private IEnumerable<Activity> GetActivities(string key, int id)
+		private async Task<IEnumerable<Activity>> GetActivities(string key, int id)
 		{
 			var activityEvents = new List<Activity>();
 
@@ -81,7 +81,7 @@ namespace BugTracker.Repository.DapperRepositories
 			var parameters = new { Key = key, Id = id.ToString() };
 
 			using (IDbConnection connection = GetConnectionString())
-			using (var reader = connection.ExecuteReader(sql, parameters))
+			using (var reader = await connection.ExecuteReaderAsync(sql, parameters))
 			{
 				var activityProjectParser = reader.GetRowParser<ActivityProject>();
 				var activityBugReportParser = reader.GetRowParser<ActivityBugReport>();

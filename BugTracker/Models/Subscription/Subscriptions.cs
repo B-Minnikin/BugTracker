@@ -30,33 +30,33 @@ namespace BugTracker.Models.Database
 			this.userManager = userManager;
 		}
 
-		public bool IsSubscribed(int userId, int bugReportId)
+		public async Task<bool> IsSubscribed(int userId, int bugReportId)
 		{
-			return userSubscriptionsRepository.IsSubscribed(userId, bugReportId);
+			return await userSubscriptionsRepository.IsSubscribed(userId, bugReportId);
 		}
 
-		public void CreateSubscriptionIfNotSubscribed(int userId, int bugReportId)
+		public async Task CreateSubscriptionIfNotSubscribed(int userId, int bugReportId)
 		{
-			if(!IsSubscribed(userId, bugReportId))
+			if(!await IsSubscribed (userId, bugReportId))
 			{
-				userSubscriptionsRepository.AddSubscription(userId, bugReportId);
+				await userSubscriptionsRepository.AddSubscription(userId, bugReportId);
 			}
 		}
 
-		public void DeleteSubscription(int userId, int bugReportId)
+		public async Task DeleteSubscription(int userId, int bugReportId)
 		{
-			if(IsSubscribed(userId, bugReportId))
+			if(await IsSubscribed (userId, bugReportId))
 			{
-				userSubscriptionsRepository.DeleteSubscription(userId, bugReportId);
+				await userSubscriptionsRepository .DeleteSubscription(userId, bugReportId);
 			}
 		}
 
 		public async Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl)
 		{
-			var subscribedUserIds = userSubscriptionsRepository.GetAllSubscribedUserIds(bugState.BugReportId);
+			var subscribedUserIds = await userSubscriptionsRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
-			string emailSubject = ComposeBugStateEmailSubject(bugState);
-			string emailMessage = ComposeBugStateEmailMessage(bugState, bugReportUrl);
+			string emailSubject = await ComposeBugStateEmailSubject(bugState);
+			string emailMessage = await ComposeBugStateEmailMessage (bugState, bugReportUrl);
 
 			foreach (var userId in subscribedUserIds)
 			{
@@ -71,10 +71,11 @@ namespace BugTracker.Models.Database
 
 		public async Task NotifyBugReportNewComment(Comment comment, string bugReportUrl)
 		{
-			var subscribedUserIds = userSubscriptionsRepository.GetAllSubscribedUserIds(comment.BugReportId);
+			var subscribedUserIds = await userSubscriptionsRepository.GetAllSubscribedUserIds(comment.BugReportId);
 
-			var bugReport = bugReportRepository.GetById(comment.BugReportId);
-			string projectName = projectRepository.GetById(bugReport.ProjectId).Name;
+			var bugReport = await bugReportRepository.GetById(comment.BugReportId);
+			var project = await projectRepository.GetById(bugReport.ProjectId);
+			string projectName = project.Name;
 			string emailSubject = $"Bug report updated: {bugReport.Title}";
 			string emailMessage = $"Project: {projectName}\nNew comment posted in bug report {bugReport.Title} by {comment.AuthorId}.\n" +
 				$"Please <a href=\"{ bugReportUrl}\">click here</a> to review new content.";
@@ -90,18 +91,19 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		private string ComposeBugStateEmailSubject(BugState bugState)
+		private async Task<string> ComposeBugStateEmailSubject(BugState bugState)
 		{
-			var bugReport = bugReportRepository.GetById(bugState.BugReportId);
+			var bugReport = await bugReportRepository.GetById(bugState.BugReportId);
 			string message = $"Bug report updated: {bugReport.Title}";
 
 			return message;
 		}
 
-		private string ComposeBugStateEmailMessage(BugState bugState, string bugReportUrl)
+		private async Task<string> ComposeBugStateEmailMessage(BugState bugState, string bugReportUrl)
 		{
-			var bugReport = bugReportRepository.GetById(bugState.BugReportId);
-			string projectName = projectRepository.GetById(bugReport.ProjectId).Name;
+			var bugReport = await bugReportRepository.GetById(bugState.BugReportId);
+			var project = await projectRepository.GetById(bugReport.ProjectId);
+			string projectName = project.Name;
 			string stateName = bugState.StateType.ToString().First().ToString().ToUpper() + bugState.StateType.ToString().Substring(1);
 
 			string message = $"Project: {projectName}\n{bugReport.Title} state updated to {stateName}\n" +

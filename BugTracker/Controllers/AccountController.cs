@@ -102,7 +102,7 @@ namespace BugTracker.Controllers
 					var createdUser = await userManager.FindByEmailAsync(user.Email);
 					logger.LogInformation($"New user registered. ID: {createdUser.Id}, Name: {createdUser.UserName}");
 
-					GenerateConfirmationEmail(createdUser);
+					await GenerateConfirmationEmail(createdUser);
 
 					// ---- fulfil stored project invitations if they exist
 					projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);

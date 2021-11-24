@@ -29,7 +29,7 @@ namespace BugTracker.Controllers
 		private readonly ISubscriptions subscriptions;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly LinkGenerator linkGenerator;
-		private readonly UserManager<IdentityUser> userManager;
+		private readonly ApplicationUserManager userManager;
 		private readonly IProjectRepository projectRepository;
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportRepository bugReportRepository;
@@ -48,7 +48,7 @@ namespace BugTracker.Controllers
 									ISubscriptions subscriptions,
 									IHttpContextAccessor httpContextAccessor,
 									LinkGenerator linkGenerator,
-									UserManager<IdentityUser> userManager)
+									ApplicationUserManager userManager)
 		{
 			this.logger = logger;
 			this.authorizationService = authorizationService;
@@ -65,12 +65,15 @@ namespace BugTracker.Controllers
 		}
 
 		[Breadcrumb("My Profile", FromController = typeof(HomeController))]
-		public ViewResult View(string id)
+		public async Task<ViewResult> View(string id)
 		{
+			//var userManager = new ApplicationUserManager();
+			var activities = await activityRepository.GetUserActivities(Int32.Parse(id));
+
 			EditProfileViewModel viewModel = new EditProfileViewModel
 			{
-				User = userManager.FindByIdAsync(id).Result,
-				Activities = activityRepository.GetUserActivities(Int32.Parse(id)).ToList()
+				User = await userManager.FindByIdAsync(id),
+				Activities = activities.ToList()
 			};
 
 			// generate activity messages
@@ -85,9 +88,11 @@ namespace BugTracker.Controllers
 		[Authorize]
 		public async Task<ViewResult> Subscriptions(int id)
 		{
+			var bugReports = await userSubscriptionsRepository .GetSubscribedReports(id);
+
 			SubscriptionsViewModel subscriptionsViewModel = new SubscriptionsViewModel
 			{
-				BugReports = await userSubscriptionsRepository.GetSubscribedReports(id).ToList()
+				BugReports = bugReports.ToList()
 			};
 
 			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProfileSubscriptions(id);
@@ -141,7 +146,7 @@ namespace BugTracker.Controllers
 					if (!result.Succeeded)
 					{
 						logger.LogError($"Failed to update user profile [{model.User.Id}]");
-						return View("Error");
+						return (IActionResult)View("Error");
 					}
 				}
 			}
