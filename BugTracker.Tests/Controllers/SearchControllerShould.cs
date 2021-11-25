@@ -13,6 +13,7 @@ using Moq;
 using Xunit;
 using System;
 using BugTracker.Services;
+using System.Threading.Tasks;
 
 namespace BugTracker.Tests.Controllers
 {
@@ -62,24 +63,24 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void Result_RedirectToHome_IfProjectIdZero()
+		public async void Result_RedirectToHome_IfProjectIdZero()
 		{
 			var projectId = 0;
 			var httpContext = MockHttpContextFactory.GetHttpContext(projectId);
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
-			IActionResult actual = controller.Result(viewModel);
+			IActionResult actual = await controller.Result(viewModel);
 			Assert.IsType<RedirectToActionResult>(actual);
 		}
 
 		[Fact]
 		public void Result_ThrowException_IfResultsViewModel_IsNull()
 		{
-			Assert.Throws<ArgumentNullException>(() => controller.Result(null));
+			Assert.ThrowsAsync<ArgumentNullException>(() => controller.Result(null));
 		}
 
 		[Fact]
-		public void Result_ReturnView_WhenNotAuthorized()
+		public async void Result_ReturnView_WhenNotAuthorized()
 		{
 			var projectId = 1;
 			var userName = "Test User";
@@ -89,7 +90,7 @@ namespace BugTracker.Tests.Controllers
 			// force the authorization failure
 			Authorize(mockAuthorizationService, false);
 
-			IActionResult actual = controller.Result(viewModel);
+			IActionResult actual = await controller.Result(viewModel);
 			var viewResult = Assert.IsType<ViewResult>(actual);
 
 			// view model is not passed back to view
@@ -97,7 +98,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void Result_ReturnView_WhenInvalidModel()
+		public async Task Result_ReturnView_WhenInvalidModel()
 		{
 			var httpContext = MockHttpContextFactory.GetHttpContext();
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
@@ -106,15 +107,16 @@ namespace BugTracker.Tests.Controllers
 			controller.ModelState.AddModelError("x", "Test error");
 			viewModel.SearchExpression.SearchText = "Test expression";
 
-			Project testProject = new Project();
-			mockProjectRepo.Setup(_ => _.GetById(It.IsAny<int>())).Returns(testProject);
+			var testProject = new Project();
+			mockProjectRepo.Setup(_ => _.GetById(It.IsAny<int>())).Returns(Task.FromResult(testProject));
 
 			List<BugReport> testResults = new List<BugReport>();
 			testResults.Add(new BugReport { Title = "First test", ProgramBehaviour = "Test text" });
 			testResults.Add(new BugReport { Title = "Second test", ProgramBehaviour = "Test text" });
-			mockBugReportRepo.Setup(_ => _.GetAllById(It.IsAny<int>())).Returns(testResults);
+			IEnumerable<BugReport> enumerableTestResults = testResults;
+			mockBugReportRepo.Setup(_ => _.GetAllById(It.IsAny<int>())).Returns(Task.FromResult(enumerableTestResults));
 
-			IActionResult result = controller.Result(viewModel);
+			IActionResult result = await controller.Result(viewModel);
 			ViewResult viewResult = Assert.IsType<ViewResult>(result);
 
 			var model = Assert.IsType<SearchResultsViewModel>(viewResult.Model);
@@ -122,13 +124,13 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void GetProjectMembers_ThrowException_IfQuery_IsNull()
+		public async Task GetProjectMembers_ThrowException_IfQuery_IsNull()
 		{
-			Assert.Throws<ArgumentNullException>(() => controller.GetProjectMembers(null, 1));
+			await Assert.ThrowsAsync<ArgumentNullException>(() => controller.GetProjectMembers(null, 1));
 		}
 
 		[Fact]
-		public void GetProjectMembers_ReturnZeroResults_IfProjectZero()
+		public async Task GetProjectMembers_ReturnZeroResults_IfProjectZero()
 		{
 			int projectId = 0;
 			string query = "admin";
@@ -138,7 +140,7 @@ namespace BugTracker.Tests.Controllers
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 			Authorize(mockAuthorizationService, true);
 
-			var jsonResult = (JsonResult)controller.GetProjectMembers(query, projectId);
+			var jsonResult = (JsonResult) await controller.GetProjectMembers(query, projectId);
 			var resultList = (List<UserTypeaheadSearchResult>)jsonResult.Value;
 			int actual = resultList.Count;
 
@@ -148,7 +150,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void GetProjectMembers_ReturnZeroResults_IfNotAuthorized()
+		public async Task GetProjectMembers_ReturnZeroResults_IfNotAuthorized()
 		{
 			int projectId = 2;
 			string query = "admin";
@@ -156,14 +158,15 @@ namespace BugTracker.Tests.Controllers
 			// Create a single search result from the search repo
 			List<UserTypeaheadSearchResult> searchResult = new List<UserTypeaheadSearchResult>();
 			searchResult.Add(new UserTypeaheadSearchResult { UserName = "Test name", Email = "test@email.com" });
-			mockSearchRepo.Setup(_ => _.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId)).Returns(searchResult);
+			IEnumerable<UserTypeaheadSearchResult> enumerableSearchResult = searchResult;
+			mockSearchRepo.Setup(_ => _.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId)).Returns(Task.FromResult(enumerableSearchResult));
 			
 			// Setup authorisation failure
 			var httpContext = MockHttpContextFactory.GetHttpContext();
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 			Authorize(mockAuthorizationService, false);
 
-			var jsonResult = (JsonResult)controller.GetProjectMembers(query, projectId);
+			var jsonResult = (JsonResult) await controller.GetProjectMembers(query, projectId);
 			var actualList = (List<UserTypeaheadSearchResult>)jsonResult.Value;
 			int actual = actualList.Count;
 
@@ -173,7 +176,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void GetBugReports_ReturnZeroResults_IfProjectZero()
+		public async Task GetBugReports_ReturnZeroResults_IfProjectZero()
 		{
 			int projectId = 0;
 			string query = "admin";
@@ -183,7 +186,7 @@ namespace BugTracker.Tests.Controllers
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 			Authorize(mockAuthorizationService, true);
 
-			var jsonResult = (JsonResult)controller.GetBugReports(query, projectId);
+			var jsonResult = (JsonResult) await controller.GetBugReports(query, projectId);
 			var resultList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
 			int actual = resultList.Count;
 
@@ -193,7 +196,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void GetBugReports_ReturnSingleResult_FromLocalId()
+		public async Task GetBugReports_ReturnSingleResult_FromLocalId()
 		{
 			int projectId = 2;
 			string query = "#1";
@@ -206,9 +209,10 @@ namespace BugTracker.Tests.Controllers
 			// Get a single search result
 			List<BugReportTypeaheadSearchResult> searchResult = new List<BugReportTypeaheadSearchResult>();
 			searchResult.Add(new BugReportTypeaheadSearchResult { BugReportId = 3, LocalBugReportId = 1, Title = "Test Title"});
-			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(1, projectId)).Returns(searchResult);
+			IEnumerable<BugReportTypeaheadSearchResult> enumerableSearchResult = searchResult;
+			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(1, projectId)).Returns(Task.FromResult(enumerableSearchResult));
 
-			var jsonResult = (JsonResult)controller.GetBugReports(query, projectId);
+			var jsonResult = (JsonResult) await controller.GetBugReports(query, projectId);
 			var actualList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
 			int actualListCount = actualList.Count;
 
@@ -218,7 +222,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void GetBugReports_ReturnZeroResults_IfNotAuthorized()
+		public async Task GetBugReports_ReturnZeroResults_IfNotAuthorized()
 		{
 			int projectId = 2;
 			string query = "admin";
@@ -226,15 +230,16 @@ namespace BugTracker.Tests.Controllers
 			// Create a single search result from the search repo
 			List<BugReportTypeaheadSearchResult> searchResult = new List<BugReportTypeaheadSearchResult>();
 			searchResult.Add(new BugReportTypeaheadSearchResult());
-			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(It.IsAny<int>(), It.IsAny<int>())).Returns(searchResult);
-			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByTitleSearchQuery(It.IsAny<string>(), It.IsAny<int>())).Returns(searchResult);
+			IEnumerable<BugReportTypeaheadSearchResult> enumerableSearchResult = searchResult;
+			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByLocalIdSearchQuery(It.IsAny<int>(), It.IsAny<int>())).Returns(Task.FromResult(enumerableSearchResult));
+			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByTitleSearchQuery(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(enumerableSearchResult));
 
 			// Setup authorisation failure
 			var httpContext = MockHttpContextFactory.GetHttpContext();
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 			Authorize(mockAuthorizationService, false);
 
-			var jsonResult = (JsonResult)controller.GetBugReports(query, projectId);
+			var jsonResult = (JsonResult) await controller.GetBugReports(query, projectId);
 			var actualList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
 			int actual = actualList.Count;
 

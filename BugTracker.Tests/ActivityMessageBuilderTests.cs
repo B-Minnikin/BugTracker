@@ -10,12 +10,16 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace BugTracker.Tests
 {
 	public class ActivityMessageBuilderTests
 	{
+		private readonly ITestOutputHelper output;
+
 		private readonly Mock<IHttpContextAccessor> mockAccessor;
 		private readonly Mock<ILinkGenerator> mockLinkGenerator;
 
@@ -26,8 +30,10 @@ namespace BugTracker.Tests
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private ActivityMessageBuilder builder;
 
-		public ActivityMessageBuilderTests()
+		public ActivityMessageBuilderTests(ITestOutputHelper output)
 		{
+			this.output = output;
+
 			mockAccessor = new Mock<IHttpContextAccessor>();
 			mockLinkGenerator = new Mock<ILinkGenerator>();
 			//mockLinkGenerator.Setup(lnk => lnk.GetPathByAction("", "", new { })).Returns("");
@@ -51,21 +57,21 @@ namespace BugTracker.Tests
 		[Fact]
 		public void GenerateMessages_ThrowsArgumentNullException_IfActivitiesNull()
 		{
-			Assert.Throws<ArgumentNullException>(() => builder.GenerateMessages(null));
+			Assert.ThrowsAsync<ArgumentNullException>(() => builder.GenerateMessages(null));
 		}
 
 		[Fact]
 		public void GetMessage_ThrowsArgumentNullException_IfActivityNull()
 		{
-			Assert.Throws<ArgumentNullException>(() => builder.GetMessage(null));
+			Assert.ThrowsAsync<ArgumentNullException>(() => builder.GetMessage(null));
 		}
 
 		[Fact]
-		public void GetMessage_CreatesMessage_WhenValidActivityComment()
+		public async Task GetMessage_CreatesMessage_WhenValidActivityComment()
 		{
 			ActivityComment activity = GetTestActivityComment();
 
-			mockBugReportRepository.Setup(repo => repo.GetById(activity.BugReportId)).Returns(new BugReport { Title = "Comment Activity Test Report"});
+			mockBugReportRepository.Setup(repo => repo.GetById(activity.BugReportId)).Returns(Task.FromResult(new BugReport { Title = "Comment Activity Test Report"}));
 
 			// User
 			string userName = "John Smith";
@@ -89,10 +95,9 @@ namespace BugTracker.Tests
 				"</a> posted a new comment in bug report: <a href=\"" + bugReportURI + 
 				"\">Comment Activity Test Report</a>.";
 
-			// act
-			var actual = builder.GetMessage(activity);
+			var actual = await builder.GetMessage(activity);
+			output.WriteLine("expected: {0}\nactual:     {1}", expected, actual);
 
-			// assert
 			Assert.Equal(expected, actual);
 		}
 
