@@ -11,7 +11,7 @@ namespace BugTracker.Repository.Interfaces
 		IGetById<BugReport>, IGetAllById<BugReport>
 	{
 		Task<BugReport> GetBugReportByLocalId(int localBugReportId, int projectId);
-		Task<int> GetCommentCountById(int bugReportId);
+		int GetCommentCountById(int bugReportId);
 
 		// Bug Reports - Local IDs
 		Task AddLocalBugReportId(int projectId);

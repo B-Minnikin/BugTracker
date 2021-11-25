@@ -9,6 +9,6 @@ namespace BugTracker.Repository.Interfaces
 		IUpdate<Project>, IDelete<Project>,
 		IGetById<Project>
 	{
-		Task<IAsyncEnumerable<Project>> GetAll();
+		Task<IEnumerable<Project>> GetAll();
 	}
 }

@@ -94,8 +94,7 @@ namespace BugTracker.Controllers
 				throw new ArgumentNullException("Search query is null");
 			}
 
-			//List<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
-			IEnumerable<UserTypeaheadSearchResult> userSearchResults = null;
+			IEnumerable<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
 
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
@@ -110,11 +109,10 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetBugReports(string query, int projectId)
 		{
-			//List<BugReportTypeaheadSearchResult> bugReportSearchResults = new List<BugReportTypeaheadSearchResult>();
-			IEnumerable<BugReportTypeaheadSearchResult> bugReportSearchResults = null;
+			IEnumerable<BugReportTypeaheadSearchResult> bugReportSearchResults = new List<BugReportTypeaheadSearchResult>();
 
-			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
-			if ((!string.IsNullOrEmpty(query) && projectId > 0) & (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded))
+			var authorizationResult = await authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
+			if ((!string.IsNullOrEmpty(query) && projectId > 0) & (authorizationResult.Succeeded))
 			{
 				query = query.TrimStart('#'); // remove leading # for local report ID queries
 				int localBugReportId;
