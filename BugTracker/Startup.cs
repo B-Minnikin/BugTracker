@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
@@ -13,7 +9,6 @@ using BugTracker.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,7 +77,7 @@ namespace BugTracker
 
 		private void ConfigureRepositories(IServiceCollection services, string connectionString)
 		{
-			services.AddTransient<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
+			services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
 
 			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
 			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));

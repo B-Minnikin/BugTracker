@@ -11,7 +11,7 @@ namespace BugTracker.Models.Authorization
 {
 	public class ApplicationUserManager : UserManager<IdentityUser>
 	{
-		private readonly string connectionString;
+		private string connectionString;
 
 		public ApplicationUserManager(string connectionString) : this(new UserStore(connectionString), null, null, null, null, null, null, null, null)
 		{
@@ -24,6 +24,16 @@ namespace BugTracker.Models.Authorization
 			IServiceProvider services, ILogger<UserManager<IdentityUser>> logger) : base(store, optionsAccessor,
 				passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
 		{
+		}
+
+		public void RegisterConnectionString(string connectionString)
+		{
+			if(connectionString is null)
+			{
+				throw new ArgumentNullException(connectionString);
+			}
+
+			this.connectionString = connectionString;
 		}
 
 		public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string roleName, int projectId)
