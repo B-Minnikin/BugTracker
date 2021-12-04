@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Claims;
 using BugTracker.Controllers;
 using BugTracker.Models;
 using BugTracker.Repository.Interfaces;
@@ -14,6 +13,7 @@ using Xunit;
 using System;
 using BugTracker.Services;
 using System.Threading.Tasks;
+using BugTracker.Tests.Helpers;
 
 namespace BugTracker.Tests.Controllers
 {
@@ -82,13 +82,7 @@ namespace BugTracker.Tests.Controllers
 		[Fact]
 		public async void Result_ReturnView_WhenNotAuthorized()
 		{
-			var projectId = 1;
-			var userName = "Test User";
-			var httpContext = MockHttpContextFactory.GetHttpContext(projectId, userName);
-			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-
-			// force the authorization failure
-			Authorize(mockAuthorizationService, false);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockContextAccessor);
 
 			IActionResult actual = await controller.Result(viewModel);
 			var viewResult = Assert.IsType<ViewResult>(actual);
@@ -100,9 +94,7 @@ namespace BugTracker.Tests.Controllers
 		[Fact]
 		public async Task Result_ReturnView_WhenInvalidModel()
 		{
-			var httpContext = MockHttpContextFactory.GetHttpContext();
-			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-			Authorize(mockAuthorizationService, true);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockContextAccessor);
 
 			controller.ModelState.AddModelError("x", "Test error");
 			viewModel.SearchExpression.SearchText = "Test expression";
@@ -136,9 +128,7 @@ namespace BugTracker.Tests.Controllers
 			string query = "admin";
 
 			// Setup authorisation success
-			var httpContext = MockHttpContextFactory.GetHttpContext();
-			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-			Authorize(mockAuthorizationService, true);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockContextAccessor);
 
 			var jsonResult = (JsonResult) await controller.GetProjectMembers(query, projectId);
 			var resultList = (List<UserTypeaheadSearchResult>)jsonResult.Value;
@@ -160,11 +150,9 @@ namespace BugTracker.Tests.Controllers
 			searchResult.Add(new UserTypeaheadSearchResult { UserName = "Test name", Email = "test@email.com" });
 			IEnumerable<UserTypeaheadSearchResult> enumerableSearchResult = searchResult;
 			mockSearchRepo.Setup(_ => _.GetMatchingProjectMembersBySearchQuery(query.ToUpper(), projectId)).Returns(Task.FromResult(enumerableSearchResult));
-			
+
 			// Setup authorisation failure
-			var httpContext = MockHttpContextFactory.GetHttpContext();
-			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-			Authorize(mockAuthorizationService, false);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockContextAccessor);
 
 			var jsonResult = (JsonResult) await controller.GetProjectMembers(query, projectId);
 			var actualList = (List<UserTypeaheadSearchResult>)jsonResult.Value;
@@ -182,9 +170,7 @@ namespace BugTracker.Tests.Controllers
 			string query = "admin";
 
 			// Setup authorisation success
-			var httpContext = MockHttpContextFactory.GetHttpContext();
-			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-			Authorize(mockAuthorizationService, true);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockContextAccessor);
 
 			var jsonResult = (JsonResult) await controller.GetBugReports(query, projectId);
 			var resultList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
@@ -202,9 +188,7 @@ namespace BugTracker.Tests.Controllers
 			string query = "#1";
 
 			// Setup authorisation success
-			var httpContext = MockHttpContextFactory.GetHttpContext();
-			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-			Authorize(mockAuthorizationService, true);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockContextAccessor);
 
 			// Get a single search result
 			List<BugReportTypeaheadSearchResult> searchResult = new List<BugReportTypeaheadSearchResult>();
@@ -235,9 +219,7 @@ namespace BugTracker.Tests.Controllers
 			mockSearchRepo.Setup(_ => _.GetMatchingBugReportsByTitleSearchQuery(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(enumerableSearchResult));
 
 			// Setup authorisation failure
-			var httpContext = MockHttpContextFactory.GetHttpContext();
-			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-			Authorize(mockAuthorizationService, false);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockContextAccessor);
 
 			var jsonResult = (JsonResult) await controller.GetBugReports(query, projectId);
 			var actualList = (List<BugReportTypeaheadSearchResult>)jsonResult.Value;
@@ -246,19 +228,6 @@ namespace BugTracker.Tests.Controllers
 			var expected = 0;
 
 			Assert.Equal(expected, actual);
-		}
-
-		private void Authorize(Mock<IAuthorizationService> authorizationService, bool willSucceed = true)
-		{
-			if (willSucceed)
-			{
-				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Success);
-			}
-			else
-			{
-				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Failed);
-			}
-		}
-			
+		}			
 	}
 }
