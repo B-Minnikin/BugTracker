@@ -20,7 +20,7 @@ namespace BugTracker.Controllers
 {
 	public class ProjectsController : Controller
 	{
-		private readonly ILogger<HomeController> _logger;
+		private readonly ILogger<ProjectsController> logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IActivityRepository activityRepository;
@@ -30,7 +30,7 @@ namespace BugTracker.Controllers
 		private readonly ApplicationUserManager userManager;
 		private readonly IConfiguration configuration;
 
-		public ProjectsController(ILogger<HomeController> logger,
+		public ProjectsController(ILogger<ProjectsController> logger,
 									IProjectRepository projectRepository,
 									IBugReportRepository bugReportRepository,
 									IActivityRepository activityRepository,
@@ -40,7 +40,7 @@ namespace BugTracker.Controllers
 									ApplicationUserManager userManager,
 									IConfiguration configuration)
 		{
-			this._logger = logger;
+			this.logger = logger;
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
 			this.activityRepository = activityRepository;
@@ -57,8 +57,8 @@ namespace BugTracker.Controllers
 			var model = await projectRepository.GetAll();
 				model = model.Where(project =>
 					{
-						Task<AuthorizationResult> authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, project.ProjectId, "CanAccessProjectPolicy");
-						if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+						Task<AuthorizationResult> authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, project.ProjectId, "CanAccessProjectPolicy");
+						if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 						{
 							return true;
 						}
@@ -71,11 +71,22 @@ namespace BugTracker.Controllers
 
 		public async Task<IActionResult> Overview(int id)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanAccessProjectPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, id, "CanAccessProjectPolicy");
 			if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				Project project = await projectRepository.GetById(id);
-				HttpContext.Session.SetInt32("currentProject", id); // save project id to session
+				Project project = null;
+
+				try
+				{
+					project = await projectRepository.GetById(id);
+				}
+				catch (InvalidOperationException ex)
+				{
+					logger.LogError(ex.Message);
+					return NotFound();
+				}
+
+				httpContextAccessor.HttpContext.Session.SetInt32("currentProject", id); // save project id to session
 
 				IEnumerable<BugReport> bugReports = await bugReportRepository.GetAllById(id);
 
@@ -87,8 +98,6 @@ namespace BugTracker.Controllers
 				};
 
 				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectOverview(project);
-				
-				// if project NULL -- redirect to error page !!
 
 				return View(overviewProjectViewModel);
 			}
@@ -134,7 +143,7 @@ namespace BugTracker.Controllers
 				userManager.RegisterConnectionString(connectionString);
 				await userManager.AddToRoleAsync(user, "Administrator", addedProject.ProjectId);
 
-				_logger.LogInformation($"New project created. ID: {addedProject.ProjectId}, Name: {addedProject.Name}");
+				logger.LogInformation($"New project created. ID: {addedProject.ProjectId}, Name: {addedProject.Name}");
 
 				return RedirectToAction("Overview", new { id = addedProject.ProjectId });
 			}
@@ -148,7 +157,7 @@ namespace BugTracker.Controllers
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				projectRepository.Delete(id);
-				_logger.LogInformation($"Project deleted. ID: {id}");
+				logger.LogInformation($"Project deleted. ID: {id}");
 			}
 
 			return RedirectToAction("Projects");
