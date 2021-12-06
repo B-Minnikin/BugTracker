@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,10 +13,13 @@ namespace BugTracker.Controllers
 	public class ErrorController : Controller
 	{
 		private readonly ILogger<ErrorController> logger;
+		private readonly IHttpContextAccessor httpContextAccessor;
 
-		public ErrorController(ILogger<ErrorController> logger)
+		public ErrorController(ILogger<ErrorController> logger,
+							     IHttpContextAccessor httpContextAccessor)
 		{
 			this.logger = logger;
+			this.httpContextAccessor = httpContextAccessor;
 		}
 
 		[Route("Error/{statusCode}")]
@@ -35,7 +39,7 @@ namespace BugTracker.Controllers
 		[AllowAnonymous]
 		public IActionResult Error()
 		{
-			var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+			var exceptionHandlerFeature = httpContextAccessor.HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 
 			logger.LogError($"Exception in path: {exceptionHandlerFeature.Path} - " +
 				$"{exceptionHandlerFeature.Error}");
