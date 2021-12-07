@@ -71,6 +71,11 @@ namespace BugTracker.Controllers
 
 		public async Task<IActionResult> Overview(int id)
 		{
+			if(id < 1)
+			{
+				return BadRequest();
+			}
+
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, id, "CanAccessProjectPolicy");
 			if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{

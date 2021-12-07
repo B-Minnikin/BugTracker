@@ -78,9 +78,20 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public async Task Overview_NotFound_IfIdInvalid()
+		public async Task Overview_ReturnsBadRequest_IfIdLessThan1()
 		{
 			var projectId = 0;
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = await controller.Overview(projectId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task Overview_NotFound_IfIdInvalid()
+		{
+			var projectId = 22;
 			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 			mockProjectRepo.Setup(_ => _.GetById(projectId)).ThrowsAsync(new InvalidOperationException());
 
