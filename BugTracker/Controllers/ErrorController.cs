@@ -30,6 +30,9 @@ namespace BugTracker.Controllers
 				case 404:
 					ViewBag.ErrorMessage = "404: Requested resource could not be found";
 					break;
+				case 401:
+					ViewBag.ErrorMessage = "401: Bad request";
+					break;
 			}
 
 			return View("NotFound");
