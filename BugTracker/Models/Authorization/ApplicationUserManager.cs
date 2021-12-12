@@ -11,10 +11,12 @@ namespace BugTracker.Models.Authorization
 {
 	public class ApplicationUserManager : UserManager<IdentityUser>
 	{
+		private UserStore userStore;
 		private string connectionString;
 
-		public ApplicationUserManager(string connectionString) : this(new UserStore(connectionString), null, null, null, null, null, null, null, null)
+		public ApplicationUserManager(UserStore userStore, string connectionString) : this(userStore, null, null, null, null, null, null, null, null)
 		{
+			this.userStore = userStore;
 			this.connectionString = connectionString;
 		}
 
@@ -36,63 +38,64 @@ namespace BugTracker.Models.Authorization
 			this.connectionString = connectionString;
 		}
 
+		public virtual void RegisterUserStore(UserStore userStore)
+		{
+			this.userStore = userStore;
+		}
+
 		public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore(connectionString);
 			if(user == null)
 			{
 				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", user.Id));
 			}
 
-			bool isAlreadyInRole = await userRoleStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
+			bool isAlreadyInRole = await userStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
 			if (isAlreadyInRole)
 			{
 				IdentityError error = new IdentityError();
 				error.Description = "User already in role";
 				return IdentityResult.Failed(error);
 			}
-			await userRoleStore.AddToRoleAsync(user, roleName, projectId, CancellationToken);
+			await userStore.AddToRoleAsync(user, roleName, projectId, CancellationToken);
 			return await UpdateAsync(user);
 		}
 
 		public async Task<IdentityResult> RemoveFromRoleAsync(int userId, string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore(connectionString);
 			var user = await FindByIdAsync(userId.ToString());
 			if(user == null)
 			{
 				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", userId));
 			}
 			
-			if(!await userRoleStore.IsInRoleAsync(user, roleName, projectId, CancellationToken))
+			if(!await userStore.IsInRoleAsync(user, roleName, projectId, CancellationToken))
 			{
 				return new IdentityResult();
 			}
 
-			await userRoleStore.RemoveFromRoleAsync(user, roleName, projectId, CancellationToken);
+			await userStore.RemoveFromRoleAsync(user, roleName, projectId, CancellationToken);
 			return await UpdateAsync(user);
 		}
 
 		public async Task<bool> IsInRoleAsync(int userId, string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore(connectionString);
 			var user = await FindByIdAsync(userId.ToString());
 			if(user == null)
 			{
 				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", userId));
 			}
 
-			return await userRoleStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
+			return await userStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
 		}
 
 		public async Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, int projectId)
 		{
 			ThrowIfDisposed();
-			var userRoleStore = new UserStore(connectionString);
-			return await userRoleStore.GetUsersInRoleAsync(roleName, projectId, CancellationToken);
+			return await userStore.GetUsersInRoleAsync(roleName, projectId, CancellationToken);
 		}
 	}
 }

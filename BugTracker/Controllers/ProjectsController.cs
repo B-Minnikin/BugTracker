@@ -134,7 +134,7 @@ namespace BugTracker.Controllers
 					BugReports = new List<BugReport>()
 				};
 
-				Project addedProject = await projectRepository .Add(newProject);
+				Project addedProject = await projectRepository.Add(newProject);
 				await bugReportRepository.AddLocalBugReportId(addedProject.ProjectId);
 
 				// Create activity event
@@ -153,7 +153,7 @@ namespace BugTracker.Controllers
 				return RedirectToAction("Overview", new { id = addedProject.ProjectId });
 			}
 
-			return View();
+			return BadRequest(ModelState);
 		}
 
 		public IActionResult DeleteProject(int id)

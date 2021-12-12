@@ -227,7 +227,7 @@ namespace BugTracker.Repository
 			throw new NotImplementedException();
 		}
 
-		public async Task AddToRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
+		public virtual async Task AddToRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -286,7 +286,7 @@ namespace BugTracker.Repository
 			}
 		}
 
-		public async Task<bool> IsInRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
+		public virtual async Task<bool> IsInRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -310,7 +310,7 @@ namespace BugTracker.Repository
 			}
 		}
 
-		public async Task<bool> IsInRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
+		public virtual async Task<bool> IsInRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 

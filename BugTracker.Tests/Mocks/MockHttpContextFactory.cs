@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Moq;
 using System.Security.Claims;
 using System.Security.Principal;
 
@@ -22,10 +23,10 @@ namespace BugTracker.Tests.Mocks
 			mockSession.SetInt32("currentProject", projectId);
 
 			var identity = new GenericIdentity(userName);
-			var contextUser = new ClaimsPrincipal(identity);
+			var contextUser = new Mock<ClaimsPrincipal>(identity);
 			var httpContext = new DefaultHttpContext()
 			{
-				User = contextUser,
+				User = contextUser.Object,
 				Session = mockSession
 			};
 

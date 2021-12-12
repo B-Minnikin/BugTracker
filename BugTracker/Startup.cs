@@ -77,7 +77,7 @@ namespace BugTracker
 
 		private void ConfigureRepositories(IServiceCollection services, string connectionString)
 		{
-			services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
+			services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(new UserStore(connectionString), connectionString));
 
 			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
 			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));

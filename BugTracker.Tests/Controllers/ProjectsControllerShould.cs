@@ -13,10 +13,10 @@ using Xunit;
 using Microsoft.AspNetCore.Mvc;
 using BugTracker.Models;
 using System.Collections.Generic;
-using SmartBreadcrumbs.Nodes;
-using BugTracker.Helpers;
 using System;
 using BugTracker.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using BugTracker.Repository;
 
 namespace BugTracker.Tests.Controllers
 {
@@ -29,6 +29,7 @@ namespace BugTracker.Tests.Controllers
 		private readonly Mock<IAuthorizationService> mockAuthorizationService;
 		private readonly Mock<IHttpContextAccessor> mockHttpContextAccessor;
 		private readonly Mock<IProjectInviter> mockProjectInviter;
+		private readonly Mock<BugTracker.Repository.UserStore> mockUserStore;
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private readonly Mock<IConfiguration> mockConfiguration;
 
@@ -43,7 +44,8 @@ namespace BugTracker.Tests.Controllers
 			mockAuthorizationService = new Mock<IAuthorizationService>();
 			mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 			mockProjectInviter = new Mock<IProjectInviter>();
-			mockUserManager = new Mock<ApplicationUserManager>("Fake Connection String");
+			mockUserStore = new Mock<UserStore>("Fake connection string");
+			mockUserManager = new Mock<ApplicationUserManager>(mockUserStore.Object, "Fake connection string");
 			mockConfiguration = new Mock<IConfiguration>();
 
 			controller = new ProjectsController(
@@ -131,6 +133,67 @@ namespace BugTracker.Tests.Controllers
 			var viewResult = Assert.IsType<ViewResult>(result);
 			var model = Assert.IsAssignableFrom<OverviewProjectViewModel>(viewResult.ViewData.Model);
 			Assert.Equal(2, model.BugReports.Count);
+		}
+
+		[Fact]
+		public async Task CreateProject_RedirectsToOverview_IfModelValid()
+		{
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			Project model = new Project
+			{
+				Name = "Test name",
+				Description = "Test description",
+				CreationTime = DateTime.Now,
+				LastUpdateTime = DateTime.Now,
+				Hidden = false,
+				BugReports = new List<BugReport>()
+			};
+			ActivityProject activityProject = new();
+
+			mockHttpContextAccessor.Setup(_ => _.HttpContext.User.FindFirst(It.IsAny<string>())).Returns(new System.Security.Claims.Claim("name", "23"));
+			mockUserManager.Setup(_ => _.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new IdentityUser()));
+			mockProjectRepo.Setup(_ => _.Add(It.IsAny<Project>())).Returns(Task.FromResult(model));
+			mockActivityRepo.Setup(_ => _.Add(It.IsAny<ActivityProject>())).Returns(Task.FromResult((Activity)activityProject));
+
+			// Get connection string
+			Mock<IConfigurationSection> mockConfigurationSection = new();
+			mockConfigurationSection.SetupGet(x => x[It.Is<string>(s => s == "DBConnectionString")]).Returns("Mock Connection String");
+			mockConfiguration.Setup(x => x.GetSection(It.Is<string>(k => k == "ConnectionStrings"))).Returns(mockConfigurationSection.Object);
+
+			// Role results within UserManager
+			mockUserStore.Setup(x => x.IsInRoleAsync(It.IsAny<IdentityUser>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<System.Threading.CancellationToken>())).Returns(Task.FromResult(true));
+			mockUserStore.Setup(x => x.AddToRoleAsync(It.IsAny<IdentityUser>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<System.Threading.CancellationToken>())).Returns(Task.FromResult(IdentityResult.Success));
+			mockUserManager.Setup(x => x.RegisterUserStore(mockUserStore.Object));
+			
+			var result = await controller.CreateProject(model);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Overview", redirectToActionResult.ActionName);
+		}
+
+		[Fact]
+		public async Task CreateProject_ReturnsBadRequest_IfModelInvalid()
+		{
+			Project model = new Project
+			{
+				Name = "Test name",
+				Description = "Test description",
+				CreationTime = DateTime.Now,
+				LastUpdateTime = DateTime.Now,
+				Hidden = false,
+				BugReports = new List<BugReport>()
+			};
+			ActivityProject activityProject = new ActivityProject();
+
+			mockProjectRepo.Setup(_ => _.Add(It.IsAny<Project>())).Returns(Task.FromResult(model));
+			mockActivityRepo.Setup(_ => _.Add(It.IsAny<ActivityProject>())).Returns(Task.FromResult((Activity)activityProject));
+			controller.ModelState.AddModelError("Test key", "Error message");
+
+			var result = await controller.CreateProject(model);
+
+			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+			Assert.IsType<SerializableError>(badRequestResult.Value);
 		}
 	}
 }

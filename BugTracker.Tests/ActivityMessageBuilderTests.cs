@@ -6,7 +6,6 @@ using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -27,6 +26,7 @@ namespace BugTracker.Tests
 		private readonly Mock<IBugReportRepository> mockBugReportRepository;
 		private readonly Mock<IMilestoneRepository> mockMilestoneRepository;
 		private readonly Mock<IBugReportStatesRepository> mockBugReportStatesRepository;
+		private readonly Mock<BugTracker.Repository.UserStore> mockUserStore;
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private ActivityMessageBuilder builder;
 
@@ -36,13 +36,13 @@ namespace BugTracker.Tests
 
 			mockAccessor = new Mock<IHttpContextAccessor>();
 			mockLinkGenerator = new Mock<ILinkGenerator>();
-			//mockLinkGenerator.Setup(lnk => lnk.GetPathByAction("", "", new { })).Returns("");
 
 			mockProjectRepository = new Mock<IProjectRepository>();
 			mockBugReportRepository = new Mock<IBugReportRepository>();
 			mockMilestoneRepository = new Mock<IMilestoneRepository>();
 			mockBugReportStatesRepository = new Mock<IBugReportStatesRepository>();
-			mockUserManager = new Mock<ApplicationUserManager>("dummy connection string");
+			mockUserStore = new Mock<UserStore>("Fake connection string");
+			mockUserManager = new Mock<ApplicationUserManager>(mockUserStore.Object, "dummy connection string");
 
 			// inject mocked dependencies
 			builder = new ActivityMessageBuilder(

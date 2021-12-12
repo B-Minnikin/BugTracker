@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BugTracker.Repository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,14 +20,14 @@ namespace BugTracker.Models.Authorization
 
 		public static async Task<bool> UserIsProfileOwner(string userName, int userId, string connectionString)
 		{
-			ApplicationUserManager userManager = new ApplicationUserManager(connectionString);
+			ApplicationUserManager userManager = new ApplicationUserManager(new UserStore(connectionString), connectionString);
 			var currentUser = await userManager.FindByNameAsync(userName);
 			return Int32.Parse(currentUser.Id) == userId;
 		}
 
 		private static async Task<bool> GetUserInRole(string userName, string roleName, int id, string connectionString)
 		{
-			ApplicationUserManager userManager = new ApplicationUserManager(connectionString);
+			ApplicationUserManager userManager = new ApplicationUserManager(new UserStore(connectionString), connectionString);
 			var user = await userManager.FindByNameAsync(userName);
 			bool userIsInRole;
 
