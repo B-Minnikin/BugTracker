@@ -2,6 +2,7 @@
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.ProjectInvitation;
+using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -145,7 +146,7 @@ namespace BugTracker.Controllers
 				// Add the user who created the project to its administrator role
 				var user = await userManager.FindByIdAsync(userId.ToString());
 				string connectionString = configuration.GetConnectionString("DBConnectionString");
-				userManager.RegisterConnectionString(connectionString);
+				userManager.RegisterUserStore(new UserStore(connectionString));
 				await userManager.AddToRoleAsync(user, "Administrator", addedProject.ProjectId);
 
 				logger.LogInformation($"New project created. ID: {addedProject.ProjectId}, Name: {addedProject.Name}");
