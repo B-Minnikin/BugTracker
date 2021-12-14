@@ -159,7 +159,12 @@ namespace BugTracker.Controllers
 
 		public IActionResult DeleteProject(int id)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
+			if (id < 1)
+			{
+				return BadRequest();
+			}
+
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, id, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				projectRepository.Delete(id);

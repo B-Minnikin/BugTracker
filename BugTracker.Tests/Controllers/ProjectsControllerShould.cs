@@ -195,5 +195,16 @@ namespace BugTracker.Tests.Controllers
 			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
 			Assert.IsType<SerializableError>(badRequestResult.Value);
 		}
+
+		[Fact]
+		public void DeleteProject_ReturnsBadRequest_IfIdLessThan1()
+		{
+			var projectId = 0;
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = controller.DeleteProject(projectId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
 	}
 }
