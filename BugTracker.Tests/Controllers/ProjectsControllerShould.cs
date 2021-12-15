@@ -204,7 +204,21 @@ namespace BugTracker.Tests.Controllers
 
 			var result = controller.DeleteProject(projectId);
 
-			Assert.IsType<BadRequestResult>(result);
+			var badRequestResult = Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public void DeleteProject_RedirectsToProjects_IfNotAuthorized()
+		{
+			int projectId = 1;
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
+
+			mockProjectRepo.Setup(_ => _.Delete(It.IsAny<int>()));
+
+			var result = controller.DeleteProject(projectId);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Projects", redirectToActionResult.ActionName);
 		}
 	}
 }
