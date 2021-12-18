@@ -17,6 +17,7 @@ using System;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using BugTracker.Repository;
+using System.Security.Claims;
 
 namespace BugTracker.Tests.Controllers
 {
@@ -219,6 +220,216 @@ namespace BugTracker.Tests.Controllers
 
 			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 			Assert.Equal("Projects", redirectToActionResult.ActionName);
+		}
+
+		[Fact]
+		public async Task Edit_Get_RedirectsToOverview_IfNotAuthorized()
+		{
+			int projectId = 1;
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = await controller.Edit(projectId);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Overview", redirectToActionResult.ActionName);
+			Assert.True(redirectToActionResult.RouteValues.ContainsKey("projectId"));
+		}
+
+		[Fact]
+		public async Task Edit_Get_ReturnsBadRequest_IfIdLessThan1()
+		{
+			var projectId = 0;
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = await controller.Edit(projectId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task Edit_Get_ReturnsProjectViewModel_IfValidId()
+		{
+			int projectId = 1;
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var testProject = new Project { ProjectId = 1, Name = "Test Project"};
+			mockProjectRepo.Setup(_ => _.GetById(It.IsAny<int>())).Returns(Task.FromResult(testProject));
+
+			var result = await controller.Edit(projectId);
+
+			var viewResult = Assert.IsType<ViewResult>(result);
+			Assert.IsAssignableFrom<EditProjectViewModel>(viewResult.ViewData.Model);
+		}
+
+		[Fact]
+		public async Task Edit_Post_ReturnsView_IfModelNotValid()
+		{
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var dummyProject = new Project { Name = "Test Project", Description = "Test project" };
+			var viewModel = new EditProjectViewModel
+			{
+				Project = dummyProject
+			};
+			controller.ModelState.AddModelError("Test key", "Error message");
+
+			mockProjectRepo.Setup(_ => _.Update(It.IsAny<Project>())).Returns(Task.FromResult(dummyProject));
+
+			var result = await controller.Edit(viewModel);
+
+			var viewResult = Assert.IsType<ViewResult>(result);
+		}
+
+		[Fact]
+		public async Task Edit_Post_ReturnsView_IfNotAuthorized()
+		{
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
+
+			var dummyProject = new Project { ProjectId = 1, Name = "Test Project", Description = "Test project" };
+			var viewModel = new EditProjectViewModel
+			{
+				Project = dummyProject
+			};
+
+			var result = await controller.Edit(viewModel);
+
+			Assert.IsType<ViewResult>(result);
+		}
+
+		[Fact]
+		public async Task Edit_Post_RedirectsToOverview_IfModelValid()
+		{
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var dummyProject = new Project 
+			{
+				ProjectId = 1,
+				Name = "Test Project",
+				Description = "Test project" ,
+				Hidden = false,
+				LastUpdateTime = DateTime.Now
+			};
+			var viewModel = new EditProjectViewModel
+			{
+				Project = dummyProject
+			};
+
+			mockHttpContextAccessor.Setup(_ => _.HttpContext.User.FindFirst(It.IsAny<string>())).Returns(new Claim(ClaimTypes.NameIdentifier, "1"));
+			mockProjectRepo.Setup(x => x.GetById(It.IsAny<int>())).Returns(Task.FromResult(dummyProject));
+			mockProjectRepo.Setup(_ => _.Update(It.IsAny<Project>())).Returns(Task.FromResult(dummyProject));
+			mockActivityRepo.Setup(_ => _.Add(It.IsAny<Activity>())).Returns(Task.FromResult(new ActivityProject() as Activity));
+
+			var result = await controller.Edit(viewModel);
+
+			var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Overview", redirectResult.ActionName);
+			var routeValueId = redirectResult.RouteValues["projectId"];
+			Assert.Equal(dummyProject.ProjectId, routeValueId);
+		}
+
+		[Fact]
+		public async Task Invites_Get_ReturnsBadRequest_IfIdLessThan1()
+		{
+			var projectId = 0;
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = await controller.Invites(projectId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task Invites_Get_RedirectsToOverview_IfNotAuthorized()
+		{
+			int projectId = 1;
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = await controller.Invites(projectId);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Overview", redirectToActionResult.ActionName);
+			Assert.True(redirectToActionResult.RouteValues.ContainsKey("projectId"));
+		}
+
+		[Fact]
+		public async Task Invites_Get_ReturnsViewModel_WhenIdValid()
+		{
+			int projectId = 1;
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var testProject = new Project { ProjectId = 1, Name = "Test Project" };
+			mockProjectRepo.Setup(_ => _.GetById(It.IsAny<int>())).Returns(Task.FromResult(testProject));
+
+			var result = await controller.Invites(projectId);
+
+			var viewResult = Assert.IsType<ViewResult>(result);
+			Assert.IsAssignableFrom<InvitesViewModel>(viewResult.ViewData.Model);
+		}
+
+		[Fact]
+		public async Task Invites_Post_RedirectsToOverview_IfNotAuthorized()
+		{
+			InvitesViewModel invitesViewModel = new InvitesViewModel
+			{
+				EmailAddress = "test@email.com",
+				ProjectId = 1
+			};
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = await controller.Invites(invitesViewModel);
+
+			var viewResult = Assert.IsType<ViewResult>(result);
+			Assert.IsAssignableFrom<InvitesViewModel>(viewResult.ViewData.Model);
+		}
+
+		[Fact]
+		public async Task Invites_Post_ReturnsView_IfModelNotValid()
+		{
+			var invitesViewModel = new InvitesViewModel
+			{
+				ProjectId = 1
+			};
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			controller.ModelState.AddModelError("Test key", "Error message");
+
+			var result = await controller.Invites(invitesViewModel);
+
+			var viewResult = Assert.IsType<ViewResult>(result);
+			Assert.IsAssignableFrom<InvitesViewModel>(viewResult.ViewData.Model);
+		}
+
+		[Fact]
+		public async Task Invites_Post_RedirectsToOverview_IfModelValid()
+		{
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
+
+			var invitesViewModel = new InvitesViewModel
+			{
+				ProjectId = 1,
+				EmailAddress = "Test@email.com"
+			};
+
+			var project = new Project
+			{
+				ProjectId = 1,
+				Name = "Test Name",
+				Description = "Test description",
+				CreationTime = DateTime.Now,
+				LastUpdateTime = DateTime.Now,
+				Hidden = false
+			};
+			
+			mockProjectRepo.Setup(x => x.GetById(It.IsAny<int>())).Returns(Task.FromResult(project));
+			mockUserManager.Setup(_ => _.GetUserAsync(It.IsAny<ClaimsPrincipal>())).Returns(Task.FromResult(new IdentityUser()));
+			mockProjectInviter.Setup(_ => _.AddProjectInvitation(It.IsAny<ProjectInvitation>()));
+
+			var result = await controller.Invites(invitesViewModel);
+
+			var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Overview", redirectResult.ActionName);
+			var routeValueId = redirectResult.RouteValues["projectId"];
+			Assert.Equal(invitesViewModel.ProjectId, routeValueId);
 		}
 	}
 }

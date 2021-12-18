@@ -70,21 +70,21 @@ namespace BugTracker.Controllers
 			return View(model);
 		}
 
-		public async Task<IActionResult> Overview(int id)
+		public async Task<IActionResult> Overview(int projectId)
 		{
-			if(id < 1)
+			if(projectId < 1)
 			{
 				return BadRequest();
 			}
 
-			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, id, "CanAccessProjectPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
 			if(authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				Project project = null;
 
 				try
 				{
-					project = await projectRepository.GetById(id);
+					project = await projectRepository.GetById(projectId);
 				}
 				catch (InvalidOperationException ex)
 				{
@@ -92,9 +92,9 @@ namespace BugTracker.Controllers
 					return NotFound();
 				}
 
-				httpContextAccessor.HttpContext.Session.SetInt32("currentProject", id); // save project id to session
+				httpContextAccessor.HttpContext.Session.SetInt32("currentProject", projectId); // save project id to session
 
-				IEnumerable<BugReport> bugReports = await bugReportRepository.GetAllById(id);
+				IEnumerable<BugReport> bugReports = await bugReportRepository.GetAllById(projectId);
 
 				OverviewProjectViewModel overviewProjectViewModel = new OverviewProjectViewModel()
 				{
@@ -151,36 +151,41 @@ namespace BugTracker.Controllers
 
 				logger.LogInformation($"New project created. ID: {addedProject.ProjectId}, Name: {addedProject.Name}");
 
-				return RedirectToAction("Overview", new { id = addedProject.ProjectId });
+				return RedirectToAction("Overview", new { projectId = addedProject.ProjectId });
 			}
 
 			return BadRequest(ModelState);
 		}
 
-		public IActionResult DeleteProject(int id)
+		public IActionResult DeleteProject(int projectId)
 		{
-			if (id < 1)
+			if (projectId < 1)
 			{
 				return BadRequest();
 			}
 
-			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, id, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				projectRepository.Delete(id);
-				logger.LogInformation($"Project deleted. ID: {id}");
+				projectRepository.Delete(projectId);
+				logger.LogInformation($"Project deleted. ID: {projectId}");
 			}
 
 			return RedirectToAction("Projects");
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Edit(int id)
+		public async Task<IActionResult> Edit(int projectId)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
+			if(projectId < 1)
+			{
+				return BadRequest();
+			}
+
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var project = await projectRepository.GetById(id);
+				var project = await projectRepository.GetById(projectId);
 				EditProjectViewModel projectViewModel = new EditProjectViewModel
 				{
 					Project = project
@@ -190,18 +195,18 @@ namespace BugTracker.Controllers
 				
 				return View(projectViewModel);
 			}
-			return RedirectToAction("Overview", new { id });
+			return RedirectToAction("Overview", new { projectId });
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> Edit(EditProjectViewModel model)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.Project.ProjectId, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, model.Project.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				if (ModelState.IsValid)
 				{
-					Project project = await projectRepository .GetById(model.Project.ProjectId);
+					Project project = await projectRepository.GetById(model.Project.ProjectId);
 					project.Name = model.Project.Name;
 					project.Description = model.Project.Description;
 					project.Hidden = model.Project.Hidden;
@@ -210,11 +215,12 @@ namespace BugTracker.Controllers
 					_ = projectRepository.Update(project);
 
 					// Create activity event
-					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					var claim = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+					int userId = Int32.Parse(claim.Value);
 					var activityEvent = new ActivityProject(DateTime.Now, model.Project.ProjectId, ActivityMessage.ProjectEdited, userId);
-					await activityRepository .Add(activityEvent);
+					_ = await activityRepository.Add(activityEvent);
 
-					return RedirectToAction("Overview", new { id = project.ProjectId });
+					return RedirectToAction("Overview", new { projectId = project.ProjectId });
 				}
 			}
 
@@ -222,15 +228,20 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Invites(int id)
+		public async Task<IActionResult> Invites(int projectId)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "ProjectAdministratorPolicy");
+			if(projectId < 1)
+			{
+				return BadRequest();
+			}
+
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				var project = await projectRepository.GetById(id);
+				var project = await projectRepository.GetById(projectId);
 				InvitesViewModel invitesViewModel = new InvitesViewModel
 				{
-					ProjectId = id
+					ProjectId = projectId
 				};
 
 				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectInvites(project);
@@ -238,13 +249,13 @@ namespace BugTracker.Controllers
 				return View(invitesViewModel);
 			}
 
-			return RedirectToAction("Overview", id);
+			return RedirectToAction("Overview", new { projectId });
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> Invites(InvitesViewModel model)
 		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				if (ModelState.IsValid)
@@ -252,13 +263,13 @@ namespace BugTracker.Controllers
 					ProjectInvitation invitation = new ProjectInvitation
 					{
 						EmailAddress = model.EmailAddress,
-						Project = await projectRepository .GetById(model.ProjectId),
+						Project = await projectRepository.GetById(model.ProjectId),
 						ToUser = null,
-						FromUser = await userManager.GetUserAsync(HttpContext.User)
+						FromUser = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User)
 					};
 
 					await projectInviter.AddProjectInvitation(invitation);
-					return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+					return RedirectToAction("Overview", "Projects", new { projectId = model.ProjectId });
 				}
 			}
 
