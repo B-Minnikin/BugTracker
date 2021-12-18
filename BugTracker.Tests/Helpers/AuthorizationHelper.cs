@@ -13,21 +13,21 @@ namespace BugTracker.Tests.Helpers
 {
 	static class AuthorizationHelper
 	{
-		public static void AllowSuccess(Mock<IAuthorizationService> authorizationService, Mock<IHttpContextAccessor> mockHttpContextAccessor)
+		public static void AllowSuccess(Mock<IAuthorizationService> authorizationService, Mock<IHttpContextAccessor> mockHttpContextAccessor, int projectId = 1)
 		{
-			ConfigureHttpContext(mockHttpContextAccessor);
+			ConfigureHttpContext(mockHttpContextAccessor, projectId);
 			Authorize(authorizationService, true);
 		}
 
-		public static void AllowFailure(Mock<IAuthorizationService> authorizationService, Mock<IHttpContextAccessor> mockHttpContextAccessor)
+		public static void AllowFailure(Mock<IAuthorizationService> authorizationService, Mock<IHttpContextAccessor> mockHttpContextAccessor, int projectId = 1)
 		{
-			ConfigureHttpContext(mockHttpContextAccessor);
+			ConfigureHttpContext(mockHttpContextAccessor, projectId);
 			Authorize(authorizationService, false);
 		}
 
-		private static void ConfigureHttpContext(Mock<IHttpContextAccessor> mockHttpContextAccessor)
+		private static void ConfigureHttpContext(Mock<IHttpContextAccessor> mockHttpContextAccessor, int projectId)
 		{
-			var httpContext = MockHttpContextFactory.GetHttpContext();
+			var httpContext = MockHttpContextFactory.GetHttpContext(projectId);
 			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 		}
 
