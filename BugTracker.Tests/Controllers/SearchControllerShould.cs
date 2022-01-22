@@ -66,7 +66,7 @@ namespace BugTracker.Tests.Controllers
 		public async void Result_RedirectToHome_IfProjectIdZero()
 		{
 			var projectId = 0;
-			var httpContext = MockHttpContextFactory.GetHttpContext(projectId);
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 			mockContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 			IActionResult actual = await controller.Result(viewModel);

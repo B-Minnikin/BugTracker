@@ -27,7 +27,7 @@ namespace BugTracker.Tests.Helpers
 
 		private static void ConfigureHttpContext(Mock<IHttpContextAccessor> mockHttpContextAccessor, int projectId)
 		{
-			var httpContext = MockHttpContextFactory.GetHttpContext(projectId);
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId});
 			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 		}
 
@@ -36,10 +36,12 @@ namespace BugTracker.Tests.Helpers
 			if (willSucceed)
 			{
 				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Success);
+				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<object>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Success);
 			}
 			else
 			{
 				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Failed);
+				authorizationService.Setup(_ => _.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<object>(), It.IsAny<string>())).ReturnsAsync(AuthorizationResult.Failed);
 			}
 		}
 	}

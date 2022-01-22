@@ -92,7 +92,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public async Task Overview_NotFound_IfIdInvalid()
+		public async Task Overview_ReturnsNotFound_IfIdInvalid()
 		{
 			var projectId = 22;
 			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
@@ -152,7 +152,6 @@ namespace BugTracker.Tests.Controllers
 			};
 			ActivityProject activityProject = new();
 
-			mockHttpContextAccessor.Setup(_ => _.HttpContext.User.FindFirst(It.IsAny<string>())).Returns(new System.Security.Claims.Claim("name", "23"));
 			mockUserManager.Setup(_ => _.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new IdentityUser()));
 			mockProjectRepo.Setup(_ => _.Add(It.IsAny<Project>())).Returns(Task.FromResult(model));
 			mockActivityRepo.Setup(_ => _.Add(It.IsAny<ActivityProject>())).Returns(Task.FromResult((Activity)activityProject));
@@ -314,7 +313,6 @@ namespace BugTracker.Tests.Controllers
 				Project = dummyProject
 			};
 
-			mockHttpContextAccessor.Setup(_ => _.HttpContext.User.FindFirst(It.IsAny<string>())).Returns(new Claim(ClaimTypes.NameIdentifier, "1"));
 			mockProjectRepo.Setup(x => x.GetById(It.IsAny<int>())).Returns(Task.FromResult(dummyProject));
 			mockProjectRepo.Setup(_ => _.Update(It.IsAny<Project>())).Returns(Task.FromResult(dummyProject));
 			mockActivityRepo.Setup(_ => _.Add(It.IsAny<Activity>())).Returns(Task.FromResult(new ActivityProject() as Activity));
