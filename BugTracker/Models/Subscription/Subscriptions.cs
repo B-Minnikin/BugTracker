@@ -1,6 +1,7 @@
 ﻿using BugTracker.Models.Authorization;
 using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
+using BugTracker.Services;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -51,8 +52,10 @@ namespace BugTracker.Models.Database
 			}
 		}
 
-		public async Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl)
+		public async Task NotifyBugReportStateChanged(BugState bugState, ApplicationLinkGenerator linkGenerator, int bugReportId)
 		{
+			string bugReportUrl = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { id = bugReportId });
+
 			var subscribedUserIds = await userSubscriptionsRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
 			string emailSubject = await ComposeBugStateEmailSubject(bugState);

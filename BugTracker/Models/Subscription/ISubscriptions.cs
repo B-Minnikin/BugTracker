@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BugTracker.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace BugTracker.Models.Database
 		Task CreateSubscriptionIfNotSubscribed(int userId, int bugReportId);
 		Task DeleteSubscription(int userId, int bugReportId);
 
-		Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl);
+		Task NotifyBugReportStateChanged(BugState bugState, ApplicationLinkGenerator linkGenerator, int bugReportId);
 		Task NotifyBugReportNewComment(Comment comment, string bugReportUrl);
 	}
 }
