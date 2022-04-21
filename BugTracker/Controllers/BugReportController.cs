@@ -345,6 +345,11 @@ namespace BugTracker.Controllers
 		[HttpPost]
 		public async Task<IActionResult> AssignMember(AssignMemberViewModel model)
 		{
+			if(model == null)
+			{
+				return BadRequest();
+			}
+
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
@@ -355,8 +360,12 @@ namespace BugTracker.Controllers
 
 				// Create activity event
 				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-				var currentProjectId = httpContextAccessor.HttpContext.Session.GetInt32("currentProject");
-				var activityEvent = new ActivityBugReportAssigned(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportAssignedToUser, userId, model.BugReportId, assignedUserId);
+				var currentProjectId = httpContextAccessor.HttpContext.Session.GetInt32("currentProject") ?? 0;
+				if (currentProjectId < 1)
+				{
+					return NotFound();
+				}
+				var activityEvent = new ActivityBugReportAssigned(DateTime.Now, currentProjectId, ActivityMessage.BugReportAssignedToUser, userId, model.BugReportId, assignedUserId);
 				await activityRepository.Add(activityEvent);
 
 				return RedirectToAction("AssignMember", new { model.BugReportId });

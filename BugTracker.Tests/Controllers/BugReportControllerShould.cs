@@ -681,7 +681,89 @@ namespace BugTracker.Tests.Controllers
 			var viewModelResult = viewResult.ViewData.Model as AssignMemberViewModel;
 			Assert.Equal(viewModelResult.BugReportId, bugReportId);
 			Assert.Equal(viewModelResult.ProjectId, projectId);
+		}
 
+		[Fact]
+		public async Task AssignMember_Post_ReturnsNotFound_WhenInvalidSessionProjectId()
+		{
+			int projectId = 0;
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			int bugReportId = 1;
+			var viewModel = new AssignMemberViewModel { ProjectId = projectId, BugReportId = bugReportId };
+
+			var renameUserId = 1;
+			var assignedUser = new IdentityUser() { UserName = "Test Assignee User", Id = renameUserId.ToString() };
+			mockUserManager.Setup(_ => _.FindByEmailAsync(It.IsAny<string>())).Returns(Task.FromResult(assignedUser));
+			mockBugReportRepo.Setup(_ => _.AddUserAssignedToBugReport(It.Is<int>(i => i == renameUserId), It.Is<int>(i => i == bugReportId))).Verifiable();
+			
+			var result = await controller.AssignMember(viewModel);
+
+			Assert.IsType<NotFoundResult>(result);
+		}
+
+		[Fact]
+		public async Task AssignMember_Post_ReturnsBadRequest_WhenViewModelNull()
+		{
+			AssignMemberViewModel viewModel = null;
+
+			int projectId = 1;
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.AssignMember(viewModel);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task AssignMember_Post_RedirectsToHome_WhenNotAuthorized()
+		{
+			var assignMemberViewModel = new AssignMemberViewModel();
+
+			int projectId = 1;
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
+
+			var result = await controller.AssignMember(assignMemberViewModel);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Index", redirectToActionResult.ActionName);
+			Assert.Equal("Home", redirectToActionResult.ControllerName);
+		}
+
+		[Fact]
+		public async Task AssignMember_Post_RedirectsToAssignMember_WhenAuthorized()
+		{
+			int projectId = 1;
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			int bugReportId = 1;
+			var viewModel = new AssignMemberViewModel { ProjectId = projectId, BugReportId = bugReportId };
+
+			var renameUserId = 1;
+			var assignedUser = new IdentityUser() { UserName = "Test Assignee User", Id = renameUserId.ToString() };
+			mockUserManager.Setup(_ => _.FindByEmailAsync(It.IsAny<string>())).Returns(Task.FromResult(assignedUser));
+			mockBugReportRepo.Setup(_ => _.AddUserAssignedToBugReport(It.Is<int>(i => i == renameUserId), It.Is<int>(i => i == bugReportId))).Verifiable();
+
+			mockActivityRepo.Setup(_ => _.Add(It.IsAny<ActivityBugReportAssigned>())).Returns(Task.FromResult(new ActivityBugReportAssigned() as Activity)).Verifiable();
+
+			var result = await controller.AssignMember(viewModel);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("AssignMember", redirectToActionResult.ActionName);
+
+			Assert.True(redirectToActionResult.RouteValues.ContainsKey("bugReportId"));
+			var routeValueId = redirectToActionResult.RouteValues["bugReportId"];
+			Assert.Equal(bugReportId, routeValueId);
 		}
 	}
 }
