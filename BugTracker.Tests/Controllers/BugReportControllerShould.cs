@@ -765,5 +765,35 @@ namespace BugTracker.Tests.Controllers
 			var routeValueId = redirectToActionResult.RouteValues["bugReportId"];
 			Assert.Equal(bugReportId, routeValueId);
 		}
+
+		[Fact]
+		public async Task RemoveAssignedMember_Post_RedirectsToAssignMember_WhenAuthorized()
+		{
+			int bugReportId = 1;
+			string memberEmail = "member@email.com";
+			int projectId = 1;
+			int userId = 2;
+
+			IdentityUser user = new IdentityUser()
+			{
+				Id = userId.ToString()
+			};
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			mockUserManager.Setup(_ => _.FindByEmailAsync(It.Is<string>(s => s == memberEmail))).Returns(Task.FromResult(user));
+			mockBugReportRepo.Setup(_ => _.DeleteUserAssignedToBugReport(It.Is<int>(i => i == userId), It.Is<int>(i => i == bugReportId))).Verifiable();
+
+			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("AssignMember", redirectToActionResult.ActionName);
+
+			Assert.True(redirectToActionResult.RouteValues.ContainsKey("bugReportId"));
+			var routeValueId = redirectToActionResult.RouteValues["bugReportId"];
+			Assert.Equal(bugReportId, routeValueId);
+		}
 	}
 }
