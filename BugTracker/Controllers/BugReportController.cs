@@ -376,9 +376,18 @@ namespace BugTracker.Controllers
 
 		[HttpPost]
 		public async Task<IActionResult> RemoveAssignedMember(int projectId, int bugReportId, string memberEmail)
-		{
+		      {
+			if(projectId < 1 || bugReportId < 1)
+			{
+				return BadRequest();
+			}
+			else if (string.IsNullOrEmpty(memberEmail))
+			{
+				return BadRequest();
+			}
+
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "ProjectAdministratorPolicy");
-			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded) 
 			{
 				var user = await userManager.FindByEmailAsync(memberEmail);
 

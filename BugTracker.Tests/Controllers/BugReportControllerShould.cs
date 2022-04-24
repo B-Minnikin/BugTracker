@@ -795,5 +795,71 @@ namespace BugTracker.Tests.Controllers
 			var routeValueId = redirectToActionResult.RouteValues["bugReportId"];
 			Assert.Equal(bugReportId, routeValueId);
 		}
+
+		[Fact]
+		public async Task RemoveAssignedMember_Post_RedirectsToHome_WhenNotAuthorized()
+		{
+			int projectId = 1;
+			int bugReportId = 1;
+			string memberEmail = "member@email.com";
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Index", redirectToActionResult.ActionName);
+			Assert.Equal("Home", redirectToActionResult.ControllerName);
+		}
+
+		[Fact]
+		public async Task RemoveAssignedMember_Post_WhenBugReportIdLessThan1()
+		{
+			int projectId = 1;
+			int bugReportId = 0;
+			string memberEmail = "member@email";
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task RemoveAssignedMember_Post_WhenProjectIdLessThan1()
+		{
+			int projectId = 0;
+			int bugReportId = 1;
+			string memberEmail = "member@email";
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task RemoveAssignedMember_Post_WhenEmailEmptyOrNull()
+		{
+			int projectId = 1;
+			int bugReportId = 1;
+			string memberEmail = "";
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
 	}
 }
