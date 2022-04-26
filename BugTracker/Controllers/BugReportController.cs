@@ -402,7 +402,16 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public async Task<IActionResult> ManageLinks(int bugReportId)
 		{
-			int currentProjectId = (int)httpContextAccessor.HttpContext.Session.GetInt32("currentProject");
+			if(bugReportId < 1)
+			{
+				return BadRequest();
+			}
+
+			var currentProjectId = httpContextAccessor.HttpContext.Session.GetInt32("currentProject") ?? 0;
+			if (currentProjectId < 1)
+			{
+				return NotFound();
+			}
 			var bugReport = await bugReportRepository.GetById(bugReportId);
 
 			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");

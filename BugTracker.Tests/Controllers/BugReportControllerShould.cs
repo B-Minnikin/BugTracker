@@ -709,12 +709,6 @@ namespace BugTracker.Tests.Controllers
 		{
 			AssignMemberViewModel viewModel = null;
 
-			int projectId = 1;
-			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
-			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-
-			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
-
 			var result = await controller.AssignMember(viewModel);
 
 			Assert.IsType<BadRequestResult>(result);
@@ -815,15 +809,11 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public async Task RemoveAssignedMember_Post_WhenBugReportIdLessThan1()
+		public async Task RemoveAssignedMember_Post_ReturnsBadRequest_WhenBugReportIdLessThan1()
 		{
 			int projectId = 1;
 			int bugReportId = 0;
 			string memberEmail = "member@email";
-			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
-			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-
-			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
 
 			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
 
@@ -831,15 +821,11 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public async Task RemoveAssignedMember_Post_WhenProjectIdLessThan1()
+		public async Task RemoveAssignedMember_Post_ReturnsBadRequest_WhenProjectIdLessThan1()
 		{
 			int projectId = 0;
 			int bugReportId = 1;
 			string memberEmail = "member@email";
-			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
-			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-
-			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
 
 			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
 
@@ -847,19 +833,89 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public async Task RemoveAssignedMember_Post_WhenEmailEmptyOrNull()
+		public async Task RemoveAssignedMember_Post_ReturnsBadRequest_WhenEmailEmptyOrNull()
 		{
 			int projectId = 1;
 			int bugReportId = 1;
 			string memberEmail = "";
-			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
-			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
-
-			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
 
 			var result = await controller.RemoveAssignedMember(projectId, bugReportId, memberEmail);
 
 			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task ManageLinks_ReturnsBadRequest_WhenBugReportIdLessThan1()
+		{
+			int bugReportId = 0;
+
+			var result = await controller.ManageLinks(bugReportId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task ManageLinks_ReturnsNotFound_WhenInvalidSessionProjectId()
+		{
+			int projectId = 0;
+			int bugReportId = 1;
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			var result = await controller.ManageLinks(bugReportId);
+
+			Assert.IsType<NotFoundResult>(result);
+		}
+
+		[Fact]
+		public async Task ManageLinks_RedirectsToHome_WhenNotAuthorized()
+		{
+			int projectId = 1;
+			int bugReportId = 1;
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.ManageLinks(bugReportId);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Index", redirectToActionResult.ActionName);
+			Assert.Equal("Home", redirectToActionResult.ControllerName);
+		}
+
+		[Fact]
+		public async Task ManageLinks_ReturnsModel_WhenAuthorized()
+		{
+			int bugReportId = 1;
+			int projectId = 1;
+
+			var project = new Project
+			{
+				ProjectId = projectId
+			};
+
+			IEnumerable<BugReport> linkedReports = new List<BugReport>
+			{
+				new BugReport{ BugReportId = 2, Title = "First report" },
+				new BugReport{ BugReportId = 3, Title = "Second report" }
+			};
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			mockBugReportRepo.Setup(_ => _.GetById(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(new BugReport { BugReportId = 4, Title = "Third report" }));
+			mockProjectRepo.Setup(_ => _.GetById(It.Is<int>(i => i == projectId))).Returns(Task.FromResult(project));
+			mockBugReportRepo.Setup(_ => _.GetLinkedReports(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(linkedReports));
+
+			var result = await controller.ManageLinks(bugReportId);
+
+			var viewResult = Assert.IsType<ViewResult>(result);
+			Assert.IsAssignableFrom<ManageLinksViewModel>(viewResult.ViewData.Model);
+			var viewModelResult = viewResult.ViewData.Model as ManageLinksViewModel;
+			Assert.Equal(viewModelResult.BugReportId, bugReportId);
+			Assert.Equal(viewModelResult.ProjectId, projectId);
 		}
 	}
 }
