@@ -17,9 +17,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using AuthorizationHelper = BugTracker.Tests.Helpers.AuthorizationHelper;
@@ -916,6 +913,195 @@ namespace BugTracker.Tests.Controllers
 			var viewModelResult = viewResult.ViewData.Model as ManageLinksViewModel;
 			Assert.Equal(viewModelResult.BugReportId, bugReportId);
 			Assert.Equal(viewModelResult.ProjectId, projectId);
+		}
+
+		[Fact]
+		public async Task LinkReports_ReturnsBadRequest_WhenViewModelNull()
+		{
+			var result = await controller.LinkReports(null);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task LinkReports_RedirectsToHome_WhenNotAuthorized()
+		{
+			int projectId = 1;
+			var model = new LinkReportsViewModel { };
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.LinkReports(model);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Index", redirectToActionResult.ActionName);
+			Assert.Equal("Home", redirectToActionResult.ControllerName);
+		}
+
+		[Fact]
+		public async Task LinkReports_RedirectsToReportOverview_WhenAuthorized()
+		{
+			int bugReportId = 1;
+			int localBugReportId = 2;
+			int projectId = 1;
+
+			var model = new LinkReportsViewModel { BugReportId = 3, LinkToBugReportLocalId = localBugReportId, ProjectId = projectId};
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var linkToReport = new BugReport { BugReportId = bugReportId };
+			mockBugReportRepo.Setup(_ => _.GetBugReportByLocalId(It.Is<int>(i => i == model.LinkToBugReportLocalId), It.Is<int>(i => i == projectId))).Returns(Task.FromResult(linkToReport));
+			mockBugReportRepo.Setup(_ => _.AddBugReportLink(It.Is<int>(i => i == model.BugReportId), It.Is<int>(i => i == linkToReport.BugReportId))).Verifiable();
+			mockActivityRepo.Setup(_ => _.Add(It.IsAny<ActivityBugReportLink>())).Verifiable();
+
+			var result = await controller.LinkReports(model);
+			Assert.NotNull(result);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
+
+			Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
+			var routeValueId = redirectToActionResult.RouteValues["id"];
+			Assert.Equal(model.BugReportId, routeValueId);
+		}
+
+		[Fact]
+		public async Task LinkReports_ReturnsNotFound_WhenInvalidSessionProjectId()
+		{
+			int projectId = 0;
+			int bugReportId = 1;
+			int localBugReportId = 2;
+			var model = new LinkReportsViewModel { BugReportId = bugReportId, LinkToBugReportLocalId = localBugReportId, ProjectId = projectId };
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			var result = await controller.LinkReports(model);
+
+			Assert.IsType<NotFoundResult>(result);
+		}
+
+		[Fact]
+		public async Task DeleteLink_ReturnsBadRequest_WhenProjectIdLessThan1()
+		{
+			int projectId = 0;
+			int bugReportId = 1;
+			int linkToBugReportId = 2;
+
+			var result = await controller.DeleteLink(projectId, bugReportId, linkToBugReportId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task DeleteLink_ReturnsBadRequest_WhenBugReportIdLessThan1()
+		{
+			int projectId = 1;
+			int bugReportId = 0;
+			int linkToBugReportId = 2;
+
+			var result = await controller.DeleteLink(projectId, bugReportId, linkToBugReportId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task DeleteLink_ReturnsBadRequest_WhenLinkToBugReportIdLessThan1()
+		{
+			int projectId = 1;
+			int bugReportId = 1;
+			int linkToBugReportId = 0;
+
+			var result = await controller.DeleteLink(projectId, bugReportId, linkToBugReportId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task DeleteLink_RedirectsToHome_WhenNotAuthorized()
+		{
+			int projectId = 1;
+			int bugReportId = 1;
+			int linkToBugReportId = 1;
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.DeleteLink(projectId, bugReportId, linkToBugReportId);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Index", redirectToActionResult.ActionName);
+			Assert.Equal("Home", redirectToActionResult.ControllerName);
+		}
+
+		[Fact]
+		public async Task DeleteLink_RedirectsToReportOverview_WhenAuthorized()
+		{
+			int projectId = 1;
+			int bugReportId = 1;
+			int linkToBugReportId = 1;
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			mockBugReportRepo.Setup(_ => _.DeleteBugReportLink(It.Is<int>(i => i == bugReportId), It.Is<int>(i => i == linkToBugReportId))).Verifiable();
+
+			var result = await controller.DeleteLink(projectId, bugReportId, linkToBugReportId);
+			Assert.NotNull(result);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
+
+			Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
+			var routeValueId = redirectToActionResult.RouteValues["id"];
+			Assert.Equal(bugReportId, routeValueId);
+		}
+
+		[Fact]
+		public async Task ReportOverview_ReturnsBadRequest_WhenBugReportIdLessThan1()
+		{
+			int bugReportId = 0;
+
+			var result = await controller.ReportOverview(bugReportId);
+
+			Assert.IsType<BadRequestResult>(result);
+		}
+
+		[Fact]
+		public async Task ReportOverview_ReturnsNotFound_WhenInvalidSessionProjectId()
+		{
+			int projectId = 0;
+			int bugReportId = 1;
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+
+			var result = await controller.ReportOverview(bugReportId);
+
+			Assert.IsType<NotFoundResult>(result);
+		}
+
+		[Fact]
+		public async Task ReportOverview_RedirectsToHome_WhenNotAuthorized()
+		{
+			int projectId = 1;
+			int bugReportId = 1;
+
+			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
+			mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
+			AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor, projectId);
+
+			var result = await controller.ReportOverview(bugReportId);
+
+			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+			Assert.Equal("Index", redirectToActionResult.ActionName);
+			Assert.Equal("Home", redirectToActionResult.ControllerName);
 		}
 	}
 }
