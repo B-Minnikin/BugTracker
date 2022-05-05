@@ -148,7 +148,7 @@ namespace BugTracker.Controllers
 							await userSubscriptionsRepository.AddSubscription(userId, addedReport.BugReportId);
 						}
 
-						return RedirectToAction("ReportOverview", new { id = addedReport.BugReportId });
+						return RedirectToAction("ReportOverview", new { bugReportId = addedReport.BugReportId });
 					}
 
 					return View(model);
@@ -178,7 +178,7 @@ namespace BugTracker.Controllers
 				subscriptions.CreateSubscriptionIfNotSubscribed(userId, bugReportId);
 			}
 
-			return RedirectToAction("ReportOverview", new { id = bugReportId});
+			return RedirectToAction("ReportOverview", new { bugReportId = bugReportId});
 		}
 
 		[HttpGet]
@@ -269,13 +269,13 @@ namespace BugTracker.Controllers
 						await activityRepository.Add(stateActivityEvent);
 					}
 
-					return RedirectToAction("ReportOverview", new { id = bugReport.BugReportId});
+					return RedirectToAction("ReportOverview", new { bugReportId = bugReport.BugReportId});
 				}
 
 				return View(viewModel);
 			}
 
-			return RedirectToAction("ReportOverview", new { id = viewModel.BugReport.BugReportId });
+			return RedirectToAction("ReportOverview", new { bugReportId = viewModel.BugReport.BugReportId });
 		}
 
 		public async Task<IActionResult> Delete(int bugReportId)
@@ -459,7 +459,7 @@ namespace BugTracker.Controllers
 				var activityEvent = new ActivityBugReportLink(DateTime.Now, currentProjectId, ActivityMessage.BugReportsLinked, userId, model.BugReportId, linkToReport.BugReportId);
 				await activityRepository.Add(activityEvent);
 
-				return RedirectToAction("ReportOverview", new { id = model.BugReportId });
+				return RedirectToAction("ReportOverview", new { bugReportId = model.BugReportId });
 			}
 
 			return RedirectToAction("Index", "Home");
@@ -475,7 +475,7 @@ namespace BugTracker.Controllers
 			{
 				await bugReportRepository.DeleteBugReportLink(bugReportId, linkToBugReportId);
 
-				return RedirectToAction("ReportOverview", new { id = bugReportId });
+				return RedirectToAction("ReportOverview", new { bugReportId = bugReportId });
 			}
 
 			return RedirectToAction("Index", "Home");

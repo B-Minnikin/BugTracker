@@ -135,7 +135,7 @@ namespace BugTracker.Controllers
 
 		private string GetUrl(int bugReportId)
 		{
-			var result = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { id = bugReportId });
+			var result = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { bugReportId = bugReportId });
 			return result;
 		}
 	}

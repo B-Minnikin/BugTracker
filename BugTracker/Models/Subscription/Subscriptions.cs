@@ -54,7 +54,7 @@ namespace BugTracker.Models.Database
 
 		public async Task NotifyBugReportStateChanged(BugState bugState, ApplicationLinkGenerator linkGenerator, int bugReportId)
 		{
-			string bugReportUrl = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { id = bugReportId });
+			string bugReportUrl = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { bugReportId = bugReportId });
 
 			var subscribedUserIds = await userSubscriptionsRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 

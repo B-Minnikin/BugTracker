@@ -129,7 +129,7 @@ namespace BugTracker.Services
 		private async Task<string> GetBugReportAnchorString(Activity activity)
 		{
 			var bugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReport.BugReportId));
-			string bugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = bugReportId });
+			string bugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { bugReportId = bugReportId });
 			var bugReport = await bugReportRepository.GetById(bugReportId);
 			string bugReportName = bugReport.Title;
 			string bugReportAnchorString = GetHTMLAnchorString(bugReportUri, bugReportName);
@@ -139,7 +139,7 @@ namespace BugTracker.Services
 		private async Task<string> GetSecondBugReportAnchorString(Activity activity)
 		{
 			var secondBugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReportLink.LinkedBugReportId));
-			string secondBugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = secondBugReportId });
+			string secondBugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { bugReportId = secondBugReportId });
 			var secondBugReport = await bugReportRepository.GetById(secondBugReportId);
 			string secondBugReportName = secondBugReport.Title;
 			string secondBugReportAnchorString = GetHTMLAnchorString(secondBugReportUri, secondBugReportName);

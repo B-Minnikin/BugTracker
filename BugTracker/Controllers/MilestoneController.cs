@@ -295,7 +295,7 @@ namespace BugTracker.Controllers
 			{
 				var bugReport = await bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId);
 				entry.BugReportId = bugReport.BugReportId;
-				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = entry.BugReportId });
+				entry.Url = Url.Action("ReportOverview", "BugReport", new { bugReportId = entry.BugReportId });
 				entry.CurrentState = await bugReportStatesRepository.GetLatestState(entry.BugReportId);
 			}
 
@@ -314,7 +314,7 @@ namespace BugTracker.Controllers
 		{
 			if (entry.Url == null)
 			{
-				entry.Url = Url.Action("ReportOverview", "BugReport", new { id = bugReportId });
+				entry.Url = Url.Action("ReportOverview", "BugReport", new { bugReportId = bugReportId });
 			}
 			return entry;
 		}
