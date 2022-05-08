@@ -10,7 +10,7 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-ALTER PROCEDURE [dbo].[ProjectInvitations_Delete]
+CREATE PROCEDURE [dbo].[ProjectInvitations_Delete]
 	@EmailAddress nvarchar(MAX),
 	@ProjectId int
 AS

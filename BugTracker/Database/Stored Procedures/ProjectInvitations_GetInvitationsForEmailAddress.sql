@@ -10,7 +10,7 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-ALTER PROCEDURE [dbo].[ProjectInvitations_GetInvitationsForEmailAddress]
+CREATE PROCEDURE [dbo].[ProjectInvitations_GetInvitationsForEmailAddress]
 	@EmailAddress nvarchar(MAX)
 AS
 BEGIN

@@ -10,7 +10,7 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-ALTER PROCEDURE [dbo].[Users_MatchByQueryAndProject]
+CREATE PROCEDURE [dbo].[Users_MatchByQueryAndProject]
 	@Query nvarchar(max),
 	@ProjectId int
 AS
