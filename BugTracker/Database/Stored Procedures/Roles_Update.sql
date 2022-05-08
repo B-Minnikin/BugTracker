@@ -23,7 +23,7 @@ BEGIN
 
     -- Insert statements for procedure here
 	UPDATE dbo.Roles
-	SET RoleId = @RoleId, Name = @Name, NormalizedName = @NormalizedName
+	SET Name = @Name, NormalizedName = @NormalizedName
 	WHERE RoleId = @RoleId
 END
 GO
