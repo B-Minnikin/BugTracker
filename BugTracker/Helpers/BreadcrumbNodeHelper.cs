@@ -34,7 +34,7 @@ namespace BugTracker.Helpers
 			};
 			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
 			{
-				RouteValues = new { id = bugReport.BugReportId },
+				RouteValues = new { bugReportId = bugReport.BugReportId },
 				Parent = overviewNode
 			};
 			var manageLinksNode = new MvcBreadcrumbNode("ManageLinks", "BugReport", "Manage Links")
@@ -54,7 +54,7 @@ namespace BugTracker.Helpers
 			};
 			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
 			{
-				RouteValues = new { id = bugReport.BugReportId },
+				RouteValues = new { bugReportId = bugReport.BugReportId },
 				Parent = overviewNode
 			};
 			var assignMembersNode = new MvcBreadcrumbNode("AssignMember", "BugReport", "Assign Members")
@@ -74,7 +74,7 @@ namespace BugTracker.Helpers
 			};
 			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
 			{
-				RouteValues = new { id = bugReport.BugReportId },
+				RouteValues = new { bugReportId = bugReport.BugReportId },
 				Parent = overviewNode
 			};
 			var editNode = new MvcBreadcrumbNode("Edit", "BugReport", "Edit")
@@ -109,7 +109,7 @@ namespace BugTracker.Helpers
 			};
 			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
 			{
-				RouteValues = new { id = bugReport.BugReportId },
+				RouteValues = new { bugReportId = bugReport.BugReportId },
 				Parent = overviewNode
 			};
 			var commentNode = new MvcBreadcrumbNode("Edit", "Comment", "Edit Comment")
@@ -129,7 +129,7 @@ namespace BugTracker.Helpers
 			};
 			var reportNode = new MvcBreadcrumbNode("ReportOverview", "BugReport", bugReport.Title)
 			{
-				RouteValues = new { id = bugReport.BugReportId },
+				RouteValues = new { bugReportId = bugReport.BugReportId },
 				Parent = overviewNode
 			};
 			var commentNode = new MvcBreadcrumbNode("Create", "Comment", "Comment")

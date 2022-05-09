@@ -63,6 +63,10 @@ namespace BugTracker.Models
 			{
 				logger.LogError(e.Message);
 			}
+			catch(ArgumentNullException e)
+			{
+				logger.LogError(e.Message, e.InnerException);
+			}
 			finally
 			{
 				client.Disconnect(true);

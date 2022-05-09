@@ -1,10 +1,6 @@
-﻿using BugTracker.Models.Authorization;
-using BugTracker.Repository;
-using BugTracker.Repository.Interfaces;
+﻿using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,7 +50,7 @@ namespace BugTracker.Models.Database
 
 		public async Task NotifyBugReportStateChanged(BugState bugState, ApplicationLinkGenerator linkGenerator, int bugReportId)
 		{
-			string bugReportUrl = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { id = bugReportId });
+			string bugReportUrl = linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { bugReportId });
 
 			var subscribedUserIds = await userSubscriptionsRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 

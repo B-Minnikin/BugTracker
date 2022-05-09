@@ -8,9 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
@@ -105,7 +102,7 @@ namespace BugTracker.Controllers
 					await GenerateConfirmationEmail(createdUser);
 
 					// ---- fulfil stored project invitations if they exist
-					projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);
+					await projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);
 
 					return View("RegistrationComplete");
 				}
@@ -202,7 +199,7 @@ namespace BugTracker.Controllers
 				if (user == null)
 					return RedirectToAction("ForgotPasswordConfirmation");
 
-				GenerateForgotPasswordEmail(user);
+				await GenerateForgotPasswordEmail(user);
 
 				return RedirectToAction("ForgotPasswordConfirmation");
 			}
