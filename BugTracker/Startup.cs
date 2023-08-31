@@ -1,4 +1,4 @@
-using BugTracker.Database.DbContext;
+using BugTracker.Database.Context;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
@@ -45,6 +45,8 @@ namespace BugTracker
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 			services.AddDbContext<UserContext>(options =>
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+			services.AddDbContext<CommentContext>(options =>
+				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
 			services.AddTransient<ILinkGenerator, ApplicationLinkGenerator>();
 
@@ -85,7 +87,7 @@ namespace BugTracker
 			services.AddBreadcrumbs(GetType().Assembly);
 		}
 
-		private void ConfigureRepositories(IServiceCollection services, string connectionString)
+		private static void ConfigureRepositories(IServiceCollection services, string connectionString)
 		{
 			services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
 
@@ -95,7 +97,7 @@ namespace BugTracker
 			services.AddTransient<IBugReportStatesRepository, DapperBugReportStatesRepository>(s => new DapperBugReportStatesRepository(connectionString));
 			services.AddTransient<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>(s => new DapperUserSubscriptionsRepository(connectionString));
 			services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
-			services.AddTransient<ICommentRepository, DapperCommentRepository>(s => new DapperCommentRepository(connectionString));
+			services.AddTransient<ICommentRepository, EfCommentRepository>();
 			services.AddTransient<IProjectInvitationsRepository, DapperProjectInvitationsRepository>(s => new DapperProjectInvitationsRepository(connectionString));
 			services.AddTransient<ISearchRepository, DapperSearchRepository>(s => new DapperSearchRepository(connectionString));
 		}

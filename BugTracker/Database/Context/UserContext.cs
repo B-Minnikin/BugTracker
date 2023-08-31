@@ -1,7 +1,7 @@
 ﻿using BugTracker.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BugTracker.Database.DbContext;
+namespace BugTracker.Database.Context;
 
 public class UserContext : Microsoft.EntityFrameworkCore.DbContext
 {

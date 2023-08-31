@@ -14,5 +14,6 @@ namespace BugTracker.Models
 		public DateTime Date { get; set; }
 		public string MainText { get; set; }
 		public int BugReportId { get; set; }
+		public bool Hidden { get; set; }
 	}
 }

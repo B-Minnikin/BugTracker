@@ -1,10 +1,9 @@
 ﻿using BugTracker.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace BugTracker.Database.DbContext;
+namespace BugTracker.Database.Context;
 
-public class BugReportContext : Microsoft.EntityFrameworkCore.DbContext
+public class BugReportContext : DbContext
 {
     public DbSet<BugReport> BugReports { get; set; }
     public DbSet<Comment> Comments { get; set; }
