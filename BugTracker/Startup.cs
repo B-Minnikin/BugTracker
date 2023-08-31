@@ -89,7 +89,7 @@ namespace BugTracker
 		{
 			services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
 
-			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
+			services.AddTransient<IProjectRepository, EfProjectRepository>();
 			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
 			services.AddTransient<IBugReportRepository, EfBugReportRepository>();
 			services.AddTransient<IBugReportStatesRepository, DapperBugReportStatesRepository>(s => new DapperBugReportStatesRepository(connectionString));
