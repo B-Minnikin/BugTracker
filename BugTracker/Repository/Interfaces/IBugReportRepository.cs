@@ -20,7 +20,7 @@ namespace BugTracker.Repository.Interfaces
 		Task AddUserAssignedToBugReport(int userId, int bugReportId);
 		Task DeleteUserAssignedToBugReport(int userId, int bugReportId);
 		Task<IEnumerable<BugReport>> GetBugReportsForAssignedUser(int userId);
-		Task<IEnumerable<IdentityUser>> GetAssignedUsersForBugReport(int bugReportId);
+		Task<IEnumerable<ApplicationUser>> GetAssignedUsersForBugReport(int bugReportId);
 
 		// Bug Report Linking
 		Task AddBugReportLink(int bugReportId, int linkToBugReportId);

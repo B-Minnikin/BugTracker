@@ -1,15 +1,18 @@
+using BugTracker.Database.DbContext;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Database;
 using BugTracker.Models.ProjectInvitation;
 using BugTracker.Repository;
 using BugTracker.Repository.DapperRepositories;
+using BugTracker.Repository.EFCoreRepositories;
 using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,6 +38,13 @@ namespace BugTracker
 			services.AddTransient<IEmailHelper, EmailHelper>();
 
 			ConfigureRepositories(services, connectionString);
+
+			services.AddDbContext<BugReportContext>(options =>
+				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+			services.AddDbContext<ProjectContext>(options =>
+				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+			services.AddDbContext<UserContext>(options =>
+				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
 			services.AddTransient<ILinkGenerator, ApplicationLinkGenerator>();
 
@@ -81,7 +91,7 @@ namespace BugTracker
 
 			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
 			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
-			services.AddTransient<IBugReportRepository, DapperBugReportRepository>(s => new DapperBugReportRepository(connectionString));
+			services.AddTransient<IBugReportRepository, EfBugReportRepository>();
 			services.AddTransient<IBugReportStatesRepository, DapperBugReportStatesRepository>(s => new DapperBugReportStatesRepository(connectionString));
 			services.AddTransient<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>(s => new DapperUserSubscriptionsRepository(connectionString));
 			services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
