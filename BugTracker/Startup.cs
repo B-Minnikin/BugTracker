@@ -94,7 +94,7 @@ namespace BugTracker
 			services.AddTransient<IProjectRepository, EfProjectRepository>();
 			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
 			services.AddTransient<IBugReportRepository, EfBugReportRepository>();
-			services.AddTransient<IBugReportStatesRepository, DapperBugReportStatesRepository>(s => new DapperBugReportStatesRepository(connectionString));
+			services.AddTransient<IBugReportStatesRepository, EfBugReportStatesRepository>();
 			services.AddTransient<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>(s => new DapperUserSubscriptionsRepository(connectionString));
 			services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
 			services.AddTransient<ICommentRepository, EfCommentRepository>();

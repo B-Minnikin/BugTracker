@@ -9,6 +9,7 @@ public class BugReportContext : DbContext
     public DbSet<Comment> Comments { get; set; }
     public DbSet<UserBugReport> UserBugReports { get; set; }
     public DbSet<BugReportLink> BugReportLinks { get; set; }
+    public DbSet<BugState> BugStates { get; set; }
     
     // TODO - attachment paths
 
