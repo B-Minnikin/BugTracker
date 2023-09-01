@@ -42,6 +42,7 @@ namespace BugTracker.Models
 		
 		public ICollection<UserBugReport> UserBugReports { get; set; }
 		public ICollection<BugReportLink> BugReportLinks { get; set; }
+		public ICollection<UserSubscription> UserSubscriptions { get; set; }
 	}
 
 	public class UserBugReport

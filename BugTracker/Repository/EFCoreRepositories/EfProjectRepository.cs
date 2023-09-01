@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BugTracker.Database.DbContext;
+using BugTracker.Database.Context;
 using BugTracker.Models;
 using BugTracker.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BugTracker.Repository.EFCoreRepositories;
 
@@ -58,9 +59,9 @@ public class EfProjectRepository : EFCoreBaseRepository, IProjectRepository
         return project;
     }
 
-    public Task<IEnumerable<Project>> GetAll()
+    public async Task<IEnumerable<Project>> GetAll()
     {
-        var projects = Task.FromResult(context.Projects.AsEnumerable());
+        var projects = await context.Projects.ToListAsync();
         return projects;
     }
 }

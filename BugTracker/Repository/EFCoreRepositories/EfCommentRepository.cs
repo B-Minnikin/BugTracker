@@ -54,10 +54,10 @@ public class EfCommentRepository : EFCoreBaseRepository, ICommentRepository
         return comment;
     }
 
-    public Task<IEnumerable<Comment>> GetAllById(int id)
+    public async Task<IEnumerable<Comment>> GetAllById(int id)
     {
-        var comments = context.Comments.Where(c => c.CommentId == id);
-        return Task.FromResult(comments.AsEnumerable());
+        var comments = await context.Comments.Where(c => c.CommentId == id).ToListAsync();
+        return comments;
     }
 
     public async Task<int> GetCommentParentId(int commentId)

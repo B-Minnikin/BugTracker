@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BugTracker.Database.DbContext;
+using BugTracker.Database.Context;
 using BugTracker.Models;
 using BugTracker.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -54,12 +54,12 @@ public class EfBugReportRepository : IBugReportRepository
         return report;
     }
 
-    public Task<IEnumerable<BugReport>> GetAllById(int projectId)
+    public async Task<IEnumerable<BugReport>> GetAllById(int projectId)
     {
         // project id
-        var reports = context.BugReports.Where(br => br.ProjectId == projectId);
+        var reports = await context.BugReports.Where(br => br.ProjectId == projectId).ToListAsync();
         // TODO - check that this works
-        return Task.FromResult(reports.AsEnumerable());
+        return reports;
     }
 
     public async Task<BugReport> GetBugReportByLocalId(int localBugReportId, int projectId)
