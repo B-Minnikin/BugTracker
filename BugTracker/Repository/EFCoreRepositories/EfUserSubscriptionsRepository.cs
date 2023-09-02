@@ -29,7 +29,6 @@ public class EfUserSubscriptionsRepository : EFCoreBaseRepository, IUserSubscrip
         await context.SaveChangesAsync();
     }
 
-    // TODO - hook up the user subscription type to the reports - also in the db context
     public async Task<IEnumerable<BugReport>> GetSubscribedReports(int userId)
     {
         var reports = await context.UserSubscriptions

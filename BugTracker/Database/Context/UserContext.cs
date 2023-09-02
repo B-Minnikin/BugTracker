@@ -5,6 +5,11 @@ namespace BugTracker.Database.Context;
 
 public class UserContext : Microsoft.EntityFrameworkCore.DbContext
 {
+    public UserContext(DbContextOptions contextOptions) : base(contextOptions)
+    {
+        
+    }
+    
     public DbSet<ApplicationUser> Users { get; set; }
     public DbSet<UserSubscription> UserSubscriptions { get; set; }
 

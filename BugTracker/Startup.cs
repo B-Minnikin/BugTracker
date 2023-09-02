@@ -53,9 +53,9 @@ namespace BugTracker
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();
 
-			services.AddTransient<IUserStore<IdentityUser>, UserStore>(s => new UserStore(connectionString));
+			services.AddTransient<IUserStore<ApplicationUser>, UserStore>(s => new UserStore(connectionString));
 			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>(s => new RoleStore(connectionString));
-			services.AddIdentity<IdentityUser, IdentityRole>(options =>
+			services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 				options.SignIn.RequireConfirmedEmail = true
 			)
 				.AddDefaultTokenProviders()
@@ -89,16 +89,16 @@ namespace BugTracker
 
 		private static void ConfigureRepositories(IServiceCollection services, string connectionString)
 		{
-			services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
+			services.AddScoped<UserManager<ApplicationUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
 
 			services.AddTransient<IProjectRepository, EfProjectRepository>();
 			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
 			services.AddTransient<IBugReportRepository, EfBugReportRepository>();
 			services.AddTransient<IBugReportStatesRepository, EfBugReportStatesRepository>();
-			services.AddTransient<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>(s => new DapperUserSubscriptionsRepository(connectionString));
+			services.AddTransient<IUserSubscriptionsRepository, EfUserSubscriptionsRepository>();
 			services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
 			services.AddTransient<ICommentRepository, EfCommentRepository>();
-			services.AddTransient<IProjectInvitationsRepository, DapperProjectInvitationsRepository>(s => new DapperProjectInvitationsRepository(connectionString));
+			services.AddTransient<IProjectInvitationsRepository, EfProjectInvitationsRepository>();
 			services.AddTransient<ISearchRepository, DapperSearchRepository>(s => new DapperSearchRepository(connectionString));
 		}
 

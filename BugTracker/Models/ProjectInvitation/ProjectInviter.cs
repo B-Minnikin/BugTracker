@@ -1,14 +1,9 @@
 ﻿using BugTracker.Models.Authorization;
 using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BugTracker.Models.ProjectInvitation
@@ -19,7 +14,7 @@ namespace BugTracker.Models.ProjectInvitation
 		private readonly IProjectInvitationsRepository projectInvitationsRepository;
 		private readonly IAuthorizationService authorizationService;
 		private readonly IEmailHelper emailHelper;
-		private readonly IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory;
+		private readonly IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory;
 		private readonly ILogger<ProjectInviter> logger;
 		private readonly ApplicationUserManager userManager;
 
@@ -27,7 +22,7 @@ namespace BugTracker.Models.ProjectInvitation
 			IProjectInvitationsRepository projectInvitationsRepository,
 			IAuthorizationService authorizationService,
 			IEmailHelper emailHelper,
-			IUserClaimsPrincipalFactory<IdentityUser> userClaimsPrincipalFactory,
+			IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
 			ILogger<ProjectInviter> logger,
 			ApplicationUserManager userManager)
 		{
@@ -59,7 +54,7 @@ namespace BugTracker.Models.ProjectInvitation
 			{
 				if(!UserHasProjectAuthorization(invitation.EmailAddress, invitation.Project.ProjectId).Result)
 				{
-					AddUserToProjectMemberRole(invitation.EmailAddress, invitation.Project.ProjectId);
+					await AddUserToProjectMemberRole(invitation.EmailAddress, invitation.Project.ProjectId);
 					SendProjectRoleNotificationEmail(invitation);
 				}
 

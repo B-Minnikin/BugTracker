@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using BugTracker.Models.ProjectInvitation;
 
 namespace BugTracker.Models;
 
@@ -16,6 +17,7 @@ public class Project
 	public bool Hidden { get; set; }
 
 	public IEnumerable<BugReport> BugReports { get; set; }
+	public ICollection<PendingProjectInvitation> PendingProjectInvitations { get; set; }
 }
 
 public class ProjectBugReportId

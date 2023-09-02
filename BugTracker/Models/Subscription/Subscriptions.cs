@@ -15,13 +15,13 @@ namespace BugTracker.Models.Database
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
 		private readonly IEmailHelper emailHelper;
-		private readonly UserManager<IdentityUser> userManager;
+		private readonly UserManager<ApplicationUser> userManager;
 
 		public Subscriptions(IProjectRepository projectRepository,
 			IBugReportRepository bugReportRepository,
 			IUserSubscriptionsRepository userSubscriptionsRepository,
 			IEmailHelper emailHelper,
-			UserManager<IdentityUser> userManager)
+			UserManager<ApplicationUser> userManager)
 		{
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
@@ -60,7 +60,7 @@ namespace BugTracker.Models.Database
 
 			foreach (var userId in subscribedUserIds)
 			{
-				IdentityUser user = await userManager.FindByIdAsync(userId.ToString());
+				ApplicationUser user = await userManager.FindByIdAsync(userId.ToString());
 
 				if (bugState.Author != user.UserName)
 				{
@@ -82,7 +82,7 @@ namespace BugTracker.Models.Database
 
 			foreach (var userId in subscribedUserIds)
 			{
-				IdentityUser user = await userManager.FindByIdAsync(userId.ToString());
+				ApplicationUser user = await userManager.FindByIdAsync(userId.ToString());
 
 				if(comment.AuthorId != int.Parse(user.Id))
 				{

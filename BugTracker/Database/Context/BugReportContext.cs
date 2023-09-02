@@ -5,6 +5,11 @@ namespace BugTracker.Database.Context;
 
 public class BugReportContext : DbContext
 {
+    public BugReportContext(DbContextOptions<BugReportContext> contextOptions) : base(contextOptions)
+    {
+        
+    }
+    
     public DbSet<BugReport> BugReports { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<UserBugReport> UserBugReports { get; set; }
