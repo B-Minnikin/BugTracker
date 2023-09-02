@@ -1,4 +1,4 @@
-﻿@inject SignInManager<IdentityUser> signInManager;
+﻿@inject SignInManager<IdentityUser> SignInManager;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,16 +22,16 @@
 
                 @await Html.PartialAsync("~/Views/Search/_SearchBox.cshtml", new SearchResultsViewModel())
 
-                @if (signInManager.IsSignedIn(User))
+                @if (SignInManager.IsSignedIn(User))
                 {
 
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @User.Identity.Name
+                            @(User.Identity?.Name ?? "N/A")
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-                            <a class="dropdown-item" asp-controller="Profile" asp-action="View" asp-route-id="@signInManager.UserManager.GetUserId(User)">Profile</a>
+                            <a class="dropdown-item" asp-controller="Profile" asp-action="View" asp-route-id="@SignInManager.UserManager.GetUserId(User)">Profile</a>
                             <!--<form method="post" asp-action="Edit" asp-controller="Profile">
                                 <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">
                                     Edit Profile

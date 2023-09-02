@@ -19,4 +19,4 @@
 
 <hr />
 
-@await Component.InvokeAsync("BugReportSearchSelector", new { ProjectId = Model.Milestone.ProjectId, MilestoneBugReportEntries = Model.MilestoneBugReportEntries })
+@await Component.InvokeAsync("BugReportSearchSelector", new { Model.Milestone.ProjectId, Model.MilestoneBugReportEntries })

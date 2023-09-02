@@ -12,7 +12,7 @@
         <div class="form-group">
             <label class="control-label" asp-for="@Model.EmailAddress"></label>
             <input class="form-control" asp-for="@Model.EmailAddress" />
-            <span asp-validation-for="@Model.EmailAddress" class="text-danger" />
+            <span asp-validation-for="@Model.EmailAddress" class="text-danger"></span>
         </div>
 
         <input type="hidden" asp-for="ProjectId" value="@Model.ProjectId"/>
