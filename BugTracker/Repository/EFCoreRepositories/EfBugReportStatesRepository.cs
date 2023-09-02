@@ -11,9 +11,9 @@ namespace BugTracker.Repository.EFCoreRepositories;
 
 public class EfBugReportStatesRepository : EFCoreBaseRepository, IBugReportStatesRepository
 {
-    private readonly BugReportContext context;
+    private readonly ApplicationContext context;
 
-    public EfBugReportStatesRepository(BugReportContext context)
+    public EfBugReportStatesRepository(ApplicationContext context)
     {
         this.context = context;
     }

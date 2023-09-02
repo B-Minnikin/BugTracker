@@ -11,9 +11,9 @@ namespace BugTracker.Repository.EFCoreRepositories;
 
 public class EfCommentRepository : EFCoreBaseRepository, ICommentRepository
 {
-    private readonly CommentContext context;
+    private readonly ApplicationContext context;
 
-    public EfCommentRepository(CommentContext context)
+    public EfCommentRepository(ApplicationContext context)
     {
         this.context = context;
     }

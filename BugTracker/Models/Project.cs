@@ -23,5 +23,6 @@ public class Project
 public class ProjectBugReportId
 {
 	public int ProjectId { get; set; }
+	public Project Project { get; set; }
 	public int NextFreeId { get; set; }
 }

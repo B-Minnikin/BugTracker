@@ -10,9 +10,9 @@ namespace BugTracker.Repository.EFCoreRepositories;
 
 public class EfProjectInvitationsRepository : IProjectInvitationsRepository
 {
-    private readonly ProjectContext context;
+    private readonly ApplicationContext context;
 
-    public EfProjectInvitationsRepository(ProjectContext context)
+    public EfProjectInvitationsRepository(ApplicationContext context)
     {
         this.context = context;
     }

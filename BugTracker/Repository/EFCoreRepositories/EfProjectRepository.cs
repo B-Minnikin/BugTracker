@@ -11,9 +11,9 @@ namespace BugTracker.Repository.EFCoreRepositories;
 
 public class EfProjectRepository : EFCoreBaseRepository, IProjectRepository
 {
-    private readonly ProjectContext context;
+    private readonly ApplicationContext context;
 
-    public EfProjectRepository(ProjectContext context)
+    public EfProjectRepository(ApplicationContext context)
     {
         this.context = context;
     }

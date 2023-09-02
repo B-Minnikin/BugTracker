@@ -10,9 +10,9 @@ namespace BugTracker.Repository.EFCoreRepositories;
 
 public class EfUserSubscriptionsRepository : EFCoreBaseRepository, IUserSubscriptionsRepository
 {
-    private readonly UserContext context;
+    private readonly ApplicationContext context;
 
-    public EfUserSubscriptionsRepository(UserContext context)
+    public EfUserSubscriptionsRepository(ApplicationContext context)
     {
         this.context = context;
     }

@@ -10,14 +10,11 @@ namespace BugTracker.Repository.EFCoreRepositories;
 
 public class EfBugReportRepository : IBugReportRepository
 {
-    private readonly BugReportContext context;
-    private readonly ProjectContext projectContext;
+    private readonly ApplicationContext context;
 
-    public EfBugReportRepository(BugReportContext context,
-        ProjectContext projectContext)
+    public EfBugReportRepository(ApplicationContext context)
     {
         this.context = context;
-        this.projectContext = projectContext;
     }
     
     public async Task<BugReport> Add(BugReport model)
@@ -83,8 +80,8 @@ public class EfBugReportRepository : IBugReportRepository
             NextFreeId = 1
         };
 
-        projectContext.ProjectBugReportIds.Add(projectBugReportId);
-        await projectContext.SaveChangesAsync();
+        context.ProjectBugReportIds.Add(projectBugReportId);
+        await context.SaveChangesAsync();
     }
 
     public async Task AddUserAssignedToBugReport(int userId, int bugReportId)
