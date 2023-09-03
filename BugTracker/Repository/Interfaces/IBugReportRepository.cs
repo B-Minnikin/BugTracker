@@ -1,6 +1,5 @@
 ﻿using BugTracker.Models;
 using BugTracker.Repository.Common;
-using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,9 +16,9 @@ namespace BugTracker.Repository.Interfaces
 		Task AddLocalBugReportId(int projectId);
 
 		// Users assigned to bug reports
-		Task AddUserAssignedToBugReport(int userId, int bugReportId);
-		Task DeleteUserAssignedToBugReport(int userId, int bugReportId);
-		Task<IEnumerable<BugReport>> GetBugReportsForAssignedUser(int userId);
+		Task AddUserAssignedToBugReport(string userId, int bugReportId);
+		Task DeleteUserAssignedToBugReport(string userId, int bugReportId);
+		Task<IEnumerable<BugReport>> GetBugReportsForAssignedUser(string userId);
 		Task<IEnumerable<ApplicationUser>> GetAssignedUsersForBugReport(int bugReportId);
 
 		// Bug Report Linking

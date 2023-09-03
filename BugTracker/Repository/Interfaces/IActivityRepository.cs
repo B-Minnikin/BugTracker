@@ -8,7 +8,7 @@ namespace BugTracker.Repository.Interfaces
 	public interface IActivityRepository : IAdd<Activity>,
 		IDelete<Activity>
 	{
-		Task<IEnumerable<Activity>> GetUserActivities(int userId);
+		Task<IEnumerable<Activity>> GetUserActivities(string id);
 		Task<IEnumerable<Activity>> GetBugReportActivities(int bugReportId);
 	}
 }

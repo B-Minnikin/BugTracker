@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTracker.Repository.EFCoreRepositories;
 
-public class EfSearchRepository : EFCoreBaseRepository, ISearchRepository
+public class EfSearchRepository : ISearchRepository
 {
     private readonly ApplicationContext context;
 
@@ -17,24 +17,52 @@ public class EfSearchRepository : EFCoreBaseRepository, ISearchRepository
         this.context = context;
     }
 
-    public Task<IEnumerable<UserTypeaheadSearchResult>> GetMatchingProjectMembersBySearchQuery(string query, int projectId)
+    public async Task<IEnumerable<UserTypeaheadSearchResult>> GetMatchingProjectMembersBySearchQuery(string query, int projectId)
     {
-        // var users = userContext.Users.Where(u => u.)
-        //
-        // var searchResult = new UserTypeaheadSearchResult
-        // {
-        //     UserName = 
-        // }
-        throw new System.NotImplementedException();
+        var results = await context.UserRoles.Where(ur => ur.ProjectId == projectId)
+            .Join(context.Users,
+                ur => ur.UserId,
+                u => u.Id,
+                (ur, u) => new { UserRole = ur, User = u })
+            .Where(j => j.User.NormalizedUserName.Contains(query.ToUpper()))
+            .Select(j => new UserTypeaheadSearchResult
+            {
+                UserName = j.User.UserName,
+                Email = j.User.Email
+            }).ToListAsync();
+
+        return results;
     }
 
-    public Task<IEnumerable<BugReportTypeaheadSearchResult>> GetMatchingBugReportsByLocalIdSearchQuery(int localBugReportId, int projectId)
+    public async Task<IEnumerable<BugReportTypeaheadSearchResult>> GetMatchingBugReportsByLocalIdSearchQuery(int localBugReportId, int projectId)
     {
-        throw new System.NotImplementedException();
+        var bugReportSearchResults =
+            await context.BugReports
+                .Where(br => br.LocalBugReportId == localBugReportId && br.ProjectId == projectId)
+                .Select(br => new BugReportTypeaheadSearchResult
+                {
+                    BugReportId = br.BugReportId,
+                    LocalBugReportId = br.LocalBugReportId,
+                    Title = br.Title
+                })
+                .ToListAsync();
+
+        return bugReportSearchResults;
     }
 
-    public Task<IEnumerable<BugReportTypeaheadSearchResult>> GetMatchingBugReportsByTitleSearchQuery(string query, int projectId)
+    public async Task<IEnumerable<BugReportTypeaheadSearchResult>> GetMatchingBugReportsByTitleSearchQuery(string query, int projectId)
     {
-        throw new System.NotImplementedException();
+        var bugReportSearchResults =
+            await context.BugReports
+                .Where(br => br.ProjectId == projectId && br.Title.Contains(query))
+                .Select(br => new BugReportTypeaheadSearchResult
+                {
+                    BugReportId = br.BugReportId,
+                    LocalBugReportId = br.LocalBugReportId,
+                    Title = br.Title
+                })
+                .ToListAsync();
+
+        return bugReportSearchResults;
     }
 }

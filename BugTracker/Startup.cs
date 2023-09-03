@@ -1,10 +1,10 @@
 using BugTracker.Database.Context;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
-using BugTracker.Models.Database;
+using BugTracker.Models.Messaging;
 using BugTracker.Models.ProjectInvitation;
+using BugTracker.Models.Subscription;
 using BugTracker.Repository;
-using BugTracker.Repository.DapperRepositories;
 using BugTracker.Repository.EFCoreRepositories;
 using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
@@ -32,29 +32,21 @@ namespace BugTracker
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string connectionString = Configuration.GetConnectionString("DBConnectionString");
-
 			services.AddControllersWithViews();
 			services.AddTransient<IEmailHelper, EmailHelper>();
 
-			ConfigureRepositories(services, connectionString);
+			ConfigureRepositories(services);
 
-			services.AddDbContext<BugReportContext>(options =>
-				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-			services.AddDbContext<ProjectContext>(options =>
-				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-			services.AddDbContext<UserContext>(options =>
-				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-			services.AddDbContext<CommentContext>(options =>
-				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+			services.AddDbContext<ApplicationContext>(options =>
+				options.UseSqlServer(Configuration.GetConnectionString("DBConnectionString")));
 
 			services.AddTransient<ILinkGenerator, ApplicationLinkGenerator>();
 
 			services.AddScoped<ISubscriptions, Subscriptions>();
 			services.AddScoped<IProjectInviter, ProjectInviter>();
 
-			services.AddTransient<IUserStore<ApplicationUser>, UserStore>(s => new UserStore(connectionString));
-			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>(s => new RoleStore(connectionString));
+			services.AddTransient<IUserStore<ApplicationUser>, UserStore>();
+			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
 			services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 				options.SignIn.RequireConfirmedEmail = true
 			)
@@ -75,7 +67,7 @@ namespace BugTracker
 					policy.Requirements.Add(new ModifyProfileRequirement()));
 			});
 
-			ConfigureAuthorizationHandlers(services, connectionString);
+			ConfigureAuthorizationHandlers(services);
 
 			services.AddDistributedMemoryCache();
 			services.AddSession(options =>
@@ -87,28 +79,29 @@ namespace BugTracker
 			services.AddBreadcrumbs(GetType().Assembly);
 		}
 
-		private static void ConfigureRepositories(IServiceCollection services, string connectionString)
+		private static void ConfigureRepositories(IServiceCollection services)
 		{
-			services.AddScoped<UserManager<ApplicationUser>, ApplicationUserManager>(s => new ApplicationUserManager(connectionString));
+			services.AddScoped<UserManager<ApplicationUser>, ApplicationUserManager>(serviceProvider => 
+				ActivatorUtilities.CreateInstance<ApplicationUserManager>(serviceProvider, 
+					serviceProvider.GetRequiredService<ApplicationContext>()));
 
-			services.AddTransient<IProjectRepository, EfProjectRepository>();
-			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
-			services.AddTransient<IBugReportRepository, EfBugReportRepository>();
-			services.AddTransient<IBugReportStatesRepository, EfBugReportStatesRepository>();
-			services.AddTransient<IUserSubscriptionsRepository, EfUserSubscriptionsRepository>();
-			services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
-			services.AddTransient<ICommentRepository, EfCommentRepository>();
-			services.AddTransient<IProjectInvitationsRepository, EfProjectInvitationsRepository>();
-			services.AddTransient<ISearchRepository, DapperSearchRepository>(s => new DapperSearchRepository(connectionString));
+			services.AddScoped<IMilestoneRepository, EfMilestoneRepository>();
+			services.AddScoped<IBugReportRepository, EfBugReportRepository>();
+			services.AddScoped<IBugReportStatesRepository, EfBugReportStatesRepository>();
+			services.AddScoped<IUserSubscriptionsRepository, EfUserSubscriptionsRepository>();
+			services.AddScoped<IActivityRepository, EfActivityRepository>();
+			services.AddScoped<ICommentRepository, EfCommentRepository>();
+			services.AddScoped<IProjectInvitationsRepository, EfProjectInvitationsRepository>();
+			services.AddScoped<ISearchRepository, EfSearchRepository>();
 		}
 
-		private void ConfigureAuthorizationHandlers(IServiceCollection services, string connectionString)
+		private static void ConfigureAuthorizationHandlers(IServiceCollection services)
 		{
-			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>(s => new ProjectAccessAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>(s => new ProjectAdministratorAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>(s => new ModifyReportAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>(s => new ModifyCommentAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>(s => new ModifyProfileAuthorizationHandler(connectionString));
+			services.AddScoped<IAuthorizationHandler, ProjectAccessAuthorizationHandler>();
+			services.AddScoped<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>();
+			services.AddScoped<IAuthorizationHandler, ModifyReportAuthorizationHandler>();
+			services.AddScoped<IAuthorizationHandler, ModifyCommentAuthorizationHandler>();
+			services.AddScoped<IAuthorizationHandler, ModifyProfileAuthorizationHandler>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

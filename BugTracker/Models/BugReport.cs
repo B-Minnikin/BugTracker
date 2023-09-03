@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace BugTracker.Models
 {
@@ -41,15 +37,16 @@ namespace BugTracker.Models
 		public int ProjectId { get; set; }
 		
 		public ICollection<UserBugReport> UserBugReports { get; set; }
-		public ICollection<BugReportLink> BugReportLinks { get; set; }
+		//public ICollection<BugReportLink> BugReportLinks { get; set; }
 		public ICollection<UserSubscription> UserSubscriptions { get; set; }
+		public ICollection<MilestoneBugReport> MilestoneBugReports { get; set; }
 	}
 
 	public class UserBugReport
 	{
 		public int BugReportId { get; set; }
 		public BugReport BugReport { get; set; }
-		public int UserId { get; set; }
+		public string UserId { get; set; }
 		public ApplicationUser User { get; set; }
 	}
 

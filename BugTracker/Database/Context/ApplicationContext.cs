@@ -1,4 +1,5 @@
 ﻿using BugTracker.Models;
+using BugTracker.Models.Authorization;
 using BugTracker.Models.ProjectInvitation;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,14 +9,12 @@ public class ApplicationContext : DbContext
 {
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
     {
-        
     }
     
     public DbSet<ApplicationUser> Users { get; set; }
     public DbSet<UserSubscription> UserSubscriptions { get; set; }
     
     public DbSet<Project> Projects { get; set; }
-    public DbSet<ProjectBugReportId> ProjectBugReportIds { get; set; }
     public DbSet<PendingProjectInvitation> PendingProjectInvitations { get; set; }
     
     public DbSet<BugReport> BugReports { get; set; }
@@ -23,18 +22,25 @@ public class ApplicationContext : DbContext
     public DbSet<UserBugReport> UserBugReports { get; set; }
     public DbSet<BugReportLink> BugReportLinks { get; set; }
     public DbSet<BugState> BugStates { get; set; }
+    public DbSet<Milestone> Milestones { get; set; }
+    public DbSet<MilestoneBugReport> MilestoneBugReports { get; set; }
+    public DbSet<Activity> Activities { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+    
+    
+    public DbSet<Role> Roles { get; set; }
 
     // TODO - attachment paths
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ProjectBugReportId>()
-            .HasKey(pbr => pbr.ProjectId);
+        modelBuilder.Entity<PendingProjectInvitation>()
+            .HasKey(pi => new { pi.ProjectId, pi.EmailAddress });
 
-        modelBuilder.Entity<ProjectBugReportId>()
-            .HasOne<Project>()
-            .WithMany()
-            .HasForeignKey(p => p.ProjectId);
+        modelBuilder.Entity<PendingProjectInvitation>()
+            .HasOne(pi => pi.Project)
+            .WithMany(p => p.PendingProjectInvitations)
+            .HasForeignKey(pi => pi.ProjectId);
         
         modelBuilder.Entity<UserSubscription>()
             .HasKey(us => new { us.UserId, us.BugReportId });
@@ -48,6 +54,19 @@ public class ApplicationContext : DbContext
             .HasOne(us => us.BugReport)
             .WithMany(br => br.UserSubscriptions)
             .HasForeignKey(us => us.BugReportId);
+
+        modelBuilder.Entity<MilestoneBugReport>()
+            .HasKey(mbr => new { mbr.BugReportId, mbr.MilestoneId });
+
+        modelBuilder.Entity<MilestoneBugReport>()
+            .HasOne(mbr => mbr.Milestone)
+            .WithMany(m => m.MilestoneBugReports)
+            .HasForeignKey(mbr => mbr.MilestoneId);
+
+        modelBuilder.Entity<MilestoneBugReport>()
+            .HasOne(mbr => mbr.BugReport)
+            .WithMany(br => br.MilestoneBugReports)
+            .HasForeignKey(mbr => mbr.BugReportId);
         
         // Users assigned to bug reports
         modelBuilder.Entity<UserBugReport>()
@@ -61,7 +80,7 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<UserBugReport>()
             .HasOne(ub => ub.BugReport)
             .WithMany(b => b.UserBugReports)
-            .HasForeignKey(ub => ub.UserId);
+            .HasForeignKey(ub => ub.BugReportId);
 
         // Bug report links
         modelBuilder.Entity<BugReportLink>()
@@ -70,11 +89,13 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<BugReportLink>()
             .HasOne(bl => bl.BugReport)
             .WithMany()
-            .HasForeignKey(bl => bl.BugReportId);
+            .HasForeignKey(bl => bl.BugReportId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<BugReportLink>()
             .HasOne(bl => bl.LinkedBugReport)
             .WithMany()
-            .HasForeignKey(bl => bl.LinkedBugReportId);
+            .HasForeignKey(bl => bl.LinkedBugReportId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

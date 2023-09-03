@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Database.Context;
@@ -17,25 +18,27 @@ public class EfBugReportRepository : IBugReportRepository
         this.context = context;
     }
     
-    public async Task<BugReport> Add(BugReport model)
+    public async Task<BugReport> Add(BugReport bugReport)
     {
-        context.Add(model);
+        // TODO - increment the project's next free local ID
+        
+        context.Add(bugReport);
         await context.SaveChangesAsync();
 
-        return model;
+        return bugReport;
     }
 
-    public async Task<BugReport> Update(BugReport model)
+    public async Task<BugReport> Update(BugReport bugReport)
     {
-        context.BugReports.Update(model);
+        context.BugReports.Update(bugReport);
         await context.SaveChangesAsync();
 
-        return model;
+        return bugReport;
     }
 
-    public async Task<BugReport> Delete(int id)
+    public async Task<BugReport> Delete(int bugReportId)
     {
-        var report = await context.BugReports.FirstOrDefaultAsync(br => br.BugReportId == id);
+        var report = await context.BugReports.FirstOrDefaultAsync(br => br.BugReportId == bugReportId);
         report.Hidden = true;
 
         context.BugReports.Update(report);
@@ -44,9 +47,9 @@ public class EfBugReportRepository : IBugReportRepository
         return report;
     }
 
-    public async Task<BugReport> GetById(int id)
+    public async Task<BugReport> GetById(int bugReportId)
     {
-        var report = await context.BugReports.FirstOrDefaultAsync(br => br.BugReportId == id);
+        var report = await context.BugReports.FirstOrDefaultAsync(br => br.BugReportId == bugReportId);
 
         return report;
     }
@@ -74,17 +77,14 @@ public class EfBugReportRepository : IBugReportRepository
 
     public async Task AddLocalBugReportId(int projectId)
     {
-        var projectBugReportId = new ProjectBugReportId
-        {
-            ProjectId = projectId,
-            NextFreeId = 1
-        };
+        var project = await context.Projects.FindAsync(projectId);
+        if (project is null) throw new NullReferenceException("Requested project ID returned null");
 
-        context.ProjectBugReportIds.Add(projectBugReportId);
+        context.Projects.Update(project);
         await context.SaveChangesAsync();
     }
 
-    public async Task AddUserAssignedToBugReport(int userId, int bugReportId)
+    public async Task AddUserAssignedToBugReport(string userId, int bugReportId)
     {
         var userBugReport = new UserBugReport
         {
@@ -96,7 +96,7 @@ public class EfBugReportRepository : IBugReportRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task DeleteUserAssignedToBugReport(int userId, int bugReportId)
+    public async Task DeleteUserAssignedToBugReport(string userId, int bugReportId)
     {
         var userBugReport =
             await context.UserBugReports.FirstOrDefaultAsync(ub =>
@@ -112,7 +112,7 @@ public class EfBugReportRepository : IBugReportRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<BugReport>> GetBugReportsForAssignedUser(int userId)
+    public async Task<IEnumerable<BugReport>> GetBugReportsForAssignedUser(string userId)
     {
         var reports = await context.UserBugReports
             .Where(ub => ub.UserId == userId)
@@ -164,6 +164,6 @@ public class EfBugReportRepository : IBugReportRepository
 
     public Task<IEnumerable<AttachmentPath>> GetAttachmentPaths(AttachmentParentType parentType, int parentId)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

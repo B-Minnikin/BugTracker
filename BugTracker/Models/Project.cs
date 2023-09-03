@@ -14,15 +14,9 @@ public class Project
 	public string Description { get; set; }
 	public DateTime CreationTime { get; set; }
 	public DateTime LastUpdateTime { get; set; }
+	public int NextFreeBugReportId { get; set; }
 	public bool Hidden { get; set; }
 
 	public IEnumerable<BugReport> BugReports { get; set; }
 	public ICollection<PendingProjectInvitation> PendingProjectInvitations { get; set; }
-}
-
-public class ProjectBugReportId
-{
-	public int ProjectId { get; set; }
-	public Project Project { get; set; }
-	public int NextFreeId { get; set; }
 }

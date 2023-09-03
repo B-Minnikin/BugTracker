@@ -1,369 +1,320 @@
-﻿using Dapper;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BugTracker.Database.Context;
+using BugTracker.Models;
+using BugTracker.Models.Authorization;
+using Microsoft.EntityFrameworkCore;
 
-namespace BugTracker.Repository
+namespace BugTracker.Repository;
+
+public class UserStore : IUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IUserRoleStore<ApplicationUser>
 {
-	public class UserStore : IUserStore<IdentityUser>, IUserPasswordStore<IdentityUser>, IUserEmailStore<IdentityUser>, IUserRoleStore<IdentityUser>
+	private readonly ApplicationContext context;
+
+	public UserStore(ApplicationContext context)
 	{
-		public UserStore(string connectionString)
-		{
-			this.connectionString = connectionString;
-		}
-
-		private System.Data.SqlClient.SqlConnection GetConnectionString()
-		{
-			return new System.Data.SqlClient.SqlConnection(connectionString);
-		}
-
-		public async Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				await connection.ExecuteScalarAsync("dbo.Users_Insert", new
-				{
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Email = user.Email,
-					NormalizedEmail = user.NormalizedEmail,
-					PasswordHash = user.PasswordHash,
-					PhoneNumber = user.PhoneNumber,
-					EmailConfirmed = user.EmailConfirmed
-				},
-					commandType: CommandType.StoredProcedure);
-			}
-
-			return IdentityResult.Success;
-		}
-
-		public async Task<IdentityResult> DeleteAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				await connection.ExecuteAsync("dbo.Users_DeleteById @Id", new { Id = user.Id });
-			}
-
-			return IdentityResult.Success;
-		}
-
-		public async Task<IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var user = await connection.QuerySingleOrDefaultAsync<IdentityUser>("dbo.Users_FindById @UserId", new { UserId = userId });
-				return user;
-			}
-		}
-
-		public async Task<IdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var user = await connection.QuerySingleOrDefaultAsync<IdentityUser>("dbo.Users_FindByName @NormalizedUserName", new { NormalizedUserName = normalizedUserName });
-				return user;
-			}
-		}
-
-		public Task<string> GetNormalizedUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(user.NormalizedUserName);
-		}
-
-		public Task<string> GetUserIdAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(user.Id.ToString());
-		}
-
-		public Task<string> GetUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(user.UserName);
-		}
-
-		public Task SetNormalizedUserNameAsync(IdentityUser user, string normalizedName, CancellationToken cancellationToken)
-		{
-			user.NormalizedUserName = normalizedName;
-			return Task.FromResult(0);
-		}
-
-		public Task SetUserNameAsync(IdentityUser user, string userName, CancellationToken cancellationToken)
-		{
-			user.UserName = userName;
-			return Task.FromResult(0);
-		}
-
-		public async Task<IdentityResult> UpdateAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				await connection.ExecuteAsync("dbo.Users_Update", new
-				{
-					UserId = user.Id,
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Email = user.Email,
-					NormalizedEmail = user.NormalizedEmail,
-					PhoneNumber = user.PhoneNumber,
-					PasswordHash = user.PasswordHash,
-					EmailConfirmed = user.EmailConfirmed
-				}, commandType: CommandType.StoredProcedure);
-			}
-
-			return IdentityResult.Success;
-		}
-
-		#region IDisposable Support
-		private bool disposedValue = false; // To detect redundant calls
-		private readonly string connectionString;
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposedValue)
-			{
-				if (disposing)
-				{
-					// TODO: dispose managed state (managed objects).
-				}
-
-				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-				// TODO: set large fields to null.
-
-				disposedValue = true;
-			}
-		}
-
-		// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-		// ~UserStore()
-		// {
-		//   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-		//   Dispose(false);
-		// }
-
-		// This code added to correctly implement the disposable pattern.
-		public void Dispose()
-		{
-			// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-			Dispose(true);
-			// TODO: uncomment the following line if the finalizer is overridden above.
-			// GC.SuppressFinalize(this);
-		}
-
-		public Task<string> GetPasswordHashAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(user.PasswordHash);
-		}
-
-		public Task<bool> HasPasswordAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(!string.IsNullOrEmpty(user.PasswordHash));
-		}
-
-		public Task SetPasswordHashAsync(IdentityUser user, string passwordHash, CancellationToken cancellationToken)
-		{
-			user.PasswordHash = passwordHash;
-			return Task.FromResult(0);
-		}
-
-		public async Task<IdentityUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var user = await connection.QuerySingleOrDefaultAsync<IdentityUser>("dbo.Users_FindByEmail @NormalizedEmail", new { NormalizedEmail = normalizedEmail });
-				return user;
-			}
-		}
-
-		public Task<string> GetEmailAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(user.Email);
-		}
-
-		public Task<bool> GetEmailConfirmedAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(user.EmailConfirmed);
-		}
-
-		public Task<string> GetNormalizedEmailAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			return Task.FromResult(user.NormalizedEmail);
-		}
-
-		public Task SetEmailAsync(IdentityUser user, string email, CancellationToken cancellationToken)
-		{
-			user.Email = email;
-			return Task.FromResult(0);
-		}
-
-		public Task SetEmailConfirmedAsync(IdentityUser user, bool confirmed, CancellationToken cancellationToken)
-		{
-			user.EmailConfirmed = confirmed;
-			return Task.FromResult(0);
-		}
-
-		public Task SetNormalizedEmailAsync(IdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
-		{
-			user.NormalizedEmail = normalizedEmail;
-			return Task.FromResult(0);
-		}
-
-		public Task AddToRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task AddToRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var normalizedName = roleName.ToUpper();
-				var roleId = await connection.ExecuteScalarAsync<int?>("dbo.Roles_FindIdByName @NormalizedName", new { NormalizedName = normalizedName });
-
-				if (!roleId.HasValue)
-				{
-					roleId = await connection.ExecuteAsync("dbo.Roles_Insert", new
-					{
-						Name = roleName,
-						NormalizedName = normalizedName
-					}, commandType: CommandType.StoredProcedure);
-				}
-
-				await connection.ExecuteAsync("dbo.UserRoles_Insert", new { RoleId = roleId, UserId = user.Id, ProjectId = projectId },
-					commandType: CommandType.StoredProcedure);
-			}
-		}
-
-		public async Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var queryResults = await connection.QueryAsync<string>("dbo.UserRoles_GetRoles @UserId", new
-				{
-					UserId = user.Id
-				});
-
-				return queryResults.ToList();
-			}
-		}
-
-		public Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, int projectId, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var queryResults = await connection.QueryAsync<IdentityUser>("dbo.UserRoles_GetUsersInRole", new
-				{
-					NormalizedName = roleName.ToUpper(),
-					ProjectId = projectId
-				}, commandType: CommandType.StoredProcedure);
-
-				return queryResults.ToList();
-			}
-		}
-
-		public async Task<bool> IsInRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var normalizedName = roleName.ToUpper();
-				var roleId = await connection.ExecuteScalarAsync<int?>("dbo.Roles_FindIdByName @NormalizedName", new
-				{
-					NormalizedName = normalizedName
-				});
-
-				if (roleId == default(int)) return false;
-
-				var matchingRoles = await connection.ExecuteScalarAsync<int>("dbo.UserRoles_CountRoleForUser_ProjectNeutral", new
-				{
-					UserId = user.Id,
-					RoleId = roleId
-				}, commandType: CommandType.StoredProcedure);
-
-				return matchingRoles > 0;
-			}
-		}
-
-		public async Task<bool> IsInRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var normalizedName = roleName.ToUpper();
-				var roleId = await connection.ExecuteScalarAsync<int?>("dbo.Roles_FindIdByName @NormalizedName", new
-				{
-					NormalizedName = normalizedName
-				});
-
-				if (roleId == default(int)) return false;
-
-				var matchingRoles = await connection.ExecuteScalarAsync<int>("dbo.UserRoles_CountRoleForUser", new
-				{
-					UserId = user.Id,
-					RoleId = roleId,
-					ProjectId = projectId
-				}, commandType: CommandType.StoredProcedure);
-
-				return matchingRoles > 0;
-			}
-		}
-
-		public Task RemoveFromRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task RemoveFromRoleAsync(IdentityUser user, string roleName, int projectId, CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var normalizedName = roleName.ToUpper();
-				var roleId = await connection.ExecuteScalarAsync<int?>("dbo.Roles_FindIdByName @NormalizedName", new
-				{
-					NormalizedName = normalizedName
-				});
-
-				if (!roleId.HasValue)
-				{
-					await connection.ExecuteAsync("dbo.UserRoles_RemoveFromRole", new
-					{
-						RoleId = roleId,
-						UserId = user.Id,
-						ProjectId = projectId
-					}, commandType: CommandType.StoredProcedure);
-				}
-			}
-		}
-		#endregion
-
+		this.context = context;
 	}
+	
+	public async Task<IdentityResult> CreateAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		if (user is null) return IdentityResult.Failed();
+		cancellationToken.ThrowIfCancellationRequested();
+
+		context.Users.Add(user);
+		await context.SaveChangesAsync(cancellationToken);
+
+		return IdentityResult.Success;
+	}
+
+	public async Task<IdentityResult> DeleteAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		if (user is null) return IdentityResult.Failed();
+		cancellationToken.ThrowIfCancellationRequested();
+
+		user.Hidden = true;
+		context.Users.Update(user);
+		await context.SaveChangesAsync(cancellationToken);
+
+		return IdentityResult.Success;
+	}
+
+	public async Task<ApplicationUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var user = await context.Users.FindAsync(new object[] { userId, cancellationToken }, cancellationToken: cancellationToken);
+		return user;
+	}
+
+	public async Task<ApplicationUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var user = await context.Users
+			.FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName, cancellationToken);
+		return user;
+	}
+
+	public Task<string> GetNormalizedUserNameAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(user.NormalizedUserName);
+	}
+
+	public Task<string> GetUserIdAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(user.Id);
+	}
+
+	public Task<string> GetUserNameAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(user.UserName);
+	}
+
+	public Task SetNormalizedUserNameAsync(ApplicationUser user, string normalizedName, CancellationToken cancellationToken)
+	{
+		user.NormalizedUserName = normalizedName;
+		return Task.FromResult(0);
+	}
+
+	public Task SetUserNameAsync(ApplicationUser user, string userName, CancellationToken cancellationToken)
+	{
+		user.UserName = userName;
+		return Task.FromResult(0);
+	}
+
+	public async Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		if (user is null) return IdentityResult.Failed();
+		cancellationToken.ThrowIfCancellationRequested();
+
+		user.Hidden = true;
+		context.Users.Update(user);
+		await context.SaveChangesAsync(cancellationToken);
+		
+		return IdentityResult.Success;
+	}
+
+	#region IDisposable Support
+
+	private bool disposedValue; // To detect redundant calls
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposedValue) return;
+		if (disposing)
+		{
+			// TODO: dispose managed state (managed objects).
+		}
+
+		// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+		// TODO: set large fields to null.
+
+		disposedValue = true;
+	}
+
+	// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+	// ~UserStore()
+	// {
+	//   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+	//   Dispose(false);
+	// }
+
+	// This code added to correctly implement the disposable pattern.
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+		Dispose(true);
+		// TODO: uncomment the following line if the finalizer is overridden above.
+		// GC.SuppressFinalize(this);
+	}
+
+	public Task<string> GetPasswordHashAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(user.PasswordHash);
+	}
+
+	public Task<bool> HasPasswordAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(!string.IsNullOrEmpty(user.PasswordHash));
+	}
+
+	public Task SetPasswordHashAsync(ApplicationUser user, string passwordHash, CancellationToken cancellationToken)
+	{
+		user.PasswordHash = passwordHash;
+		return Task.FromResult(0);
+	}
+
+	public async Task<ApplicationUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var user = await context.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+		return user;
+	}
+
+	public Task<string> GetEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(user.Email);
+	}
+
+	public Task<bool> GetEmailConfirmedAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(user.EmailConfirmed);
+	}
+
+	public Task<string> GetNormalizedEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		return Task.FromResult(user.NormalizedEmail);
+	}
+
+	public Task SetEmailAsync(ApplicationUser user, string email, CancellationToken cancellationToken)
+	{
+		user.Email = email;
+		return Task.FromResult(0);
+	}
+
+	public Task SetEmailConfirmedAsync(ApplicationUser user, bool confirmed, CancellationToken cancellationToken)
+	{
+		user.EmailConfirmed = confirmed;
+		return Task.FromResult(0);
+	}
+
+	public Task SetNormalizedEmailAsync(ApplicationUser user, string normalizedEmail, CancellationToken cancellationToken)
+	{
+		user.NormalizedEmail = normalizedEmail;
+		return Task.FromResult(0);
+	}
+
+	public Task AddToRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+	{
+		throw new NotImplementedException();
+	}
+
+	public async Task AddToRoleAsync(ApplicationUser user, string roleName, int projectId, CancellationToken cancellationToken)
+	{
+		if (user is null) throw new ArgumentNullException(nameof(user));
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var role = await context.Roles.FirstOrDefaultAsync(r => r.NormalisedName == roleName, cancellationToken);
+		if (role is null)
+		{
+			// create a new role with the required name
+			role = new Role
+			{
+				Name = roleName,
+				NormalisedName = roleName.ToUpper(),
+			};
+
+			context.Roles.Add(role);
+			await context.SaveChangesAsync(cancellationToken);
+		}
+
+		var userRole = new UserRole
+		{
+			RoleId = role.Id,
+			UserId = user.Id,
+			ProjectId = projectId
+		};
+
+		context.UserRoles.Add(userRole);
+		await context.SaveChangesAsync(cancellationToken);
+	}
+
+	public async Task<IList<string>> GetRolesAsync(ApplicationUser user, CancellationToken cancellationToken)
+	{
+		if (user is null) throw new ArgumentNullException(nameof(user));
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var roles = await context.UserRoles
+			.Where(ur => ur.UserId == user.Id)
+			.Join(context.Roles,
+				ur => ur.RoleId,
+				r => r.Id,
+				(ur, r) => r.Name)
+			.ToListAsync(cancellationToken);
+
+		return roles;
+	}
+
+	public async Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var users = await context.UserRoles.Where(ur => ur.Role.NormalisedName == roleName.ToUpper())
+			.Join(context.Users,
+				ur => ur.UserId,
+				u => u.Id,
+				(ur, u) => u).ToListAsync(cancellationToken);
+
+		return users;
+	}
+
+	public async Task<IList<ApplicationUser>> GetUsersInRoleAsync(string roleName, int projectId, CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var users = await context.UserRoles.Where(ur => ur.Role.NormalisedName == roleName.ToUpper() && ur.ProjectId == projectId)
+			.Join(context.Users,
+				ur => ur.UserId,
+				u => u.Id,
+				(ur, u) => u).ToListAsync(cancellationToken);
+
+		return users;
+	}
+
+	public async Task<bool> IsInRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var role = await context.UserRoles.Where(ur => ur.UserId == user.Id)
+			.Join(context.Roles,
+				ur => ur.RoleId,
+				r => r.Id,
+				(ur, r) => new { UserRole = ur, Role = r })
+			.FirstOrDefaultAsync(cancellationToken);
+
+		return role != null;
+	}
+
+	public async Task<bool> IsInRoleAsync(ApplicationUser user, string roleName, int projectId, CancellationToken cancellationToken)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var role = await context.UserRoles.Where(ur => ur.UserId == user.Id && ur.ProjectId == projectId)
+			.Join(context.Roles,
+				ur => ur.RoleId,
+				r => r.Id,
+				(ur, r) => new { UserRole = ur, Role = r })
+			.FirstOrDefaultAsync(cancellationToken);
+
+		return role != null;
+	}
+
+	public Task RemoveFromRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
+	{
+		throw new NotImplementedException();
+	}
+
+	public async Task RemoveFromRoleAsync(ApplicationUser user, string roleName, int projectId, CancellationToken cancellationToken)
+	{
+		if (user is null) throw new ArgumentNullException(nameof(user));
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var userRole = await context.UserRoles
+			.Where(ur => ur.UserId == user.Id && ur.ProjectId == projectId)
+			.Join(context.Roles,
+				ur => ur.RoleId,
+				r => r.Id,
+				(ur, r) => ur)
+			.FirstOrDefaultAsync(cancellationToken);
+
+		context.UserRoles.Remove(userRole);
+		await context.SaveChangesAsync(cancellationToken);
+	}
+	#endregion
 }

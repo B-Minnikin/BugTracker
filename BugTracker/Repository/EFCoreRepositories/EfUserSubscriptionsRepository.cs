@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTracker.Repository.EFCoreRepositories;
 
-public class EfUserSubscriptionsRepository : EFCoreBaseRepository, IUserSubscriptionsRepository
+public class EfUserSubscriptionsRepository : IUserSubscriptionsRepository
 {
     private readonly ApplicationContext context;
 
@@ -17,7 +17,7 @@ public class EfUserSubscriptionsRepository : EFCoreBaseRepository, IUserSubscrip
         this.context = context;
     }
     
-    public async Task AddSubscription(int userId, int bugReportId)
+    public async Task AddSubscription(string userId, int bugReportId)
     {
         var userSubscription = new UserSubscription
         {
@@ -29,7 +29,7 @@ public class EfUserSubscriptionsRepository : EFCoreBaseRepository, IUserSubscrip
         await context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<BugReport>> GetSubscribedReports(int userId)
+    public async Task<IEnumerable<BugReport>> GetSubscribedReports(string userId)
     {
         var reports = await context.UserSubscriptions
             .Where(us => us.UserId == userId)
@@ -40,13 +40,13 @@ public class EfUserSubscriptionsRepository : EFCoreBaseRepository, IUserSubscrip
         return reports;
     }
 
-    public async Task<bool> IsSubscribed(int userId, int bugReportId)
+    public async Task<bool> IsSubscribed(string userId, int bugReportId)
     {
         return await context.UserSubscriptions
             .AnyAsync(us => us.BugReportId == bugReportId && us.UserId == userId);
     }
 
-    public async Task DeleteSubscription(int userId, int bugReportId)
+    public async Task DeleteSubscription(string userId, int bugReportId)
     {
         var userSubscription =
             await context.UserSubscriptions.FirstOrDefaultAsync(us =>

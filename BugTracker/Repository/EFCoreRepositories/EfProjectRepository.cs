@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Database.Context;
 using BugTracker.Models;
@@ -9,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTracker.Repository.EFCoreRepositories;
 
-public class EfProjectRepository : EFCoreBaseRepository, IProjectRepository
+public class EfProjectRepository : IProjectRepository
 {
     private readonly ApplicationContext context;
 

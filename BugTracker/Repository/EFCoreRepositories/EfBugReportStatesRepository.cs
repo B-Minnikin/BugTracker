@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTracker.Repository.EFCoreRepositories;
 
-public class EfBugReportStatesRepository : EFCoreBaseRepository, IBugReportStatesRepository
+public class EfBugReportStatesRepository : IBugReportStatesRepository
 {
     private readonly ApplicationContext context;
 
