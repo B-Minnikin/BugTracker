@@ -1,39 +1,36 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using BugTracker.Database.Context;
 
-namespace BugTracker.Models.Authorization
+namespace BugTracker.Models.Authorization;
+
+public class ModifyProfileAuthorizationHandler : AuthorizationHandler<ModifyProfileRequirement, string>
 {
-	public class ModifyProfileAuthorizationHandler : AuthorizationHandler<ModifyProfileRequirement, int>
+	private readonly ApplicationContext appContext;
+
+	public ModifyProfileAuthorizationHandler(ApplicationContext appContext)
 	{
-		private readonly string connectionString;
-
-		public ModifyProfileAuthorizationHandler(string connectionString)
-		{
-			this.connectionString = connectionString;
-		}
-
-		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyProfileRequirement requirement, int userId)
-		{
-			string userName = context.User.Identity.Name;
-			if(userName == null)
-			{
-				return Task.CompletedTask;
-			}
-			
-			bool userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, connectionString);
-			bool userIsProfileOwner = AuthorizationHelper.UserIsProfileOwner(context.User.Identity.Name, userId, connectionString).Result;
-
-			if(userIsSuperadministrator || userIsProfileOwner)
-			{
-				context.Succeed(requirement);
-			}
-
-			return Task.CompletedTask;
-		}
+		this.appContext = appContext;
 	}
 
-	public class ModifyProfileRequirement : IAuthorizationRequirement { }
+	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyProfileRequirement requirement, string userId)
+	{
+		var userName = context.User.Identity?.Name;
+		if(userName == null)
+		{
+			return Task.CompletedTask;
+		}
+		
+		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, appContext);
+		var userIsProfileOwner = AuthorizationHelper.UserIsProfileOwner(context.User.Identity.Name, userId, appContext).Result;
+
+		if(userIsSuperadministrator || userIsProfileOwner)
+		{
+			context.Succeed(requirement);
+		}
+
+		return Task.CompletedTask;
+	}
 }
+
+public class ModifyProfileRequirement : IAuthorizationRequirement { }
