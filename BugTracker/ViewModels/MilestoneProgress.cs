@@ -3,51 +3,36 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.ViewModels
+namespace BugTracker.ViewModels;
+
+public class MilestoneProgress
 {
-	public class MilestoneProgress
+	private string _percentCompleted = "0%";
+
+	public int CompletedBugReports { get; }
+	public int TotalBugReports { get; }
+	public string PercentCompleted
 	{
-		private string _percentCompleted = "0%";
-
-		public int CompletedBugReports { get; set; }
-		public int TotalBugReports { get; set; }
-		public string PercentCompleted
+		get => _percentCompleted;
+		private set
 		{
-			get {
-				return _percentCompleted;
-			}
-			private set
+			if (TotalBugReports > 0)
 			{
-				if (TotalBugReports > 0)
-				{
-					_percentCompleted = String.Format("{0}%", value);
-				}
+				_percentCompleted = $"{value}%";
 			}
 		}
+	}
 
-		public string PercentCompletedText
-		{
-			get
-			{
-				return _percentCompleted.Replace("%", " percent");
-			}
-		}
+	public string PercentCompletedText => _percentCompleted.Replace("%", " percent");
 
-		public MilestoneProgress(IEnumerable<MilestoneBugReportEntry> bugReports)
-		{
-			CompletedBugReports = bugReports.Where(m => m.CurrentState.StateType != StateType.open).Count();
-			TotalBugReports = bugReports.Count();
+	public MilestoneProgress(IEnumerable<MilestoneBugReportEntry> bugReports)
+	{
+		CompletedBugReports = bugReports.Where(m => m.CurrentState.StateType != StateType.Open).Count();
+		TotalBugReports = bugReports.Count();
 
-			if(TotalBugReports > 0)
-			{
-				PercentCompleted = (Math.Floor(((double)CompletedBugReports / (double)TotalBugReports) * 100)).ToString();
-			}
-			else
-			{
-				PercentCompleted = "0";
-			}
-		}
+		PercentCompleted = TotalBugReports > 0
+			? Math.Floor((double)CompletedBugReports / TotalBugReports * 100).ToString(CultureInfo.CurrentCulture)
+			: "0";
 	}
 }

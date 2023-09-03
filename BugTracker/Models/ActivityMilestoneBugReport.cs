@@ -9,7 +9,7 @@ namespace BugTracker.Models
 
 		public ActivityMilestoneBugReport() { }
 
-		public ActivityMilestoneBugReport(DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int milestoneId, int bugReportId)
+		public ActivityMilestoneBugReport(DateTime timestamp, int projectId, ActivityMessage messageId, string userId, int milestoneId, int bugReportId)
 			: base(timestamp, projectId, messageId, userId)
 		{
 			MilestoneId = milestoneId;

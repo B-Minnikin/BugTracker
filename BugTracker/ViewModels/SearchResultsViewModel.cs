@@ -1,20 +1,16 @@
 ﻿using BugTracker.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.ViewModels
+namespace BugTracker.ViewModels;
+
+public class SearchResultsViewModel
 {
-	public class SearchResultsViewModel
+	public bool AdvancedSearchResultsBeginCollapsed { get; set; } = true;
+	public SearchExpression SearchExpression { get; set; } = new()
 	{
-		public bool AdvancedSearchResultsBeginCollapsed { get; set; } = true;
-		public SearchExpression SearchExpression { get; set; } = new SearchExpression
-		{
-			SearchText = "",
-			SearchInDetails = false,
-			SearchTitles = true
-		};
-		public List<BugReport> SearchResults { get; set; } = new List<BugReport>();
-	}
+		SearchText = "",
+		SearchInDetails = false,
+		SearchTitles = true
+	};
+	public List<BugReport> SearchResults { get; set; } = new();
 }

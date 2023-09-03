@@ -1,13 +1,11 @@
 ﻿using BugTracker.Helpers;
 using BugTracker.Models;
-using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -48,11 +46,13 @@ namespace BugTracker.Controllers
 		{
 			if(searchModel is null)
 			{
-				throw new ArgumentNullException("Search model is null");
+				throw new ArgumentNullException(nameof(searchModel));
 			}
 
-			int currentProjectId = httpContextAccessor.HttpContext.Session.GetInt32("currentProject") ?? 0;
-			logger.LogInformation("currentProjectId = " + currentProjectId);
+			var currentProjectId = httpContextAccessor.HttpContext?.Session.GetInt32("currentProject");
+			if (!currentProjectId.HasValue) return BadRequest();
+			
+			logger.LogInformation($"currentProjectId = {currentProjectId.Value}");
 			if(currentProjectId <= 0) {
 				logger.LogWarning($"currentProjectId ({currentProjectId}) not set to a valid value: Redirecting to Home controller.");
 				return RedirectToAction("Index", "Home");
@@ -63,14 +63,14 @@ namespace BugTracker.Controllers
 			{
 				if (ModelState.IsValid)
 				{
-					var project = await projectRepository.GetById(currentProjectId);
+					var project = await projectRepository.GetById(currentProjectId.Value);
 					var bugReports = await bugReportRepository.GetAllById(project.ProjectId);
 
 					// set default start date to the project's creation date - if user has not entered more recent date
 					if (searchModel.SearchExpression.DateRangeBegin < project.CreationTime)
 						searchModel.SearchExpression.DateRangeBegin = project.CreationTime;
 
-					if (!String.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
+					if (!string.IsNullOrEmpty(searchModel.SearchExpression.SearchText))
 					{
 						searchModel.SearchResults = bugReports.Where(rep => rep.Title.ToUpper().Contains(searchModel.SearchExpression.SearchText.ToUpper())
 							&& rep.CreationTime >= searchModel.SearchExpression.DateRangeBegin && rep.CreationTime <= searchModel.SearchExpression.DateRangeEnd).ToList();
@@ -91,12 +91,15 @@ namespace BugTracker.Controllers
 		{
 			if (query is null)
 			{
-				throw new ArgumentNullException("Search query is null");
+				throw new ArgumentNullException(nameof(query));
 			}
 
 			IEnumerable<UserTypeaheadSearchResult> userSearchResults = new List<UserTypeaheadSearchResult>();
 
-			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, projectId, "CanAccessProjectPolicy");
+			var user = httpContextAccessor.HttpContext?.User;
+			if (user is null) return BadRequest();
+
+			var authorizationResult = authorizationService.AuthorizeAsync(user, projectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				if (!string.IsNullOrEmpty(query) && projectId > 0)
@@ -115,13 +118,12 @@ namespace BugTracker.Controllers
 			if ((!string.IsNullOrEmpty(query) && projectId > 0) & (authorizationResult.Succeeded))
 			{
 				query = query.TrimStart('#'); // remove leading # for local report ID queries
-				int localBugReportId;
-				bool intParseSuccess = Int32.TryParse(query, out localBugReportId);
+				
+				var intParseSuccess = int.TryParse(query, out var localBugReportId);
 
-				if(intParseSuccess)
-					bugReportSearchResults = await searchRepository.GetMatchingBugReportsByLocalIdSearchQuery(localBugReportId, projectId);
-				else
-					bugReportSearchResults = await searchRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId);
+				bugReportSearchResults = intParseSuccess
+					? await searchRepository.GetMatchingBugReportsByLocalIdSearchQuery(localBugReportId, projectId)
+					: await searchRepository.GetMatchingBugReportsByTitleSearchQuery(query.ToUpper(), projectId);
 			}
 
 			// Generate an URL for each bug report

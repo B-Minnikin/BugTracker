@@ -8,7 +8,7 @@ namespace BugTracker.Models
 
 		public ActivityMilestone() { }
 
-		public ActivityMilestone(DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int milestoneId)
+		public ActivityMilestone(DateTime timestamp, int projectId, ActivityMessage messageId, string userId, int milestoneId)
 			: base(timestamp, projectId, messageId, userId)
 		{
 			MilestoneId = milestoneId;

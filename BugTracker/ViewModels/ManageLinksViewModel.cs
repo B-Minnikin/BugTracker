@@ -1,8 +1,5 @@
 ﻿using BugTracker.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BugTracker.ViewModels
 {
@@ -12,6 +9,6 @@ namespace BugTracker.ViewModels
 		public int BugReportId { get; set; }
 		public int LinkToBugReportLocalId { get; set; }
 
-		public List<BugReport> LinkedReports { get; set; } = new List<BugReport>();
+		public List<BugReport> LinkedReports { get; set; } = new();
 	}
 }

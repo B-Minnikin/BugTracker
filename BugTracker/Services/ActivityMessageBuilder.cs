@@ -1,15 +1,9 @@
 ﻿using BugTracker.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Extension_Methods;
-using System.Text;
-using BugTracker.Models.Authorization;
 using Microsoft.AspNetCore.Identity;
-using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
 
 namespace BugTracker.Services
@@ -17,14 +11,14 @@ namespace BugTracker.Services
 	public class ActivityMessageBuilder : IActivityMessageBuilder
 	{
 		private readonly ILinkGenerator linkGenerator;
-		private readonly UserManager<IdentityUser> userManager;
+		private readonly UserManager<ApplicationUser> userManager;
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IMilestoneRepository milestoneRepository;
 		private readonly IBugReportStatesRepository bugReportStatesRepository;
 
 		public ActivityMessageBuilder(ILinkGenerator linkGenerator,
-			UserManager<IdentityUser> userManager,
+			UserManager<ApplicationUser> userManager,
 			IProjectRepository projectRepository,
 			IBugReportRepository bugReportRepository,
 			IMilestoneRepository milestoneRepository,
@@ -40,17 +34,17 @@ namespace BugTracker.Services
 
 		public async Task GenerateMessages(IEnumerable<Activity> activities)
 		{
-			if (activities == null) throw new ArgumentNullException("Unable to generate activity messages. Activity collection is null.");
+			if (activities == null) throw new ArgumentNullException(nameof(activities));
 
 			foreach (var activity in activities)
 			{
-				activity.ActivityMessage = await this.GetMessage(activity);
+				activity.ActivityMessage = await GetMessage(activity);
 			}
 		}
 
 		public async Task<string> GetMessage(Activity activity)
 		{
-			if (activity == null) throw new ArgumentNullException("Unable to generate activity message. Activity is null.");
+			if (activity == null) throw new ArgumentNullException(nameof(activity));
 
 			string message = $"{activity.Timestamp} ";
 			var usernameAnchorString = await GetUserAnchorString(activity);
@@ -101,7 +95,7 @@ namespace BugTracker.Services
 						$"milestone: {await GetMilestoneAnchorString(activity)}.";
 					break;
 				default:
-					throw new ArgumentNullException("Unable to generate activity message. No matching case.");
+					throw new ArgumentException("Unable to generate activity message. No matching case.");
 			}
 
 			return message;
@@ -109,49 +103,49 @@ namespace BugTracker.Services
 
 		private async Task<string> GetUserAnchorString(Activity activity)
 		{
-			var user = await userManager.FindByIdAsync(activity.UserId.ToString());
-			string userUri = linkGenerator.GetPathByAction("View", "Profile", new { id = activity.UserId });
-			string userName = user.UserName;
-			var userNameAnchorString = GetHTMLAnchorString(userUri, userName);
+			var user = await userManager.FindByIdAsync(activity.UserId);
+			var userUri = linkGenerator.GetPathByAction("View", "Profile", new { id = activity.UserId });
+			var userName = user.UserName;
+			var userNameAnchorString = GetHtmlAnchorString(userUri, userName);
 			return userNameAnchorString;
 		}
 
 		private async Task<string> GetProjectAnchorString(Activity activity)
 		{
 			var projectId = activity.GetDerivedProperty<int>(nameof(Activity.ProjectId));
-			string projectUri = linkGenerator.GetUriByAction("Overview", "Projects", new { id = projectId });
+			var projectUri = linkGenerator.GetUriByAction("Overview", "Projects", new { id = projectId });
 			var project = await projectRepository .GetById(projectId);
-			string projectName = project.Name;
-			string projectAnchorString = GetHTMLAnchorString(projectUri, projectName);
+			var projectName = project.Name;
+			var projectAnchorString = GetHtmlAnchorString(projectUri, projectName);
 			return projectAnchorString;
 		}
 
 		private async Task<string> GetBugReportAnchorString(Activity activity)
 		{
 			var bugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReport.BugReportId));
-			string bugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = bugReportId });
+			var bugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = bugReportId });
 			var bugReport = await bugReportRepository.GetById(bugReportId);
-			string bugReportName = bugReport.Title;
-			string bugReportAnchorString = GetHTMLAnchorString(bugReportUri, bugReportName);
+			var bugReportName = bugReport.Title;
+			var bugReportAnchorString = GetHtmlAnchorString(bugReportUri, bugReportName);
 			return bugReportAnchorString;
 		}
 
 		private async Task<string> GetSecondBugReportAnchorString(Activity activity)
 		{
 			var secondBugReportId = activity.GetDerivedProperty<int>(nameof(ActivityBugReportLink.LinkedBugReportId));
-			string secondBugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = secondBugReportId });
+			var secondBugReportUri = linkGenerator.GetUriByAction("ReportOverview", "BugReport", new { id = secondBugReportId });
 			var secondBugReport = await bugReportRepository.GetById(secondBugReportId);
-			string secondBugReportName = secondBugReport.Title;
-			string secondBugReportAnchorString = GetHTMLAnchorString(secondBugReportUri, secondBugReportName);
+			var secondBugReportName = secondBugReport.Title;
+			var secondBugReportAnchorString = GetHtmlAnchorString(secondBugReportUri, secondBugReportName);
 			return secondBugReportAnchorString;
 		}
 
 		private async Task<string> GetAssignedUsernameAnchorString(Activity activity)
 		{
-			var assignedUser = await userManager.FindByIdAsync(activity.UserId.ToString());
-			string assignedUserUri = linkGenerator.GetUriByAction("View", "Profile", new { id = assignedUser.Id });
-			string assignedUserName = assignedUser.UserName;
-			string assignedUserAnchorString = GetHTMLAnchorString(assignedUserUri, assignedUserName);
+			var assignedUser = await userManager.FindByIdAsync(activity.UserId);
+			var assignedUserUri = linkGenerator.GetUriByAction("View", "Profile", new { id = assignedUser.Id });
+			var assignedUserName = assignedUser.UserName;
+			var assignedUserAnchorString = GetHtmlAnchorString(assignedUserUri, assignedUserName);
 			return assignedUserAnchorString;
 		}
 
@@ -159,21 +153,21 @@ namespace BugTracker.Services
 		{
 			var bugReportStateId = activity.GetDerivedProperty<int>(propertyName);
 			var bugState = await bugReportStatesRepository.GetById(bugReportStateId);
-			string bugReportStateName = Enum.GetName(typeof(StateType), bugState.StateType);
+			var bugReportStateName = Enum.GetName(typeof(StateType), bugState.StateType);
 			return bugReportStateName;
 		}
 
 		private async Task<string> GetMilestoneAnchorString(Activity activity)
 		{
 			var milestoneId = activity.GetDerivedProperty<int>(nameof(ActivityMilestone.MilestoneId));
-			string milestoneUri = linkGenerator.GetUriByAction("Overview", "Milestone", new { milestoneId = milestoneId });
+			var milestoneUri = linkGenerator.GetUriByAction("Overview", "Milestone", new { milestoneId });
 			var milestone = await milestoneRepository.GetById(milestoneId);
-			string milestoneName = milestone.Title;
-			string milestoneAnchorString = GetHTMLAnchorString(milestoneUri, milestoneName);
+			var milestoneName = milestone.Title;
+			var milestoneAnchorString = GetHtmlAnchorString(milestoneUri, milestoneName);
 			return milestoneAnchorString;
 		}
 
-		private string GetHTMLAnchorString(string href, string name)
+		private static string GetHtmlAnchorString(string href, string name)
 		{
 			return "<a href=\"" + href + "\">" + name + "</a>"; 
 		}

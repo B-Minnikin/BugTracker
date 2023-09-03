@@ -2,45 +2,39 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.Controllers
+namespace BugTracker.Controllers;
+
+public class ErrorController : Controller
 {
-	public class ErrorController : Controller
+	private readonly ILogger<ErrorController> logger;
+
+	public ErrorController(ILogger<ErrorController> logger)
 	{
-		private readonly ILogger<ErrorController> logger;
+		this.logger = logger;
+	}
 
-		public ErrorController(ILogger<ErrorController> logger)
+	[Route("Error/{statusCode}")]
+	public IActionResult StatusCodeHandler(int statusCode)
+	{
+		ViewBag.ErrorMessage = statusCode switch
 		{
-			this.logger = logger;
-		}
+			404 => "404: Requested resource could not be found",
+			_ => ViewBag.ErrorMessage
+		};
 
-		[Route("Error/{statusCode}")]
-		public IActionResult StatusCodeHandler(int statusCode)
-		{
-			switch (statusCode)
-			{
-				case 404:
-					ViewBag.ErrorMessage = "404: Requested resource could not be found";
-					break;
-			}
+		return View("NotFound");
+	}
 
-			return View("NotFound");
-		}
+	[Route("Error")]
+	[AllowAnonymous]
+	public IActionResult Error()
+	{
+		var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 
-		[Route("Error")]
-		[AllowAnonymous]
-		public IActionResult Error()
-		{
-			var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+		logger.LogError($"Exception in path: {exceptionHandlerFeature.Path} - " +
+			$"{exceptionHandlerFeature.Error}");
 
-			logger.LogError($"Exception in path: {exceptionHandlerFeature.Path} - " +
-				$"{exceptionHandlerFeature.Error}");
-
-			return View("Error");
-		}
+		return View("Error");
 	}
 }

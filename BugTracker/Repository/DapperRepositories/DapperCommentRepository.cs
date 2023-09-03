@@ -17,10 +17,10 @@ namespace BugTracker.Repository.DapperRepositories
 			{
 				var insertedCommentId = await connection.ExecuteScalarAsync("dbo.Comments_Insert", new
 				{
-					AuthorId = comment.AuthorId,
-					Date = comment.Date,
-					MainText = comment.MainText,
-					BugReportId = comment.BugReportId
+					comment.AuthorId,
+					comment.Date,
+					comment.MainText,
+					comment.BugReportId
 				},
 					commandType: CommandType.StoredProcedure);
 				Comment insertedComment = await connection.QueryFirstAsync<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = insertedCommentId });
@@ -34,11 +34,11 @@ namespace BugTracker.Repository.DapperRepositories
 			{
 				connection.Execute("dbo.Comments_Update", new
 				{
-					CommentId = commentChanges.CommentId,
-					AuthorId = commentChanges.AuthorId,
-					MainText = commentChanges.MainText
+					commentChanges.CommentId,
+					commentChanges.AuthorId,
+					commentChanges.MainText
 				}, commandType: CommandType.StoredProcedure);
-				Comment updatedComment = await connection.QueryFirstAsync<Comment>("dbo.Comments_GetById @CommentId", new { CommentId = commentChanges.CommentId });
+				Comment updatedComment = await connection.QueryFirstAsync<Comment>("dbo.Comments_GetById @CommentId", new { commentChanges.CommentId });
 				return updatedComment;
 			}
 		}

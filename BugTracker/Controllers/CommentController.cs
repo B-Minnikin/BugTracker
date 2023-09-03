@@ -1,22 +1,19 @@
 ﻿using BugTracker.Helpers;
 using BugTracker.Models;
-using BugTracker.Models.Database;
-using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BugTracker.Models.Subscription;
 
 namespace BugTracker.Controllers
 {
 	public class CommentController : Controller
 	{
-		private readonly ILogger<CommentController> _logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IUserSubscriptionsRepository userSubscriptionsRepository;
@@ -26,8 +23,7 @@ namespace BugTracker.Controllers
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
 
-		public CommentController(ILogger<CommentController> logger,
-									IProjectRepository projectRepository,
+		public CommentController(IProjectRepository projectRepository,
 									IBugReportRepository bugReportRepository,
 									IUserSubscriptionsRepository userSubscriptionsRepository,
 									IActivityRepository activityRepository,
@@ -36,7 +32,6 @@ namespace BugTracker.Controllers
 									IHttpContextAccessor httpContextAccessor,
 									ISubscriptions subscriptions)
 		{
-			this._logger = logger;
 			this.projectRepository = projectRepository;
 			this.bugReportRepository = bugReportRepository;
 			this.userSubscriptionsRepository = userSubscriptionsRepository;
@@ -55,8 +50,13 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				CreateCommentViewModel createCommentViewModel = new CreateCommentViewModel{};
-				createCommentViewModel.Comment.BugReportId = bugReportId;
+				var createCommentViewModel = new CreateCommentViewModel
+				{
+					Comment =
+					{
+						BugReportId = bugReportId
+					}
+				};
 
 				var currentProject = await projectRepository.GetById(currentProjectId ?? 0);
 				var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
@@ -75,9 +75,9 @@ namespace BugTracker.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+				var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-				Comment newComment = new Comment
+				var newComment = new Comment
 				{
 					AuthorId = userId,
 					Date = DateTime.Now,
@@ -85,10 +85,12 @@ namespace BugTracker.Controllers
 					BugReportId = model.Comment.BugReportId
 				};
 
-				Comment addedComment = await commentRepository.Add(newComment);
+				var addedComment = await commentRepository.Add(newComment);
 
 				// Create activity event
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+				if (!currentProjectId.HasValue) return BadRequest();
+				
 				var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentPosted, userId, addedComment.BugReportId, addedComment.CommentId);
 				await activityRepository.Add(commentActivity);
 
@@ -109,7 +111,7 @@ namespace BugTracker.Controllers
 		[HttpGet]
 		public async Task<ViewResult> Edit(int id)
 		{
-			Comment comment = await commentRepository .GetById(id);
+			var comment = await commentRepository.GetById(id);
 
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 			var currentProject = await projectRepository.GetById(currentProjectId ?? 0);
@@ -119,28 +121,28 @@ namespace BugTracker.Controllers
 			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.CommentEdit(currentProject, currentBugReport);
 
 			return View(comment);
-
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Edit(Comment model)
+		public async Task<IActionResult> Edit(Comment viewModel)
 		{
 			if (ModelState.IsValid)
 			{
-				Comment comment = await commentRepository .GetById(model.CommentId);
+				var comment = await commentRepository .GetById(viewModel.CommentId);
 				var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+				if (!currentProjectId.HasValue) return BadRequest();
 
 				var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = comment.AuthorId}, "CanModifyCommentPolicy");
 				if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 				{
-					comment.MainText = model.MainText;
+					comment.MainText = viewModel.MainText;
 					// increment edit count
 					// update edit time
 
 					await commentRepository .Update(comment);
 
 					// Create activity event
-					int userId = Int32.Parse(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+					var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 					var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportId, comment.CommentId);
 					await activityRepository.Add(commentActivity);
 				}
@@ -153,14 +155,14 @@ namespace BugTracker.Controllers
 		public async Task<IActionResult> Delete(int id)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			int parentBugReportId = await commentRepository.GetCommentParentId(id);
-			var commentAuthor = await commentRepository .GetById(id);
-			int commentAuthorId = commentAuthor.AuthorId;
+			var parentBugReportId = await commentRepository.GetCommentParentId(id);
+			var commentAuthor = await commentRepository.GetById(id);
+			var commentAuthorId = commentAuthor.AuthorId;
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = commentAuthorId }, "CanModifyCommentPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				await commentRepository .Delete(id);
+				await commentRepository.Delete(id);
 			}
 
 			return RedirectToAction("ReportOverview", "BugReport", new { id = parentBugReportId });

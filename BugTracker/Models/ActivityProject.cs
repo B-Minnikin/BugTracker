@@ -6,7 +6,7 @@ namespace BugTracker.Models
 	{
 		public ActivityProject() { }
 
-		public ActivityProject(DateTime timestamp, int projectId, ActivityMessage messageId, int userId)
+		public ActivityProject(DateTime timestamp, int projectId, ActivityMessage messageId, string userId)
 			: base(timestamp, projectId, messageId, userId)
 		{ }
 	}

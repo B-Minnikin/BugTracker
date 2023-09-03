@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
+namespace BugTracker.Models.Messaging;
 
-namespace BugTracker.Models
+public interface IEmailHelper
 {
-	public interface IEmailHelper
-	{
-		void Send(string userName, string emailAddress, string subject, string messageBody);
-	}
+	void Send(string userName, string emailAddress, string subject, string messageBody);
 }

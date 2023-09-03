@@ -17,10 +17,10 @@ namespace BugTracker.Repository.DapperRepositories
 			{
 				var insertedBugStateId = await connection.ExecuteScalarAsync("dbo.BugStates_Insert", new
 				{
-					Author = bugState.Author,
-					Time = bugState.Time,
-					StateType = bugState.StateType,
-					BugReportId = bugState.BugReportId
+					bugState.Author,
+					bugState.Time,
+					bugState.StateType,
+					bugState.BugReportId
 				},
 					commandType: CommandType.StoredProcedure);
 				BugState insertedState = await connection.QueryFirstAsync<BugState>("dbo.BugStates_GetById @BugStateId", new { BugStateId = insertedBugStateId });

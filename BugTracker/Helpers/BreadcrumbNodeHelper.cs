@@ -1,9 +1,5 @@
 ﻿using BugTracker.Models;
 using SmartBreadcrumbs.Nodes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BugTracker.Helpers
 {
@@ -228,11 +224,11 @@ namespace BugTracker.Helpers
 			return editNode;
 		}
 
-		public static MvcBreadcrumbNode ProfileSubscriptions(int profileId)
+		public static MvcBreadcrumbNode ProfileSubscriptions(string userId)
 		{
 			var profileNode = new MvcBreadcrumbNode("View", "Profile", "My Profile")
 			{
-				RouteValues = new { id = profileId }
+				RouteValues = new { id = userId }
 			};
 			var subscriptionsNode = new MvcBreadcrumbNode("Subscriptions", "Profile", "Subscriptions")
 			{

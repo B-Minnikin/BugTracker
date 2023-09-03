@@ -11,11 +11,11 @@ namespace BugTracker.Repository.DapperRepositories
 	{
 		public DapperUserSubscriptionsRepository(string connectionString) : base(connectionString) { }
 
-		public async Task AddSubscription(int userId, int bugReportId)
+		public async Task AddSubscription(string userId, int bugReportId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
-				var insertedBugStateId = await connection.ExecuteScalarAsync("dbo.UserSubscriptions_Insert", new
+				_ = await connection.ExecuteScalarAsync("dbo.UserSubscriptions_Insert", new
 				{
 					UserId = userId,
 					BugReportId = bugReportId
@@ -24,7 +24,7 @@ namespace BugTracker.Repository.DapperRepositories
 			}
 		}
 
-		public async Task<IEnumerable<BugReport>> GetSubscribedReports(int userId)
+		public async Task<IEnumerable<BugReport>> GetSubscribedReports(string userId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
@@ -33,7 +33,7 @@ namespace BugTracker.Repository.DapperRepositories
 			}
 		}
 
-		public async Task<bool> IsSubscribed(int userId, int bugReportId)
+		public async Task<bool> IsSubscribed(string userId, int bugReportId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
@@ -43,7 +43,7 @@ namespace BugTracker.Repository.DapperRepositories
 			}
 		}
 
-		public async Task DeleteSubscription(int userId, int bugReportId)
+		public async Task DeleteSubscription(string userId, int bugReportId)
 		{
 			using (IDbConnection connection = GetConnectionString())
 			{
