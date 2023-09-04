@@ -1,5 +1,5 @@
 ﻿@model OverviewBugReportViewModel
-@inject UserManager<IdentityUser> UserManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewBag.Title = "Bug Report Overview";
@@ -19,11 +19,11 @@
 
 @* Disable button classes *@
 @{
-    string disabledButtonClass = "btn btn-secondary disabled";
-    string enabledButtonClass = "btn btn-primary";
+    const string disabledButtonClass = "btn btn-secondary disabled";
+    const string enabledButtonClass = "btn btn-primary";
 
-    string subscribeButtonClass = Model.DisableSubscribeButton ? disabledButtonClass : enabledButtonClass;
-    string assignMembersButtonClass = Model.DisableAssignMembersButton ? disabledButtonClass : enabledButtonClass;
+    var subscribeButtonClass = Model.DisableSubscribeButton ? disabledButtonClass : enabledButtonClass;
+    var assignMembersButtonClass = Model.DisableAssignMembersButton ? disabledButtonClass : enabledButtonClass;
 }
 
 <a asp-controller="BugReport" asp-action="Edit" asp-route-bugReportId="@Model.BugReport.BugReportId" class="btn btn-primary">Edit Bug Report</a>

@@ -55,11 +55,11 @@ public class EfUserSubscriptionsRepository : IUserSubscriptionsRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<int>> GetAllSubscribedUserIds(int bugReportId)
+    public async Task<IEnumerable<string>> GetAllSubscribedUserIds(int bugReportId)
     {
         var userIds = await context.UserSubscriptions
             .Where(us => us.BugReportId == bugReportId)
-            .Select(us => us.BugReportId)
+            .Select(us => us.UserId)
             .ToListAsync();
 
         return userIds;

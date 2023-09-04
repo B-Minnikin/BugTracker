@@ -99,10 +99,10 @@ namespace BugTracker.Controllers
 					await userSubscriptionsRepository.AddSubscription(userId, addedComment.BugReportId);
 				}
 
-				string bugReportUrl = Url.Action("ReportOverview", "BugReport", new { id = addedComment.BugReportId}, Request.Scheme);
+				string bugReportUrl = Url.Action("ReportOverview", "BugReport", new { bugReportId = addedComment.BugReportId}, Request.Scheme);
 				await subscriptions .NotifyBugReportNewComment(addedComment, bugReportUrl);
 
-				return RedirectToAction("ReportOverview", "BugReport", new { id = addedComment.BugReportId});
+				return RedirectToAction("ReportOverview", "BugReport", new { bugReportId = addedComment.BugReportId});
 			}
 
 			return View();
@@ -146,7 +146,7 @@ namespace BugTracker.Controllers
 					var commentActivity = new ActivityComment(DateTime.Now, currentProjectId.Value, ActivityMessage.CommentEdited, userId, comment.BugReportId, comment.CommentId);
 					await activityRepository.Add(commentActivity);
 				}
-				return RedirectToAction("ReportOverview", "BugReport", new { id = comment.BugReportId});
+				return RedirectToAction("ReportOverview", "BugReport", new { bugReportId = comment.BugReportId});
 			}
 
 			return View();
@@ -165,7 +165,7 @@ namespace BugTracker.Controllers
 				await commentRepository.Delete(id);
 			}
 
-			return RedirectToAction("ReportOverview", "BugReport", new { id = parentBugReportId });
+			return RedirectToAction("ReportOverview", "BugReport", new { bugReportId = parentBugReportId });
 		}
 	}
 }

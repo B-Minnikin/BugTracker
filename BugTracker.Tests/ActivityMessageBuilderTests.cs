@@ -7,6 +7,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BugTracker.Repository;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -19,6 +20,7 @@ namespace BugTracker.Tests
 		private readonly Mock<ILinkGenerator> mockLinkGenerator;
 
 		private readonly Mock<IBugReportRepository> mockBugReportRepository;
+		private readonly Mock<UserStore> mockUserStore;
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private ActivityMessageBuilder builder;
 
@@ -30,6 +32,8 @@ namespace BugTracker.Tests
 
 			var mockProjectRepository = new Mock<IProjectRepository>();
 			mockBugReportRepository = new Mock<IBugReportRepository>();
+			mockUserStore = new Mock<UserStore>("Fake connection string");
+			mockUserManager = new Mock<ApplicationUserManager>(mockUserStore.Object, "dummy connection string");
 			var mockMilestoneRepository = new Mock<IMilestoneRepository>();
 			var mockBugReportStatesRepository = new Mock<IBugReportStatesRepository>();
 			mockUserManager = new Mock<ApplicationUserManager>("dummy connection string");
@@ -80,13 +84,12 @@ namespace BugTracker.Tests
 			// mock activity extensions
 			var extensionMethodsDict = new Dictionary<string, int>();
 			extensionMethodsDict.Add(nameof(ActivityBugReport.BugReportId), activity.BugReportId);
-			//extensionMethodsDict.Add(nameof(Activity.UserId), activity.UserId);
 			ConfigureActivityMethodsMock(activity, extensionMethodsDict);
-			var gg = new Dictionary<string, string>();
-			gg.Add(nameof(Activity.UserId), activity.UserId);
-			ConfigureActivityMethodsMock(activity, gg);
+			var stringExtensionMethods = new Dictionary<string, string>();
+			stringExtensionMethods.Add(nameof(Activity.UserId), activity.UserId);
+			ConfigureActivityMethodsMock(activity, stringExtensionMethods);
 			
-			string expected = activity.Timestamp + " <a href=\"" + profileUri + "\">" + userName + 
+			var expected = activity.Timestamp + " <a href=\"" + profileUri + "\">" + userName + 
 				"</a> posted a new comment in bug report: <a href=\"" + bugReportUri + 
 				"\">Comment Activity Test Report</a>.";
 
@@ -113,12 +116,12 @@ namespace BugTracker.Tests
 		private ActivityComment GetTestActivityComment()
 		{
 			// comment parameters
-			DateTime timestamp = new DateTime(2001, 01, 02, 12, 12, 12);
-			int projectId = 1;
-			ActivityMessage activityMessage = ActivityMessage.CommentPosted;
-			var userId = "1";
-			int bugReportId = 1;
-			int commentId = 1;
+			var timestamp = new DateTime(2001, 01, 02, 12, 12, 12);
+			const int projectId = 1;
+			const ActivityMessage activityMessage = ActivityMessage.CommentPosted;
+			const string userId = "1";
+			const int bugReportId = 1;
+			const int commentId = 1;
 
 			return new ActivityComment(timestamp, projectId, activityMessage, userId, bugReportId, commentId);
 		}

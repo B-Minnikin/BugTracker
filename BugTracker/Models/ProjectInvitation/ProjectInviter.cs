@@ -80,7 +80,7 @@ public class ProjectInviter : IProjectInviter
 		if(user != null)
 		{
 			var projectIds = await projectInvitationsRepository.GetProjectInvitationsForEmailAddress(emailAddress);
-			foreach (int projectId in projectIds.ToList())
+			foreach (var projectId in projectIds.ToList())
 			{
 				await userManager.AddToRoleAsync(user, "Member", projectId);
 				await RemovePendingProjectInvitation (emailAddress, projectId);

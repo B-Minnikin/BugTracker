@@ -8,7 +8,7 @@ using BugTracker.Database.Context;
 using BugTracker.Repository;
 
 namespace BugTracker.Models.Authorization;
-	
+
 public class ApplicationUserManager : UserManager<ApplicationUser>
 {
 	private readonly ApplicationContext context;

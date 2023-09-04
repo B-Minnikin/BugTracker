@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -8,20 +9,27 @@ namespace BugTracker.Controllers;
 public class ErrorController : Controller
 {
 	private readonly ILogger<ErrorController> logger;
+	private readonly IHttpContextAccessor httpContextAccessor;
 
-	public ErrorController(ILogger<ErrorController> logger)
+	public ErrorController(ILogger<ErrorController> logger,
+		IHttpContextAccessor httpContextAccessor)
 	{
 		this.logger = logger;
+		this.httpContextAccessor = httpContextAccessor;
 	}
 
 	[Route("Error/{statusCode}")]
 	public IActionResult StatusCodeHandler(int statusCode)
 	{
-		ViewBag.ErrorMessage = statusCode switch
+		switch (statusCode)
 		{
-			404 => "404: Requested resource could not be found",
-			_ => ViewBag.ErrorMessage
-		};
+			case 404:
+				ViewBag.ErrorMessage = "404: Requested resource could not be found";
+				break;
+			case 401:
+				ViewBag.ErrorMessage = "401: Bad request";
+				break;
+		}
 
 		return View("NotFound");
 	}
@@ -30,10 +38,10 @@ public class ErrorController : Controller
 	[AllowAnonymous]
 	public IActionResult Error()
 	{
-		var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+		var exceptionHandlerFeature = httpContextAccessor.HttpContext?.Features.Get<IExceptionHandlerPathFeature>();
 
-		logger.LogError($"Exception in path: {exceptionHandlerFeature.Path} - " +
-			$"{exceptionHandlerFeature.Error}");
+		logger.LogError($"Exception in path: {exceptionHandlerFeature?.Path} - " +
+			$"{exceptionHandlerFeature?.Error}");
 
 		return View("Error");
 	}

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using BugTracker.Database.Context;
 
 namespace BugTracker.Models.Authorization;
@@ -22,21 +22,14 @@ public static class AuthorizationHelper
 		return currentUser.Id == userId;
 	}
 
-	private static async Task<bool> GetUserInRole(string userName, string roleName, int id, ApplicationContext context)
+	private static async Task<bool> GetUserInRole(string userName, string roleName, int projectId, ApplicationContext context)
 	{
 		var userManager = new ApplicationUserManager(context);
 		var user = await userManager.FindByNameAsync(userName);
-		bool userIsInRole;
+		var isUserInRole = roleName == "Superadministrator"
+			? await userManager.IsInRoleAsync(user, roleName)
+			: await userManager.IsInRoleAsync(user, roleName, projectId);
 
-		if (roleName == "Superadministrator")
-		{
-			userIsInRole = await userManager.IsInRoleAsync(user, roleName);
-		}
-		else
-		{
-			userIsInRole = await userManager.IsInRoleAsync(user.Id, roleName, id);
-		}
-
-		return userIsInRole;
+		return isUserInRole;
 	}
 }

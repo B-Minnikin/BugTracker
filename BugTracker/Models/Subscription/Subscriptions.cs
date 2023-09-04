@@ -1,8 +1,9 @@
-﻿using BugTracker.Repository.Interfaces;
+using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Models.Messaging;
+using BugTracker.Services;
 
 namespace BugTracker.Models.Subscription;
 
@@ -48,16 +49,19 @@ public class Subscriptions : ISubscriptions
 		}
 	}
 
-	public async Task NotifyBugReportStateChanged(BugState bugState, string bugReportUrl)
+	public async Task NotifyBugReportStateChanged(BugState bugState, ApplicationLinkGenerator linkGenerator, int bugReportId)
 	{
+		var bugReportUrl =
+			linkGenerator.GetPathByAction("ReportOverview", "BugReport", new { bugReportId });
+		
 		var subscribedUserIds = await userSubscriptionsRepository.GetAllSubscribedUserIds(bugState.BugReportId);
 
-		string emailSubject = await ComposeBugStateEmailSubject(bugState);
-		string emailMessage = await ComposeBugStateEmailMessage (bugState, bugReportUrl);
+		var emailSubject = await ComposeBugStateEmailSubject(bugState);
+		var emailMessage = await ComposeBugStateEmailMessage (bugState, bugReportUrl);
 
 		foreach (var userId in subscribedUserIds)
 		{
-			ApplicationUser user = await userManager.FindByIdAsync(userId.ToString());
+			var user = await userManager.FindByIdAsync(userId);
 
 			if (bugState.Author != user.UserName)
 			{
@@ -79,7 +83,7 @@ public class Subscriptions : ISubscriptions
 
 		foreach (var userId in subscribedUserIds)
 		{
-			var user = await userManager.FindByIdAsync(userId.ToString());
+			var user = await userManager.FindByIdAsync(userId);
 
 			if(comment.AuthorId != user.Id)
 			{

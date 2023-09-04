@@ -30,6 +30,8 @@ namespace BugTracker.Controllers
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly ISubscriptions subscriptions;
 		private readonly LinkGenerator linkGenerator;
+		private readonly ApplicationLinkGenerator applicationLinkGenerator;
+		//private readonly ApplicationUserManager userManager;
 		private readonly UserManager<ApplicationUser> userManager;
 
 		public BugReportController(IProjectRepository projectRepository,
@@ -57,17 +59,27 @@ namespace BugTracker.Controllers
 			this.subscriptions = subscriptions;
 			this.linkGenerator = linkGenerator;
 			this.userManager = userManager;
+
+			this.applicationLinkGenerator = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
 		}
 
 		[HttpGet]
-		public async Task<ViewResult> CreateReport()
+		public async Task<IActionResult> CreateReport()
 		{
-			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var currentProject = await projectRepository.GetById(currentProjectId ?? 0);
+			var currentProjectId = httpContextAccessor.HttpContext?.Session.GetInt32("currentProject");
+			if (!currentProjectId.HasValue) return BadRequest();
+			
+			var currentProject = await projectRepository.GetById(currentProjectId.Value);
 
-			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportCreate(currentProject);
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext?.User, currentProjectId, "CanAccessProjectPolicy");
+			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+			{
+				ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportCreate(currentProject);
 
-			return View();
+				return View();
+			}
+
+			return RedirectToAction("Overview", "Projects", new { projectId = currentProjectId });
 		}
 
 		[HttpPost]
@@ -208,8 +220,8 @@ namespace BugTracker.Controllers
 
 				var createdBugState = await bugReportStatesRepository.Add(newBugState);
 
-				var bugReportUrl = Url.Action("ReportOverview", "BugReport", new { id = bugReport.BugReportId }, Request.Scheme);
-				await subscriptions .NotifyBugReportStateChanged(createdBugState, bugReportUrl);
+				var linkGen = new ApplicationLinkGenerator(httpContextAccessor, linkGenerator);
+				await subscriptions.NotifyBugReportStateChanged(createdBugState, linkGen, bugReport.BugReportId);
 
 				// Create activity event
 				var stateActivityEvent = new ActivityBugReportStateChange(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportStateChanged, userId, bugReport.BugReportId, createdBugState.BugStateId, latestBugState.BugStateId);
@@ -242,7 +254,7 @@ namespace BugTracker.Controllers
 			if (!currentProjectId.HasValue) return BadRequest();
 			var bugReport = await bugReportRepository .GetById(bugReportId);
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				var currentProject = await projectRepository.GetById(currentProjectId.Value);
@@ -309,7 +321,7 @@ namespace BugTracker.Controllers
 			
 			var bugReport = await bugReportRepository.GetById(bugReportId);
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				var currentProject = await projectRepository.GetById(currentProjectId.Value);
@@ -353,12 +365,12 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult DeleteLink(int projectId, int bugReportId, int linkToBugReportId)
+		public async Task<IActionResult> DeleteLink(int projectId, int bugReportId, int linkToBugReportId)
 		{
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, projectId, "ProjectAdministratorPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				bugReportRepository.DeleteBugReportLink(bugReportId, linkToBugReportId);
+				await bugReportRepository.DeleteBugReportLink(bugReportId, linkToBugReportId);
 
 				return RedirectToAction("ReportOverview", new { id = bugReportId });
 			}
@@ -370,7 +382,7 @@ namespace BugTracker.Controllers
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
+			var authorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
 				HttpContext.Session.SetInt32("currentBugReport", bugReportId);
@@ -410,7 +422,7 @@ namespace BugTracker.Controllers
 				{
 					viewModel.DisableSubscribeButton = true;
 				}
-				var adminAuthorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
+				var adminAuthorizationResult = authorizationService.AuthorizeAsync(httpContextAccessor.HttpContext.User, currentProjectId, "ProjectAdministratorPolicy");
 				if (adminAuthorizationResult.IsCompletedSuccessfully && adminAuthorizationResult.Result.Succeeded)
 				{
 					viewModel.DisableAssignMembersButton = false;

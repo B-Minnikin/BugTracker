@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using BugTracker.Models;
 using BugTracker.Models.Messaging;
 
 namespace BugTracker.Controllers;
@@ -14,15 +15,15 @@ namespace BugTracker.Controllers;
 public class AccountController : Controller
 {
 	private readonly ILogger<AccountController> logger;
-	private readonly UserManager<IdentityUser> userManager;
-	private readonly SignInManager<IdentityUser> signInManager;
+	private readonly UserManager<ApplicationUser> userManager;
+	private readonly SignInManager<ApplicationUser> signInManager;
 	private readonly IProjectInviter projectInvitation;
 	private readonly IWebHostEnvironment webHostEnvironment;
 	private readonly IEmailHelper emailHelper;
 
 	public AccountController(ILogger<AccountController> logger,
-									UserManager<IdentityUser> userManager,
-									SignInManager<IdentityUser> signInManager,
+									UserManager<ApplicationUser> userManager,
+									SignInManager<ApplicationUser> signInManager,
 									IProjectInviter projectInvitation,
 									IWebHostEnvironment webHostEnvironment,
 									IEmailHelper emailHelper)
@@ -82,7 +83,7 @@ public class AccountController : Controller
 	{
 		if (ModelState.IsValid)
 		{
-			var user = new IdentityUser
+			var user = new ApplicationUser
 			{
 				UserName = model.Email,
 				Email = model.Email,
@@ -109,7 +110,7 @@ public class AccountController : Controller
 		return View(model);
 	}
 
-	private async Task GenerateConfirmationEmail(IdentityUser user)
+	private async Task GenerateConfirmationEmail(ApplicationUser user)
 	{
 		var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 		var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token }, Request.Scheme);
@@ -248,7 +249,7 @@ public class AccountController : Controller
 		return View("ResetPasswordConfirmation");
 	}
 
-	private async Task GenerateForgotPasswordEmail(IdentityUser user)
+	private async Task GenerateForgotPasswordEmail(ApplicationUser user)
 	{
 		var token = await userManager.GeneratePasswordResetTokenAsync(user);
 		var passwordResetLink = Url.Action("ResetPassword", "Account", new { email = user.Email, token }, Request.Scheme);

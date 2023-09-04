@@ -10,6 +10,6 @@ namespace BugTracker.Repository.Interfaces
 		Task<IEnumerable<BugReport>> GetSubscribedReports(string userId);
 		Task<bool> IsSubscribed(string userId, int bugReportId);
 		Task DeleteSubscription(string userId, int bugReportId);
-		Task<IEnumerable<int>> GetAllSubscribedUserIds(int bugReportId);
+		Task<IEnumerable<string>> GetAllSubscribedUserIds(int bugReportId);
 	}
 }

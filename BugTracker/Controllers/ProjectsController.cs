@@ -19,7 +19,7 @@ namespace BugTracker.Controllers
 {
 	public class ProjectsController : Controller
 	{
-		private readonly ILogger<HomeController> logger;
+		private readonly ILogger<ProjectsController> logger;
 		private readonly IProjectRepository projectRepository;
 		private readonly IBugReportRepository bugReportRepository;
 		private readonly IActivityRepository activityRepository;
@@ -28,7 +28,7 @@ namespace BugTracker.Controllers
 		private readonly IProjectInviter projectInviter;
 		private readonly ApplicationUserManager userManager;
 
-		public ProjectsController(ILogger<HomeController> logger,
+		public ProjectsController(ILogger<ProjectsController> logger,
 									IProjectRepository projectRepository,
 									IBugReportRepository bugReportRepository,
 									IActivityRepository activityRepository,
