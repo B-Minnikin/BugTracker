@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTracker.Repository;
 
-public class UserStore : IUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IUserRoleStore<ApplicationUser>
+public class UserStore : IUserPasswordStore<ApplicationUser>, IUserEmailStore<ApplicationUser>, IUserRoleStore<ApplicationUser>
 {
 	private readonly ApplicationContext context;
 

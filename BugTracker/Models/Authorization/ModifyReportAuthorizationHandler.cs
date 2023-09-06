@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Threading.Tasks;
-using BugTracker.Database.Context;
 
 namespace BugTracker.Models.Authorization;
 
 public class ModifyReportAuthorizationHandler : AuthorizationHandler<ModifyReportRequirement, object>
 {
-	private readonly ApplicationContext appContext;
+	private readonly ApplicationUserManager userManager;
 
-	public ModifyReportAuthorizationHandler(ApplicationContext appContext)
+	public ModifyReportAuthorizationHandler(ApplicationUserManager userManager)
 	{
-		this.appContext = appContext;
+		this.userManager = userManager;
 	}
 
 	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyReportRequirement requirement, dynamic resource)
@@ -22,12 +21,12 @@ public class ModifyReportAuthorizationHandler : AuthorizationHandler<ModifyRepor
 			return Task.CompletedTask;
 		}
 
-		var roleAdministrator = Enum.GetName(typeof(Roles), Roles.Administrator);
-		var roleMember = Enum.GetName(typeof(Roles), Roles.Member);
+		var roleAdministrator = Enum.GetName(typeof(ProjectRoles), ProjectRoles.Administrator);
+		var roleMember = Enum.GetName(typeof(ProjectRoles), ProjectRoles.Member);
 
-		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, appContext);
-		bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, roleAdministrator, resource.ProjectId, appContext);
-		bool userIsReportAuthor = userName == resource.PersonReporting && AuthorizationHelper.UserIsInProjectRole(userName, roleMember, resource.ProjectId, appContext);
+		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, userManager);
+		bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, roleAdministrator, resource.ProjectId, userManager);
+		bool userIsReportAuthor = userName == resource.PersonReporting && AuthorizationHelper.UserIsInProjectRole(userName, roleMember, resource.ProjectId, userManager);
 
 		if(userIsSuperadministrator || userIsProjectAdministrator || userIsReportAuthor)
 		{

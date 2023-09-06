@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using BugTracker.Models.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BugTracker.Models;
 
@@ -23,6 +25,8 @@ public class UserSubscription
 
 public class UserRole
 {
+    //[Key]
+    public int UserRoleId { get; set; }
     public string UserId { get; set; }
     public ApplicationUser User { get; set; }
     public int RoleId { get; set; }

@@ -91,6 +91,7 @@ public class Startup
 		services.AddScoped<IUserSubscriptionsRepository, EfUserSubscriptionsRepository>();
 		services.AddScoped<IActivityRepository, EfActivityRepository>();
 		services.AddScoped<ICommentRepository, EfCommentRepository>();
+		services.AddScoped<IProjectRepository, EfProjectRepository>();
 		services.AddScoped<IProjectInvitationsRepository, EfProjectInvitationsRepository>();
 		services.AddScoped<ISearchRepository, EfSearchRepository>();
 	}

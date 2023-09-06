@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using BugTracker.Models;
+using BugTracker.Models.Authorization;
 using BugTracker.Models.Messaging;
 
 namespace BugTracker.Controllers;
@@ -15,18 +16,18 @@ namespace BugTracker.Controllers;
 public class AccountController : Controller
 {
 	private readonly ILogger<AccountController> logger;
-	private readonly UserManager<ApplicationUser> userManager;
+	private readonly ApplicationUserManager userManager;
 	private readonly SignInManager<ApplicationUser> signInManager;
 	private readonly IProjectInviter projectInvitation;
 	private readonly IWebHostEnvironment webHostEnvironment;
 	private readonly IEmailHelper emailHelper;
 
 	public AccountController(ILogger<AccountController> logger,
-									UserManager<ApplicationUser> userManager,
-									SignInManager<ApplicationUser> signInManager,
-									IProjectInviter projectInvitation,
-									IWebHostEnvironment webHostEnvironment,
-									IEmailHelper emailHelper)
+							 ApplicationUserManager userManager,
+							 SignInManager<ApplicationUser> signInManager,
+							 IProjectInviter projectInvitation,
+							 IWebHostEnvironment webHostEnvironment,
+							 IEmailHelper emailHelper)
 	{
 		this.logger = logger;
 		this.userManager = userManager;

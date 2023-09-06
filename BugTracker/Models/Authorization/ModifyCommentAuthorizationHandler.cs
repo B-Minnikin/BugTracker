@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Threading.Tasks;
-using BugTracker.Database.Context;
 
 namespace BugTracker.Models.Authorization;
 
 public class ModifyCommentAuthorizationHandler : AuthorizationHandler<ModifyCommentRequirement, object>
 {
-	private readonly ApplicationContext appContext;
+	private readonly ApplicationUserManager userManager;
 
-	public ModifyCommentAuthorizationHandler(ApplicationContext appContext)
+	public ModifyCommentAuthorizationHandler(ApplicationUserManager userManager)
 	{
-		this.appContext = appContext;
+		this.userManager = userManager;
 	}
 
 	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyCommentRequirement requirement, dynamic resource)
@@ -22,12 +21,12 @@ public class ModifyCommentAuthorizationHandler : AuthorizationHandler<ModifyComm
 			return Task.CompletedTask;
 		}
 
-		var roleAdministrator = Enum.GetName(typeof(Roles), Roles.Administrator);
-		var roleMember = Enum.GetName(typeof(Roles), Roles.Member);
+		var roleAdministrator = Enum.GetName(typeof(ProjectRoles), ProjectRoles.Administrator);
+		var roleMember = Enum.GetName(typeof(ProjectRoles), ProjectRoles.Member);
 
-		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, appContext);
-		bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, roleAdministrator, resource.ProjectId, appContext);
-		bool userIsCommentAuthor = userName == resource.Author && AuthorizationHelper.UserIsInProjectRole(userName, roleMember, resource.ProjectId, appContext);
+		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, userManager);
+		bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, roleAdministrator, resource.ProjectId, userManager);
+		bool userIsCommentAuthor = userName == resource.Author && AuthorizationHelper.UserIsInProjectRole(userName, roleMember, resource.ProjectId, userManager);
 
 		if (userIsSuperadministrator || userIsProjectAdministrator || userIsCommentAuthor)
 		{

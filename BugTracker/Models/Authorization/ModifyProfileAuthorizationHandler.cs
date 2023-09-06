@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
-using BugTracker.Database.Context;
 
 namespace BugTracker.Models.Authorization;
 
 public class ModifyProfileAuthorizationHandler : AuthorizationHandler<ModifyProfileRequirement, string>
 {
-	private readonly ApplicationContext appContext;
+	private readonly ApplicationUserManager userManager;
 
-	public ModifyProfileAuthorizationHandler(ApplicationContext appContext)
+	public ModifyProfileAuthorizationHandler(ApplicationUserManager userManager)
 	{
-		this.appContext = appContext;
+		this.userManager = userManager;
 	}
 
 	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyProfileRequirement requirement, string userId)
@@ -21,8 +20,8 @@ public class ModifyProfileAuthorizationHandler : AuthorizationHandler<ModifyProf
 			return Task.CompletedTask;
 		}
 		
-		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, appContext);
-		var userIsProfileOwner = AuthorizationHelper.UserIsProfileOwner(context.User.Identity.Name, userId, appContext).Result;
+		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, userManager);
+		var userIsProfileOwner = AuthorizationHelper.UserIsProfileOwner(context.User.Identity.Name, userId, userManager).Result;
 
 		if(userIsSuperadministrator || userIsProfileOwner)
 		{

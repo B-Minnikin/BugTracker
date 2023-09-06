@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Threading.Tasks;
-using BugTracker.Database.Context;
 
 namespace BugTracker.Models.Authorization;
 
 public class ProjectAdministratorAuthorizationHandler : AuthorizationHandler<ProjectAdministratorRequirement, int>
 {
-	private readonly ApplicationContext appContext;
+	private readonly ApplicationUserManager userManager;
 
-	public ProjectAdministratorAuthorizationHandler(ApplicationContext appContext)
+	public ProjectAdministratorAuthorizationHandler(ApplicationUserManager userManager)
 	{
-		this.appContext = appContext;
+		this.userManager = userManager;
 	}
 
 	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectAdministratorRequirement requirement, int projectId)
@@ -22,8 +21,8 @@ public class ProjectAdministratorAuthorizationHandler : AuthorizationHandler<Pro
 			return Task.CompletedTask;
 		}
 
-		bool userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, appContext);
-		bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, Enum.GetName(typeof(Roles), Roles.Administrator), projectId, appContext);
+		var userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, userManager);
+		var userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, Enum.GetName(typeof(ProjectRoles), ProjectRoles.Administrator), projectId, userManager);
 
 		if (userIsSuperadministrator || userIsProjectAdministrator)
 		{
