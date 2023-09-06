@@ -2,7 +2,6 @@
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.ProjectInvitation;
-using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BugTracker.Database.Repository.Interfaces;
 
 namespace BugTracker.Controllers
 {

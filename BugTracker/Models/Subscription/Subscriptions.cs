@@ -1,7 +1,7 @@
-using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System.Threading.Tasks;
+using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Models.Messaging;
 using BugTracker.Services;
 

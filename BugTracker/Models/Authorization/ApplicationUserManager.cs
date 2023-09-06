@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BugTracker.Database.Context;
-using BugTracker.Repository;
+using BugTracker.Database.Repository;
 
 namespace BugTracker.Models.Authorization;
 

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BugTracker.Helpers;
 using System.Security.Claims;
-using BugTracker.Repository.Interfaces;
+using BugTracker.Database.Repository.Interfaces;
 
 namespace BugTracker.Controllers;
 

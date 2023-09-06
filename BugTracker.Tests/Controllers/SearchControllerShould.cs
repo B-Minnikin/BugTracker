@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using BugTracker.Controllers;
 using BugTracker.Models;
-using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using BugTracker.Tests.Mocks;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +13,7 @@ using Xunit;
 using System;
 using BugTracker.Services;
 using System.Threading.Tasks;
+using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Tests.Helpers;
 
 namespace BugTracker.Tests.Controllers

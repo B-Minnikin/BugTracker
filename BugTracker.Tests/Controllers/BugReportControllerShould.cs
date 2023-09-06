@@ -1,8 +1,6 @@
 ﻿using BugTracker.Controllers;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
-using BugTracker.Repository;
-using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using BugTracker.Tests.Helpers;
 using BugTracker.Tests.Mocks;
@@ -17,6 +15,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using BugTracker.Database.Context;
+using BugTracker.Database.Repository;
+using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Models.Subscription;
 using Xunit;
 using AuthorizationHelper = BugTracker.Tests.Helpers.AuthorizationHelper;

@@ -1,6 +1,5 @@
 ﻿using BugTracker.Helpers;
 using BugTracker.Models;
-using BugTracker.Repository.Interfaces;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Models.Subscription;
 
 namespace BugTracker.Controllers

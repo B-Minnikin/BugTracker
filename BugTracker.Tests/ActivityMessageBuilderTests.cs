@@ -1,13 +1,13 @@
 using BugTracker.Extension_Methods;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
-using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BugTracker.Repository;
+using BugTracker.Database.Repository;
+using BugTracker.Database.Repository.Interfaces;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -1,12 +1,12 @@
 using BugTracker.Database.Context;
+using BugTracker.Database.Repository;
+using BugTracker.Database.Repository.EFCoreRepositories;
+using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.Messaging;
 using BugTracker.Models.ProjectInvitation;
 using BugTracker.Models.Subscription;
-using BugTracker.Repository;
-using BugTracker.Repository.EFCoreRepositories;
-using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;

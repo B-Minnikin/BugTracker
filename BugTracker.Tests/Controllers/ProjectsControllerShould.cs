@@ -1,7 +1,6 @@
 ﻿using BugTracker.Controllers;
 using BugTracker.Models.Authorization;
 using BugTracker.Models.ProjectInvitation;
-using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -16,8 +15,9 @@ using System.Collections.Generic;
 using System;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using BugTracker.Repository;
 using System.Security.Claims;
+using BugTracker.Database.Repository;
+using BugTracker.Database.Repository.Interfaces;
 
 namespace BugTracker.Tests.Controllers
 {

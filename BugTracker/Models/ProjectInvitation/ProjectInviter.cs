@@ -1,10 +1,10 @@
 ﻿using BugTracker.Models.Authorization;
-using BugTracker.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
+using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Models.Messaging;
 
 namespace BugTracker.Models.ProjectInvitation;

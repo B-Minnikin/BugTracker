@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Extension_Methods;
 using Microsoft.AspNetCore.Identity;
-using BugTracker.Repository.Interfaces;
 
 namespace BugTracker.Services
 {
