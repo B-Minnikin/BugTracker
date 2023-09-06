@@ -5,7 +5,6 @@ namespace BugTracker.Models
 	public class ActivityMilestoneBugReport : Activity
 	{
 		public int MilestoneId{ get; set; }
-		public int BugReportId { get; set; }
 
 		public ActivityMilestoneBugReport() { }
 

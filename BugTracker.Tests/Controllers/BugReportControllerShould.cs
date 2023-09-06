@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using BugTracker.Database.Context;
 using BugTracker.Database.Repository;
 using BugTracker.Database.Repository.Interfaces;
 using BugTracker.Models.Subscription;
@@ -35,7 +34,7 @@ public class BugReportControllerShould
 	private readonly Mock<ISubscriptions> mockSubscriptions;
 	private readonly Mock<ApplicationUserManager> mockUserManager;
 	
-	private BugReportController controller;
+	private readonly BugReportController controller;
 
 	public BugReportControllerShould()
 	{
@@ -72,12 +71,12 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task CreateReport_Get_ReturnsView_WhenValidSessionProjectId()
 	{
-		int projectId = 1;
+		const int projectId = 1;
 		var project = new Project { ProjectId = projectId, Name = "Test project" };
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
-		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
 		mockProjectRepo.Setup(p => p.GetById(It.Is<int>(i => i == projectId))).Returns(Task.FromResult(project)).Verifiable();
 
@@ -89,7 +88,7 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task CreateReport_Get_ReturnsNotFound_WhenInvalidSessionProjectId()
 	{
-		int projectId = 0;
+		const int projectId = 0;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -103,7 +102,7 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task CreateReport_Get_RedirectsToProjectOverview_WhenNotAuthorized()
 	{
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId});
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -121,11 +120,11 @@ public class BugReportControllerShould
 	{
 		CreateBugReportViewModel viewModel = null;
 
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
-		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
 		var result = await controller.CreateReport(viewModel);
 
@@ -137,7 +136,7 @@ public class BugReportControllerShould
 	{
 		var bugReportViewModel = new CreateBugReportViewModel();
 
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -155,7 +154,7 @@ public class BugReportControllerShould
 	{
 		var createBugReportViewModel = new CreateBugReportViewModel();
 
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -180,7 +179,7 @@ public class BugReportControllerShould
 			Hidden = false
 		};
 
-		int projectId = 0;
+		const int projectId = 0;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -470,13 +469,13 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Edit_Post_RedirectToReportOverview_WhenModelValid()
 	{
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
-		int bugReportId = 1;
+		const int bugReportId = 1;
 		var bugReport = new BugReport { 
 			BugReportId = bugReportId,
 			Title = "Test title",
@@ -498,10 +497,11 @@ public class BugReportControllerShould
 			BugStateId = 1,
 			BugReportId = bugReportId
 		};
+		var activity = new ActivityBugReport(DateTime.Now, projectId, ActivityMessage.BugReportPosted, "1", bugReportId);
 
 		mockBugReportRepo.Setup(br => br.GetById(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(bugReport)).Verifiable();
 		mockBugReportRepo.Setup(br => br.Update(It.IsAny<BugReport>())).Returns(Task.FromResult(bugReport));
-		mockActivityRepo.Setup(a => a.Add(It.IsAny<ActivityBugReport>())).Returns(Task.FromResult(new ActivityBugReport() as Activity));
+		mockActivityRepo.Setup(a => a.Add(It.IsAny<ActivityBugReport>())).Returns(Task.FromResult((Activity)activity));
 		mockBugReportStatesRepo.Setup(brs => brs.GetLatestState(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(new BugState { StateType = StateType.Closed}));
 		mockBugReportStatesRepo.Setup(brs => brs.Add(It.IsAny<BugState>())).Returns(Task.FromResult(bugState)).Verifiable();
 		mockSubscriptions.Setup(s => s.NotifyBugReportStateChanged(It.Is<BugState>(bs => bs.Equals(bugState)), It.IsAny<ApplicationLinkGenerator>(), It.Is<int>(i => i == bugReportId))).Verifiable();
@@ -520,7 +520,7 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Delete_ReturnsBadRequest_WhenBugReportIdLessThan1()
 	{
-		int bugReportId = 0;
+		const int bugReportId = 0;
 
 		var result = await controller.Delete(bugReportId);
 
@@ -530,8 +530,8 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Delete_ReturnsNotFound_WhenInvalidSessionProjectId()
 	{
-		int projectId = 0;
-		int bugReportId = 1;
+		const int projectId = 0;
+		const int bugReportId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -545,13 +545,13 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Delete_RedirectsToProjectsOverview_WhenNotAuthorized()
 	{
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 		AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
 
-		int bugReportId = 1;
+		const int bugReportId = 1;
 		var bugReport = new BugReport { BugReportId = bugReportId, PersonReporting = "Test user" };
 		
 		mockBugReportRepo.Setup(br => br.GetById(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(bugReport)).Verifiable();
@@ -574,13 +574,13 @@ public class BugReportControllerShould
 	{
 		// verifiable delete
 
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
-		int bugReportId = 1;
+		const int bugReportId = 1;
 		var bugReport = new BugReport { BugReportId = bugReportId, PersonReporting = "Test user" };
 
 		mockBugReportRepo.Setup(br => br.GetById(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(bugReport)).Verifiable();
@@ -600,8 +600,8 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task AssignMember_Get_ReturnsNotFound_WhenInvalidSessionProjectId()
 	{
-		int projectId = 0;
-		int bugReportId = 1;
+		const int projectId = 0;
+		const int bugReportId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 

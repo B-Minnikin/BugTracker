@@ -25,9 +25,8 @@ public class ApplicationContext : DbContext
     public DbSet<BugState> BugStates { get; set; }
     public DbSet<Milestone> Milestones { get; set; }
     public DbSet<MilestoneBugReport> MilestoneBugReports { get; set; }
-    public DbSet<Activity> Activities { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
-    
+    public DbSet<Activity> Activities { get; set; }
     
     public DbSet<Role> Roles { get; set; }
 
@@ -35,6 +34,17 @@ public class ApplicationContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Activity>()
+            .HasDiscriminator<string>("ActivityType")
+            .HasValue<ActivityComment>(nameof(ActivityComment))
+            .HasValue<ActivityBugReport>(nameof(ActivityBugReport))
+            .HasValue<ActivityBugReportAssigned>(nameof(ActivityBugReportAssigned))
+            .HasValue<ActivityBugReportLink>(nameof(ActivityBugReportLink))
+            .HasValue<ActivityBugReportStateChange>(nameof(ActivityBugReportStateChange))
+            .HasValue<ActivityMilestone>(nameof(ActivityMilestone))
+            .HasValue<ActivityMilestoneBugReport>(nameof(ActivityMilestoneBugReport))
+            .HasValue<ActivityProject>(nameof(ActivityProject));
+        
         modelBuilder.Entity<PendingProjectInvitation>()
             .HasKey(pi => new { pi.ProjectId, pi.EmailAddress });
 

@@ -20,7 +20,6 @@ namespace BugTracker.Tests
 		private readonly Mock<ILinkGenerator> mockLinkGenerator;
 
 		private readonly Mock<IBugReportRepository> mockBugReportRepository;
-		private readonly Mock<UserStore> mockUserStore;
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private ActivityMessageBuilder builder;
 
@@ -32,7 +31,7 @@ namespace BugTracker.Tests
 
 			var mockProjectRepository = new Mock<IProjectRepository>();
 			mockBugReportRepository = new Mock<IBugReportRepository>();
-			mockUserStore = new Mock<UserStore>("Fake connection string");
+			var mockUserStore = new Mock<UserStore>("Fake connection string");
 			mockUserManager = new Mock<ApplicationUserManager>(mockUserStore.Object, "dummy connection string");
 			var mockMilestoneRepository = new Mock<IMilestoneRepository>();
 			var mockBugReportStatesRepository = new Mock<IBugReportStatesRepository>();

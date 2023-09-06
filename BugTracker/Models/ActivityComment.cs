@@ -4,7 +4,6 @@ namespace BugTracker.Models
 {
 	public class ActivityComment : Activity
 	{
-		public int BugReportId { get; set; }
 		public int CommentId { get; set; }
 
 		public ActivityComment() { }

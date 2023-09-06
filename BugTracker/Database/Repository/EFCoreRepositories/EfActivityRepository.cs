@@ -29,7 +29,12 @@ public class EfActivityRepository : IActivityRepository
     public async Task<Activity> Delete(int activityId)
     {
         var activity = await context.Activities.FindAsync(activityId);
-        if (activity is null) throw new NullReferenceException("Specified activity was null");
+        if (activity is null)
+        {
+            // TODO - log missing value warning
+            //throw new NullReferenceException("Specified activity was null");
+            return null;
+        }
         
         activity.Hidden = true;
 

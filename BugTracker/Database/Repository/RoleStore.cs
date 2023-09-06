@@ -69,7 +69,12 @@ public sealed class RoleStore : IRoleStore<IdentityRole>
 		cancellationToken.ThrowIfCancellationRequested();
 
 		var role = await context.Roles.FirstOrDefaultAsync(r => r.NormalisedName == normalizedRoleName, cancellationToken);
-		if (role is null) throw new NullReferenceException("Requested role was null");
+		if (role is null)
+		{
+			// TODO - log missing value warning
+			//throw new NullReferenceException("Requested role was null");
+			return null;
+		}
 		
 		var identityRole = new IdentityRole
 		{

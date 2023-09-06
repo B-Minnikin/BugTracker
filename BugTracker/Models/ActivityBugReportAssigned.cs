@@ -4,7 +4,6 @@ namespace BugTracker.Models
 {
 	public class ActivityBugReportAssigned : Activity
 	{
-		public int BugReportId { get; set; }
 		public string AssigneeId { get; set; }
 
 		public ActivityBugReportAssigned()	{ }

@@ -4,13 +4,12 @@ namespace BugTracker.Models;
 
 public class ActivityBugReportLink : Activity
 {
-	public int BugReportId { get; set; }
 	public int LinkedBugReportId { get; set; }
 
-	public ActivityBugReportLink(DateTime timestamp, int projectId, ActivityMessage messageId, string userId, int firstBugReportId, int secondBugReportId)
+	public ActivityBugReportLink(DateTime timestamp, int projectId, ActivityMessage messageId, string userId, int bugReportId, int linkedBugReportId)
 		: base(timestamp, projectId, messageId, userId)
 	{
-		BugReportId = firstBugReportId;
-		LinkedBugReportId = secondBugReportId;
+		BugReportId = bugReportId;
+		LinkedBugReportId = linkedBugReportId;
 	}
 }
