@@ -12,6 +12,7 @@ public class ApplicationContext : DbContext
     }
     
     public DbSet<ApplicationUser> Users { get; set; }
+    
     public DbSet<UserSubscription> UserSubscriptions { get; set; }
     
     public DbSet<Project> Projects { get; set; }
@@ -54,6 +55,19 @@ public class ApplicationContext : DbContext
             .HasOne(us => us.BugReport)
             .WithMany(br => br.UserSubscriptions)
             .HasForeignKey(us => us.BugReportId);
+
+        modelBuilder.Entity<UserRole>()
+            .HasKey(ur => ur.UserRoleId);
+
+        modelBuilder.Entity<UserRole>()
+            .HasOne(ur => ur.Role)
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(ur => ur.RoleId);
+
+        modelBuilder.Entity<UserRole>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId);
 
         modelBuilder.Entity<MilestoneBugReport>()
             .HasKey(mbr => new { mbr.BugReportId, mbr.MilestoneId });
