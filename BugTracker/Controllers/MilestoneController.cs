@@ -134,20 +134,20 @@ public class MilestoneController : Controller
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> New(NewMilestoneViewModel model)
+	public async Task<IActionResult> New(NewMilestoneViewModel viewModel)
 	{
-		var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+		var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, viewModel.ProjectId, "ProjectAdministratorPolicy");
 		if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 		{
 			if (ModelState.IsValid)
 			{
 				var newMilestone = new Milestone()
 				{
-					ProjectId = model.ProjectId,
-					Title = model.Title,
-					Description = model.Description,
-					CreationTime = model.CreationTime,
-					DueDate = model.DueDate
+					ProjectId = viewModel.ProjectId,
+					Title = viewModel.Title,
+					Description = viewModel.Description,
+					CreationTime = viewModel.CreationTime,
+					DueDate = viewModel.DueDate
 				};
 
 				var createdMilestone = await milestoneRepository.Add(newMilestone);
@@ -158,7 +158,7 @@ public class MilestoneController : Controller
 				await activityRepository.Add(milestoneActivityEvent);
 
 				// handle bug report ids
-				foreach (var reportEntry in model.MilestoneBugReportEntries)
+				foreach (var reportEntry in viewModel.MilestoneBugReportEntries)
 				{
 					var report = await bugReportRepository.GetBugReportByLocalId(reportEntry.LocalBugReportId, newMilestone.ProjectId);
 					
@@ -174,7 +174,7 @@ public class MilestoneController : Controller
 			}
 
 			logger.LogWarning($"Invalid Milestone model state");
-			return View(model);
+			return View(viewModel);
 		}
 
 		return RedirectToAction("Index", "Home");
@@ -208,28 +208,28 @@ public class MilestoneController : Controller
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> Edit(EditMilestoneViewModel model)
+	public async Task<IActionResult> Edit(EditMilestoneViewModel viewModel)
 	{
-		var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, model.ProjectId, "ProjectAdministratorPolicy");
+		var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, viewModel.ProjectId, "ProjectAdministratorPolicy");
 		if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 		{
 			if (ModelState.IsValid)
 			{
-				await milestoneRepository.Update(model.Milestone);
-				await UpdateEditedMilestoneBugReports(model.Milestone, model.MilestoneBugReportEntries);
+				await milestoneRepository.Update(viewModel.Milestone);
+				await UpdateEditedMilestoneBugReports(viewModel.Milestone, viewModel.MilestoneBugReportEntries);
 
 				// Create activity event
 				var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 				var currentProjectId = httpContextAccessor.HttpContext?.Session.GetInt32("currentProject");
 				if (!currentProjectId.HasValue) return BadRequest();
 				
-				var activityEvent = new ActivityMilestone(DateTime.Now, currentProjectId.Value, ActivityMessage.MilestoneEdited, userId, model.Milestone.MilestoneId);
+				var activityEvent = new ActivityMilestone(DateTime.Now, currentProjectId.Value, ActivityMessage.MilestoneEdited, userId, viewModel.Milestone.MilestoneId);
 				await activityRepository.Add(activityEvent);
 
-				return RedirectToAction("Overview", "Milestone", new { milestoneId = model.Milestone.MilestoneId });
+				return RedirectToAction("Overview", "Milestone", new { milestoneId = viewModel.Milestone.MilestoneId });
 			}
 
-			return View(model);
+			return View(viewModel);
 		}
 
 		return RedirectToAction("Index", "Home");
@@ -291,7 +291,7 @@ public class MilestoneController : Controller
 	private async Task<IEnumerable<MilestoneBugReportEntry>> GenerateBugReportEntries(int milestoneId)
 	{
 		var milestone = await milestoneRepository.GetById(milestoneId);
-		var entries = await milestoneRepository .GetMilestoneBugReportEntries(milestoneId);
+		var entries = await milestoneRepository.GetMilestoneBugReportEntries(milestoneId);
 
 		foreach(var entry in entries)
 		{

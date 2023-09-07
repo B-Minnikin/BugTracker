@@ -109,11 +109,11 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ViewResult> Edit(int id)
+		public async Task<ViewResult> Edit(int commentId)
 		{
-			var comment = await commentRepository.GetById(id);
+			var comment = await commentRepository.GetById(commentId);
 
-			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
+			var currentProjectId = httpContextAccessor.HttpContext?.Session.GetInt32("currentProject");
 			var currentProject = await projectRepository.GetById(currentProjectId ?? 0);
 			var currentBugReportId = HttpContext.Session.GetInt32("currentBugReport");
 			var currentBugReport = await bugReportRepository .GetById(currentBugReportId ?? 0);
@@ -152,17 +152,17 @@ namespace BugTracker.Controllers
 			return View();
 		}
 
-		public async Task<IActionResult> Delete(int id)
+		public async Task<IActionResult> Delete(int commentId)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
-			var parentBugReportId = await commentRepository.GetCommentParentId(id);
-			var commentAuthor = await commentRepository.GetById(id);
+			var parentBugReportId = await commentRepository.GetCommentParentId(commentId);
+			var commentAuthor = await commentRepository.GetById(commentId);
 			var commentAuthorId = commentAuthor.AuthorId;
 
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, Author = commentAuthorId }, "CanModifyCommentPolicy");
 			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
 			{
-				await commentRepository.Delete(id);
+				await commentRepository.Delete(commentId);
 			}
 
 			return RedirectToAction("ReportOverview", "BugReport", new { bugReportId = parentBugReportId });

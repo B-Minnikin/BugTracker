@@ -15,249 +15,247 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BugTracker.Database.Repository.Interfaces;
 
-namespace BugTracker.Controllers
+namespace BugTracker.Controllers;
+
+public class ProjectsController : Controller
 {
-	public class ProjectsController : Controller
+	private readonly ILogger<ProjectsController> logger;
+	private readonly IProjectRepository projectRepository;
+	private readonly IBugReportRepository bugReportRepository;
+	private readonly IActivityRepository activityRepository;
+	private readonly IAuthorizationService authorizationService;
+	private readonly IHttpContextAccessor httpContextAccessor;
+	private readonly IProjectInviter projectInviter;
+	private readonly ApplicationUserManager userManager;
+
+	public ProjectsController(ILogger<ProjectsController> logger,
+								IProjectRepository projectRepository,
+								IBugReportRepository bugReportRepository,
+								IActivityRepository activityRepository,
+								IAuthorizationService authorizationService,
+								IHttpContextAccessor httpContextAccessor,
+								IProjectInviter projectInvitation,
+								ApplicationUserManager userManager)
 	{
-		private readonly ILogger<ProjectsController> logger;
-		private readonly IProjectRepository projectRepository;
-		private readonly IBugReportRepository bugReportRepository;
-		private readonly IActivityRepository activityRepository;
-		private readonly IAuthorizationService authorizationService;
-		private readonly IHttpContextAccessor httpContextAccessor;
-		private readonly IProjectInviter projectInviter;
-		private readonly ApplicationUserManager userManager;
+		this.logger = logger;
+		this.projectRepository = projectRepository;
+		this.bugReportRepository = bugReportRepository;
+		this.activityRepository = activityRepository;
+		this.authorizationService = authorizationService;
+		this.httpContextAccessor = httpContextAccessor;
+		this.projectInviter = projectInvitation;
+		this.userManager = userManager;
+	}
 
-		public ProjectsController(ILogger<ProjectsController> logger,
-									IProjectRepository projectRepository,
-									IBugReportRepository bugReportRepository,
-									IActivityRepository activityRepository,
-									IAuthorizationService authorizationService,
-									IHttpContextAccessor httpContextAccessor,
-									IProjectInviter projectInvitation,
-									ApplicationUserManager userManager)
+	[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]
+	public async Task<ViewResult> Projects()
+	{
+		var model = await projectRepository.GetAll();
+			model = model.Where(project =>
+				{
+					var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, project.ProjectId, "CanAccessProjectPolicy");
+					return authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded;
+				}
+			);
+
+		return View(model);
+	}
+
+	public async Task<IActionResult> Overview(int projectId)
+	{
+		var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, projectId, "CanAccessProjectPolicy");
+		if (!authorizationResult.IsCompletedSuccessfully || authorizationResult.Result.Succeeded)
 		{
-			this.logger = logger;
-			this.projectRepository = projectRepository;
-			this.bugReportRepository = bugReportRepository;
-			this.activityRepository = activityRepository;
-			this.authorizationService = authorizationService;
-			this.httpContextAccessor = httpContextAccessor;
-			this.projectInviter = projectInvitation;
-			this.userManager = userManager;
+			return RedirectToAction("Index", "Home");
 		}
+		
+		var project = await projectRepository.GetById(projectId);
+		if (project == null) return NotFound();
+		HttpContext.Session.SetInt32("currentProject", projectId); // save project id to session
 
-		[Breadcrumb("Projects", FromAction ="Index", FromController =typeof(HomeController))]
-		public async Task<ViewResult> Projects()
+		var bugReports = await bugReportRepository.GetAllById(projectId);
+
+		var viewModel = new OverviewProjectViewModel()
 		{
-			var model = await projectRepository.GetAll();
-				model = model.Where(project =>
-					{
-						var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, project.ProjectId, "CanAccessProjectPolicy");
-						return authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded;
-					}
-				);
+			Project = project,
+			BugReports = bugReports.ToList(),
+			CommentCountHandler = bugReportRepository.GetCommentCountById
+		};
 
-			return View(model);
-		}
+		ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectOverview(project);
 
-		public async Task<IActionResult> Overview(int id)
-		{
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, id, "CanAccessProjectPolicy");
-			if (!authorizationResult.IsCompletedSuccessfully || authorizationResult.Result.Succeeded)
-			{
+		return View(viewModel);
+	}
 
-				return RedirectToAction("Index", "Home");
-			}
-			
-			var project = await projectRepository.GetById(id);
-			if (project == null) return NotFound();
-			HttpContext.Session.SetInt32("currentProject", id); // save project id to session
+	[HttpGet]
+	[Authorize]
+	[Breadcrumb("Create Project", FromAction = "Projects")]
+	public ViewResult CreateProject()
+	{
+		return View();
+	}
 
-			var bugReports = await bugReportRepository.GetAllById(id);
-
-			var viewModel = new OverviewProjectViewModel()
-			{
-				Project = project,
-				BugReports = bugReports.ToList(),
-				CommentCountHandler = bugReportRepository.GetCommentCountById
-			};
-
-			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectOverview(project);
-
-			return View(viewModel);
-		}
-
-		[HttpGet]
-		[Authorize]
-		[Breadcrumb("Create Project", FromAction = "Projects")]
-		public ViewResult CreateProject()
+	[HttpPost]
+	[Authorize]
+	public async Task<IActionResult> CreateProject(Project model)
+	{
+		if (!ModelState.IsValid)
 		{
 			return View();
 		}
-
-		[HttpPost]
-		[Authorize]
-		public async Task<IActionResult> CreateProject(Project model)
+		
+		var project = new Project
 		{
-			if (!ModelState.IsValid)
-			{
-				return View();
-			}
-			
-			var project = new Project
-			{
-				Name = model.Name,
-				Description = model.Description,
-				CreationTime = DateTime.Now,
-				LastUpdateTime = DateTime.Now,
-				Hidden = model.Hidden,
-				BugReports = new List<BugReport>()
-			};
+			Name = model.Name,
+			Description = model.Description,
+			CreationTime = DateTime.Now,
+			LastUpdateTime = DateTime.Now,
+			Hidden = model.Hidden,
+			BugReports = new List<BugReport>()
+		};
 
-			_ = await projectRepository.Add(project);
-			await bugReportRepository.AddLocalBugReportId(project.ProjectId);
+		_ = await projectRepository.Add(project);
+		await bugReportRepository.AddLocalBugReportId(project.ProjectId);
 
-			// Create activity event
-			var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-			
-			var activityEvent = new ActivityProject(DateTime.Now, project.ProjectId, ActivityMessage.ProjectCreated, userId);
-			await activityRepository.Add(activityEvent);
+		// Create activity event
+		var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		
+		var activityEvent = new ActivityProject(DateTime.Now, project.ProjectId, ActivityMessage.ProjectCreated, userId);
+		await activityRepository.Add(activityEvent);
 
-			// Add the user who created the project to its administrator role
-			var user = await userManager.FindByIdAsync(userId);
-			await userManager.AddToRoleAsync(user, "Administrator", project.ProjectId);
+		// Add the user who created the project to its administrator role
+		var user = await userManager.FindByIdAsync(userId);
+		await userManager.AddToRoleAsync(user, "Administrator", project.ProjectId);
 
-			logger.LogInformation($"New project created. ID: {project.ProjectId}, Name: {project.Name}");
+		logger.LogInformation($"New project created. ID: {project.ProjectId}, Name: {project.Name}");
 
-			return RedirectToAction("Overview", new { id = project.ProjectId });
+		return RedirectToAction("Overview", new { id = project.ProjectId });
+	}
+
+	public async Task<IActionResult> DeleteProject(int projectId)
+	{
+		var user = httpContextAccessor.HttpContext?.User;
+		if (user is null) return BadRequest();
+		
+		var authorizationResult = authorizationService.AuthorizeAsync(user, projectId, "ProjectAdministratorPolicy");
+		if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
+		{
+			await projectRepository.Delete(projectId);
+			logger.LogInformation($"Project deleted. ID: {projectId}");
 		}
 
-		public async Task<IActionResult> DeleteProject(int id)
-		{
-			var user = httpContextAccessor.HttpContext?.User;
-			if (user is null) return BadRequest();
-			
-			var authorizationResult = authorizationService.AuthorizeAsync(user, id, "ProjectAdministratorPolicy");
-			if (authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded)
-			{
-				await projectRepository.Delete(id);
-				logger.LogInformation($"Project deleted. ID: {id}");
-			}
+		return RedirectToAction("Projects");
+	}
 
-			return RedirectToAction("Projects");
+	[HttpGet]
+	public async Task<IActionResult> Edit(int projectId)
+	{
+		var user = httpContextAccessor.HttpContext?.User;
+		if (user is null) return BadRequest();
+		
+		var authorizationResult = authorizationService.AuthorizeAsync(user, projectId, "ProjectAdministratorPolicy");
+		if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
+		{
+			return RedirectToAction("Overview", new { projectId });
+		}
+		
+		var project = await projectRepository.GetById(projectId);
+		var viewModel = new EditProjectViewModel
+		{
+			Project = project
+		};
+
+		ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectEdit(project);
+		
+		return View(viewModel);
+	}
+
+	[HttpPost]
+	public async Task<IActionResult> Edit(EditProjectViewModel viewModel)
+	{
+		var user = httpContextAccessor.HttpContext?.User;
+		if (user is null) return BadRequest();
+		
+		var authorizationResult = authorizationService.AuthorizeAsync(user, viewModel.Project.ProjectId, "ProjectAdministratorPolicy");
+		if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
+		{
+			return Forbid();
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> Edit(int id)
+		if (!ModelState.IsValid)
 		{
-			var user = httpContextAccessor.HttpContext?.User;
-			if (user is null) return BadRequest();
-			
-			var authorizationResult = authorizationService.AuthorizeAsync(user, id, "ProjectAdministratorPolicy");
-			if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
-			{
-				return RedirectToAction("Overview", new { id });
-			}
-			
-			var project = await projectRepository.GetById(id);
-			var viewModel = new EditProjectViewModel
-			{
-				Project = project
-			};
-
-			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectEdit(project);
-			
 			return View(viewModel);
 		}
+		
+		var project = await projectRepository.GetById(viewModel.Project.ProjectId);
+		if (project == null) return BadRequest();
+		
+		project.Name = viewModel.Project.Name;
+		project.Description = viewModel.Project.Description;
+		project.Hidden = viewModel.Project.Hidden;
+		project.LastUpdateTime = DateTime.Now;
 
-		[HttpPost]
-		public async Task<IActionResult> Edit(EditProjectViewModel viewModel)
+		_ = projectRepository.Update(project);
+
+		// Create activity event
+		var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		if (userId is null) return BadRequest();
+		
+		var activityEvent = new ActivityProject(DateTime.Now, viewModel.Project.ProjectId, ActivityMessage.ProjectEdited, userId);
+		await activityRepository .Add(activityEvent);
+
+		return RedirectToAction("Overview", new { id = project.ProjectId });
+	}
+
+	[HttpGet]
+	public async Task<IActionResult> Invites(int projectId)
+	{
+		var user = httpContextAccessor.HttpContext?.User;
+		if (user is null) return BadRequest();
+		
+		var authorizationResult = authorizationService.AuthorizeAsync(user, projectId, "ProjectAdministratorPolicy");
+		if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
 		{
-			var user = httpContextAccessor.HttpContext?.User;
-			if (user is null) return BadRequest();
-			
-			var authorizationResult = authorizationService.AuthorizeAsync(user, viewModel.Project.ProjectId, "ProjectAdministratorPolicy");
-			if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
-			{
-				return Forbid();
-			}
+			return RedirectToAction("Overview", projectId);
+		}
+		
+		var project = await projectRepository.GetById(projectId);
+		var viewModel = new InvitesViewModel
+		{
+			ProjectId = projectId
+		};
 
-			if (!ModelState.IsValid)
-			{
-				return View(viewModel);
-			}
-			
-			var project = await projectRepository.GetById(viewModel.Project.ProjectId);
-			if (project == null) return BadRequest();
-			
-			project.Name = viewModel.Project.Name;
-			project.Description = viewModel.Project.Description;
-			project.Hidden = viewModel.Project.Hidden;
-			project.LastUpdateTime = DateTime.Now;
+		ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectInvites(project);
+		
+		return View(viewModel);
+	}
 
-			_ = projectRepository.Update(project);
-
-			// Create activity event
-			var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-			if (userId is null) return BadRequest();
-			
-			var activityEvent = new ActivityProject(DateTime.Now, viewModel.Project.ProjectId, ActivityMessage.ProjectEdited, userId);
-			await activityRepository .Add(activityEvent);
-
-			return RedirectToAction("Overview", new { id = project.ProjectId });
+	[HttpPost]
+	public async Task<IActionResult> Invites(InvitesViewModel model)
+	{
+		var user = httpContextAccessor.HttpContext?.User;
+		if (user is null) return BadRequest();
+		
+		var authorizationResult = authorizationService.AuthorizeAsync(user, model.ProjectId, "ProjectAdministratorPolicy");
+		if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
+		{
+			return Forbid();
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> Invites(int id)
+		if (!ModelState.IsValid)
 		{
-			var user = httpContextAccessor.HttpContext?.User;
-			if (user is null) return BadRequest();
-			
-			var authorizationResult = authorizationService.AuthorizeAsync(user, id, "ProjectAdministratorPolicy");
-			if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
-			{
-				return RedirectToAction("Overview", id);
-			}
-			
-			var project = await projectRepository.GetById(id);
-			var viewModel = new InvitesViewModel
-			{
-				ProjectId = id
-			};
-
-			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.ProjectInvites(project);
-			
-			return View(viewModel);
+			return View(model);
 		}
-
-		[HttpPost]
-		public async Task<IActionResult> Invites(InvitesViewModel model)
+		
+		var invitation = new ProjectInvitation
 		{
-			var user = httpContextAccessor.HttpContext?.User;
-			if (user is null) return BadRequest();
-			
-			var authorizationResult = authorizationService.AuthorizeAsync(user, model.ProjectId, "ProjectAdministratorPolicy");
-			if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
-			{
-				return Forbid();
-			}
+			EmailAddress = model.EmailAddress,
+			Project = await projectRepository .GetById(model.ProjectId),
+			ToUser = null,
+			FromUser = await userManager.GetUserAsync(HttpContext.User)
+		};
 
-			if (!ModelState.IsValid)
-			{
-				return View(model);
-			}
-			
-			var invitation = new ProjectInvitation
-			{
-				EmailAddress = model.EmailAddress,
-				Project = await projectRepository .GetById(model.ProjectId),
-				ToUser = null,
-				FromUser = await userManager.GetUserAsync(HttpContext.User)
-			};
-
-			await projectInviter.AddProjectInvitation(invitation);
-			return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
-		}
+		await projectInviter.AddProjectInvitation(invitation);
+		return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
 	}
 }
