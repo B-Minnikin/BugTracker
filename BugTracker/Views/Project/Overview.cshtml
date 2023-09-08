@@ -6,9 +6,9 @@
 
 <h1>Project Overview - @Model.Project.Name</h1>
 
-<a asp-controller="BugReport" asp-action="CreateReport" class="btn btn-primary">Create Bug Report</a>
-<a asp-controller="Projects" asp-action="Edit" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Edit Project</a>
-<a asp-controller="Projects" asp-action="Invites" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Invites</a>
+<a asp-controller="BugReport" asp-action="Create" class="btn btn-primary">Create Bug Report</a>
+<a asp-controller="Project" asp-action="Edit" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Edit Project</a>
+<a asp-controller="Project" asp-action="Invites" asp-route-id="@Model.Project.ProjectId" class="btn btn-primary">Invites</a>
 <a asp-controller="Milestone" asp-action="Milestones" asp-route-projectId="@Model.Project.ProjectId" class="btn btn-primary">Milestones</a>
 
 <h3>Bug Reports</h3>
@@ -37,7 +37,7 @@
                     Bug report state history - closed / open, etc
                 *@
 
-                <a asp-controller="BugReport" asp-action="ReportOverview" asp-route-bugReportId="@bugReport.BugReportId" class="stretched-link"></a>
+                <a asp-controller="BugReport" asp-action="Overview" asp-route-bugReportId="@bugReport.BugReportId" class="stretched-link"></a>
             </div>
         </div>
     }

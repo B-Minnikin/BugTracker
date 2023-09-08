@@ -80,7 +80,7 @@ public class BugReportControllerShould
 
 		mockProjectRepo.Setup(p => p.GetById(It.Is<int>(i => i == projectId))).Returns(Task.FromResult(project)).Verifiable();
 
-		var result = await controller.CreateReport();
+		var result = await controller.Create();
 
 		Assert.IsType<ViewResult>(result);
 	}
@@ -94,7 +94,7 @@ public class BugReportControllerShould
 
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
 
-		var result = await controller.CreateReport();
+		var result = await controller.Create();
 
 		Assert.IsType<NotFoundResult>(result);
 	}
@@ -108,7 +108,7 @@ public class BugReportControllerShould
 
 		AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
 
-		var result = await controller.CreateReport();
+		var result = await controller.Create();
 
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("Overview", redirectToActionResult.ActionName);
@@ -126,7 +126,7 @@ public class BugReportControllerShould
 
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
-		var result = await controller.CreateReport(viewModel);
+		var result = await controller.Create(viewModel);
 
 		Assert.IsType<BadRequestResult>(result);
 	}
@@ -142,7 +142,7 @@ public class BugReportControllerShould
 
 		AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
 
-		var result = await controller.CreateReport(bugReportViewModel);
+		var result = await controller.Create(bugReportViewModel);
 
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("Overview", redirectToActionResult.ActionName);
@@ -161,7 +161,7 @@ public class BugReportControllerShould
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
 		controller.ModelState.AddModelError("Test key", "Error message");
-		var result = await controller.CreateReport(createBugReportViewModel);
+		var result = await controller.Create(createBugReportViewModel);
 
 		var viewResult = Assert.IsType<ViewResult>(result);
 		Assert.IsAssignableFrom<CreateBugReportViewModel>(viewResult.ViewData.Model);
@@ -185,7 +185,7 @@ public class BugReportControllerShould
 
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
 
-		var result = await controller.CreateReport(bugReportViewModel);
+		var result = await controller.Create(bugReportViewModel);
 
 		Assert.IsType<NotFoundResult>(result);
 	}
@@ -226,7 +226,7 @@ public class BugReportControllerShould
 		mockUserSubscriptionsRepo.Setup(us => us.IsSubscribed(It.IsAny<string>(), It.Is<int>(br => br == bugReport.BugReportId))).Returns(Task.FromResult(false)).Verifiable();
 		mockUserSubscriptionsRepo.Setup(us => us.AddSubscription(It.IsAny<string>(), It.Is<int>(br => br == bugReport.BugReportId))).Verifiable();
 
-		var result = await controller.CreateReport(createBugReportViewModel);
+		var result = await controller.Create(createBugReportViewModel);
 
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
@@ -1062,7 +1062,7 @@ public class BugReportControllerShould
 	{
 		const int bugReportId = 0;
 
-		var result = await controller.ReportOverview(bugReportId);
+		var result = await controller.Overview(bugReportId);
 
 		Assert.IsType<BadRequestResult>(result);
 	}
@@ -1076,7 +1076,7 @@ public class BugReportControllerShould
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
-		var result = await controller.ReportOverview(bugReportId);
+		var result = await controller.Overview(bugReportId);
 
 		Assert.IsType<NotFoundResult>(result);
 	}
@@ -1091,7 +1091,7 @@ public class BugReportControllerShould
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 		AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
 
-		var result = await controller.ReportOverview(bugReportId);
+		var result = await controller.Overview(bugReportId);
 
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("Index", redirectToActionResult.ActionName);

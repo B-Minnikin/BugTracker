@@ -297,7 +297,7 @@ public class MilestoneController : Controller
 		{
 			var bugReport = await bugReportRepository.GetBugReportByLocalId(entry.LocalBugReportId, milestone.ProjectId);
 			entry.BugReportId = bugReport.BugReportId;
-			entry.Url = Url.Action("ReportOverview", "BugReport", new { id = entry.BugReportId });
+			entry.Url = Url.Action("Overview", "BugReport", new { id = entry.BugReportId });
 			entry.CurrentState = await bugReportStatesRepository.GetLatestState(entry.BugReportId);
 		}
 
@@ -316,7 +316,7 @@ public class MilestoneController : Controller
 
 	private MilestoneBugReportEntry GenerateBugReportUrl(MilestoneBugReportEntry entry, int bugReportId)
 	{
-		entry.Url ??= Url.Action("ReportOverview", "BugReport", new { id = bugReportId });
+		entry.Url ??= Url.Action("Overview", "BugReport", new { id = bugReportId });
 		
 		return entry;
 	}

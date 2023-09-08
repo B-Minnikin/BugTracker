@@ -63,7 +63,7 @@ namespace BugTracker.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> CreateReport()
+		public async Task<IActionResult> Create()
 		{
 			var currentProjectId = httpContextAccessor.HttpContext?.Session.GetInt32("currentProject");
 			if (!currentProjectId.HasValue) return BadRequest();
@@ -78,11 +78,11 @@ namespace BugTracker.Controllers
 				return View();
 			}
 
-			return RedirectToAction("Overview", "Projects", new { projectId = currentProjectId });
+			return RedirectToAction("Overview", "Project", new { projectId = currentProjectId });
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> CreateReport(CreateBugReportViewModel viewModel)
+		public async Task<IActionResult> Create(CreateBugReportViewModel viewModel)
 		{
 			var currentProjectId = httpContextAccessor.HttpContext?.Session.GetInt32("currentProject") ?? 0;
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProjectId, "CanAccessProjectPolicy");
@@ -136,7 +136,7 @@ namespace BugTracker.Controllers
 				await userSubscriptionsRepository.AddSubscription(userId, bugReport.BugReportId);
 			}
 
-			return RedirectToAction("ReportOverview", new { id = bugReport.BugReportId });
+			return RedirectToAction("Overview", new { id = bugReport.BugReportId });
 		}
 
 		public IActionResult Subscribe(int bugReportId)
@@ -145,7 +145,7 @@ namespace BugTracker.Controllers
 			
 			subscriptions.CreateSubscriptionIfNotSubscribed(userId, bugReportId);
 
-			return RedirectToAction("ReportOverview", new { id = bugReportId});
+			return RedirectToAction("Overview", new { id = bugReportId});
 		}
 
 		[HttpGet]
@@ -166,7 +166,7 @@ namespace BugTracker.Controllers
 			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, new { ProjectId = currentProjectId, viewModel.BugReport.PersonReporting}, "CanModifyReportPolicy");
 			if (!authorizationResult.IsCompletedSuccessfully && !authorizationResult.Result.Succeeded)
 			{
-				return RedirectToAction("Overview", "Projects", new { id = currentProjectId});
+				return RedirectToAction("Overview", "Project", new { id = currentProjectId});
 			}
 			
 			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.BugReportEdit(currentProject, viewModel.BugReport);
@@ -227,7 +227,7 @@ namespace BugTracker.Controllers
 				await activityRepository.Add(stateActivityEvent);
 			}
 			
-			return RedirectToAction("ReportOverview", new { id = bugReport.BugReportId});
+			return RedirectToAction("Overview", new { id = bugReport.BugReportId});
 		}
 
 		public async Task<IActionResult> Delete(int bugReportId)
@@ -243,7 +243,7 @@ namespace BugTracker.Controllers
 				await bugReportRepository.Delete(bugReportId);
 			}
 
-			return RedirectToAction("Overview", "Projects", new { id = currentProjectId });
+			return RedirectToAction("Overview", "Project", new { id = currentProjectId });
 		}
 
 		[HttpGet]
@@ -357,7 +357,7 @@ namespace BugTracker.Controllers
 				var activityEvent = new ActivityBugReportLink(DateTime.Now, currentProjectId.Value, ActivityMessage.BugReportsLinked, userId, viewModel.BugReportId, linkToReport.BugReportId);
 				await activityRepository.Add(activityEvent);
 
-				return RedirectToAction("ReportOverview", new { id = viewModel.BugReportId });
+				return RedirectToAction("Overview", new { id = viewModel.BugReportId });
 			}
 
 			return RedirectToAction("Index", "Home");
@@ -371,13 +371,13 @@ namespace BugTracker.Controllers
 			{
 				await bugReportRepository.DeleteBugReportLink(bugReportId, linkToBugReportId);
 
-				return RedirectToAction("ReportOverview", new { id = bugReportId });
+				return RedirectToAction("Overview", new { id = bugReportId });
 			}
 
 			return RedirectToAction("Index", "Home");
 		}
 
-		public async Task<IActionResult> ReportOverview(int bugReportId)
+		public async Task<IActionResult> Overview(int bugReportId)
 		{
 			var currentProjectId = HttpContext.Session.GetInt32("currentProject");
 

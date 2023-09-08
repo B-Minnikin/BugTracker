@@ -33,11 +33,11 @@ namespace BugTracker.Tests.Controllers
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		private readonly Mock<IConfiguration> mockConfiguration;
 
-		private readonly ProjectsController controller;
+		private readonly ProjectController controller;
 
 		public ProjectsControllerShould()
 		{
-			var mockLogger = new Mock<ILogger<ProjectsController>>();
+			var mockLogger = new Mock<ILogger<ProjectController>>();
 			mockProjectRepo = new Mock<IProjectRepository>();
 			mockBugReportRepo = new Mock<IBugReportRepository>();
 			mockActivityRepo = new Mock<IActivityRepository>();
@@ -48,7 +48,7 @@ namespace BugTracker.Tests.Controllers
 			mockUserManager = new Mock<ApplicationUserManager>(mockUserStore.Object, "Fake connection string");
 			mockConfiguration = new Mock<IConfiguration>();
 
-			controller = new ProjectsController(
+			controller = new ProjectController(
 					mockLogger.Object,
 					mockProjectRepo.Object,
 					mockBugReportRepo.Object,
@@ -166,7 +166,7 @@ namespace BugTracker.Tests.Controllers
 			mockUserStore.Setup(um => um.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<System.Threading.CancellationToken>())).Returns(Task.FromResult(IdentityResult.Success));
 			//mockUserManager.Setup(um => um.RegisterUserStore(mockUserStore.Object));
 			
-			var result = await controller.CreateProject(model);
+			var result = await controller.Create(model);
 
 			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 			Assert.Equal("Overview", redirectToActionResult.ActionName);
@@ -190,7 +190,7 @@ namespace BugTracker.Tests.Controllers
 			mockActivityRepo.Setup(a => a.Add(It.IsAny<ActivityProject>())).Returns(Task.FromResult((Activity)activityProject));
 			controller.ModelState.AddModelError("Test key", "Error message");
 
-			var result = await controller.CreateProject(model);
+			var result = await controller.Create(model);
 
 			var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
 			Assert.IsType<SerializableError>(badRequestResult.Value);
@@ -202,7 +202,7 @@ namespace BugTracker.Tests.Controllers
 			var projectId = 0;
 			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
-			var result = controller.DeleteProject(projectId);
+			var result = controller.Delete(projectId);
 
 			_ = Assert.IsType<BadRequestResult>(result);
 		}
@@ -215,7 +215,7 @@ namespace BugTracker.Tests.Controllers
 
 			mockProjectRepo.Setup(p => p.Delete(It.IsAny<int>()));
 
-			var result = controller.DeleteProject(projectId);
+			var result = controller.Delete(projectId);
 
 			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 			Assert.Equal("Projects", redirectToActionResult.ActionName);

@@ -17,9 +17,9 @@ using BugTracker.Database.Repository.Interfaces;
 
 namespace BugTracker.Controllers;
 
-public class ProjectsController : Controller
+public class ProjectController : Controller
 {
-	private readonly ILogger<ProjectsController> logger;
+	private readonly ILogger<ProjectController> logger;
 	private readonly IProjectRepository projectRepository;
 	private readonly IBugReportRepository bugReportRepository;
 	private readonly IActivityRepository activityRepository;
@@ -28,7 +28,7 @@ public class ProjectsController : Controller
 	private readonly IProjectInviter projectInviter;
 	private readonly ApplicationUserManager userManager;
 
-	public ProjectsController(ILogger<ProjectsController> logger,
+	public ProjectController(ILogger<ProjectController> logger,
 								IProjectRepository projectRepository,
 								IBugReportRepository bugReportRepository,
 								IActivityRepository activityRepository,
@@ -64,7 +64,7 @@ public class ProjectsController : Controller
 	public async Task<IActionResult> Overview(int projectId)
 	{
 		var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, projectId, "CanAccessProjectPolicy");
-		if (!authorizationResult.IsCompletedSuccessfully || authorizationResult.Result.Succeeded)
+		if (!authorizationResult.IsCompletedSuccessfully || !authorizationResult.Result.Succeeded)
 		{
 			return RedirectToAction("Index", "Home");
 		}
@@ -90,14 +90,14 @@ public class ProjectsController : Controller
 	[HttpGet]
 	[Authorize]
 	[Breadcrumb("Create Project", FromAction = "Projects")]
-	public ViewResult CreateProject()
+	public ViewResult Create()
 	{
 		return View();
 	}
 
 	[HttpPost]
 	[Authorize]
-	public async Task<IActionResult> CreateProject(Project model)
+	public async Task<IActionResult> Create(Project model)
 	{
 		if (!ModelState.IsValid)
 		{
@@ -132,7 +132,7 @@ public class ProjectsController : Controller
 		return RedirectToAction("Overview", new { id = project.ProjectId });
 	}
 
-	public async Task<IActionResult> DeleteProject(int projectId)
+	public async Task<IActionResult> Delete(int projectId)
 	{
 		var user = httpContextAccessor.HttpContext?.User;
 		if (user is null) return BadRequest();
@@ -256,6 +256,6 @@ public class ProjectsController : Controller
 		};
 
 		await projectInviter.AddProjectInvitation(invitation);
-		return RedirectToAction("Overview", "Projects", new { id = model.ProjectId });
+		return RedirectToAction("Overview", "Project", new { id = model.ProjectId });
 	}
 }

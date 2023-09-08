@@ -46,18 +46,18 @@ public class AccountController : Controller
 
 	[HttpPost]
 	[AllowAnonymous]
-	public async Task<IActionResult> Login(LoginViewModel model)
+	public async Task<IActionResult> Login(LoginViewModel viewModel)
 	{
 		if (ModelState.IsValid)
 		{
-			var user = await userManager.FindByEmailAsync(model.Email);
-			if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, model.Password)))
+			var user = await userManager.FindByEmailAsync(viewModel.Email);
+			if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, viewModel.Password)))
 			{
 				ModelState.AddModelError(string.Empty, "Email not confirmed");
-				return View(model);
+				return View(viewModel);
 			}
 
-			var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: true, false);
+			var result = await signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, isPersistent: true, false);
 
 			if (result.Succeeded)
 			{
@@ -68,7 +68,7 @@ public class AccountController : Controller
 			ModelState.AddModelError(string.Empty, "Invalid login attempt");
 		}
 
-		return View(model);
+		return View(viewModel);
 	}
 
 	[HttpGet]
@@ -80,24 +80,25 @@ public class AccountController : Controller
 
 	[HttpPost]
 	[AllowAnonymous]
-	public async Task<IActionResult> Register(RegisterViewModel model)
+	public async Task<IActionResult> Register(RegisterViewModel viewModel)
 	{
 		if (ModelState.IsValid)
 		{
 			var user = new ApplicationUser
 			{
-				UserName = model.Email,
-				Email = model.Email,
-				NormalizedEmail = model.Email.ToUpper()
+				UserName = viewModel.Email,
+				Email = viewModel.Email,
+				NormalizedEmail = viewModel.Email.ToUpper()
 			};
-			var result = await userManager.CreateAsync(user, model.Password);
+			var result = await userManager.CreateAsync(user, viewModel.Password);
 
 			if (result.Succeeded)
 			{
 				var createdUser = await userManager.FindByEmailAsync(user.Email);
 				logger.LogInformation($"New user registered. ID: {createdUser.Id}, Name: {createdUser.UserName}");
 
-				await GenerateConfirmationEmail(createdUser);
+				// Disabled for now
+				//await GenerateConfirmationEmail(createdUser);
 
 				// ---- fulfil stored project invitations if they exist
 				await projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);
@@ -108,7 +109,7 @@ public class AccountController : Controller
 			AddErrorToModelState(result);
 		}
 
-		return View(model);
+		return View(viewModel);
 	}
 
 	private async Task GenerateConfirmationEmail(ApplicationUser user)
