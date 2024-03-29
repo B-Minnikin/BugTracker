@@ -118,15 +118,13 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task CreateReport_Post_ReturnsBadRequest_WhenViewModelNull()
 	{
-		CreateBugReportViewModel viewModel = null;
-
 		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
-		var result = await controller.Create(viewModel);
+		var result = await controller.Create(null);
 
 		Assert.IsType<BadRequestResult>(result);
 	}
@@ -230,15 +228,15 @@ public class BugReportControllerShould
 
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(bugReport.BugReportId, routeValueId);
 	}
 
 	[Fact]
 	public void Subscribe_ReturnsBadRequest_WhenIdLessThan1()
 	{
-		int bugReportId = 0;
+		const int bugReportId = 0;
 		
 		var result = controller.Subscribe(bugReportId);
 
@@ -248,7 +246,7 @@ public class BugReportControllerShould
 	[Fact]
 	public void Subscribe_RedirectsToReportOverview_WhenNotAuthorized()
 	{
-		int bugReportId = 1;
+		const int bugReportId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = 1 });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -261,8 +259,8 @@ public class BugReportControllerShould
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(bugReportId, routeValueId);
 
 		// don't create subscription - check
@@ -272,9 +270,9 @@ public class BugReportControllerShould
 	[Fact]
 	public void Subscribe_ReturnsNotFound_WhenInvalidSessionProjectId()
 	{
-		int bugReportId = 1;
+		const int bugReportId = 1;
 
-		int projectId = 0;
+		const int projectId = 0;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -288,13 +286,13 @@ public class BugReportControllerShould
 	[Fact]
 	public void Subscribe_RedirectsToReportOverview_AfterSuccessfulSubscribe()
 	{
-		int bugReportId = 1;
-		int projectId = 1;
+		const int bugReportId = 1;
+		const int projectId = 1;
 
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
-		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
+		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
 		mockSubscriptions.Setup(s => s.CreateSubscriptionIfNotSubscribed(It.IsAny<string>(), It.Is<int>(id => id == bugReportId))).Verifiable();
 
@@ -310,9 +308,9 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Edit_Get_ReturnsNotFound_WhenInvalidSessionProjectId()
 	{
-		int bugReportId = 1;
+		const int bugReportId = 1;
 
-		int projectId = 0;
+		const int projectId = 0;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
@@ -326,7 +324,7 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Edit_Get_ReturnsBadRequest_WhenReportIdLessThan1()
 	{
-		int bugReportId = 0;
+		const int bugReportId = 0;
 
 		var result = await controller.Edit(bugReportId);
 
@@ -336,8 +334,8 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Edit_Get_RedirectsToProjectsOverview_WhenNotAuthorized()
 	{
-		int projectId = 1;
-		int bugReportId = 1;
+		const int projectId = 1;
+		const int bugReportId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 		var bugReport = new BugReport { PersonReporting = "Test user"};
@@ -355,16 +353,16 @@ public class BugReportControllerShould
 		Assert.Equal("Overview", redirectToActionResult.ActionName);
 		Assert.Equal("Projects", redirectToActionResult.ControllerName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(projectId, routeValueId);
 	}
 
 	[Fact]
 	public async Task Edit_Get_ReturnsView_WhenBugReportIdValid()
 	{
-		int projectId = 1;
-		int bugReportId = 1;
+		const int projectId = 1;
+		const int bugReportId = 1;
 
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
@@ -394,8 +392,8 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Edit_Post_ReturnsNotFound_WhenInvalidSessionProjectId()
 	{
-		int projectId = 0;
-		int bugReportId = 1;
+		const int projectId = 0;
+		const int bugReportId = 1;
 		var bugReport = new BugReport { BugReportId = bugReportId, PersonReporting = "Test user" };
 		var viewModel = new EditBugReportViewModel
 		{
@@ -416,13 +414,13 @@ public class BugReportControllerShould
 	[Fact]
 	public async Task Edit_Post_RedirectToReportOverview_WhenNotAuthorized()
 	{
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 		AuthorizationHelper.AllowFailure(mockAuthorizationService, mockHttpContextAccessor);
 
-		int bugReportId = 1;
+		const int bugReportId = 1;
 		var bugReport = new BugReport { BugReportId = bugReportId, PersonReporting = "Test user" };
 		var viewModel = new EditBugReportViewModel
 		{
@@ -435,21 +433,21 @@ public class BugReportControllerShould
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(bugReportId, routeValueId);
 	}
 
 	[Fact]
 	public async Task Edit_Post_ReturnView_WhenModelInvalid()
 	{
-		int projectId = 1;
+		const int projectId = 1;
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
 		mockHttpContextAccessor.Setup(accessor => accessor.HttpContext).Returns(httpContext);
 
 		AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor);
 
-		int bugReportId = 1;
+		const int bugReportId = 1;
 		var bugReport = new BugReport { BugReportId = bugReportId, PersonReporting = "Test user" };
 		var viewModel = new EditBugReportViewModel
 		{
@@ -463,7 +461,7 @@ public class BugReportControllerShould
 		var viewResult = Assert.IsType<ViewResult>(result);
 		Assert.IsAssignableFrom<EditBugReportViewModel>(viewResult.ViewData.Model);
 		var viewModelResult = viewResult.ViewData.Model as EditBugReportViewModel;
-		Assert.Equal(viewModelResult.BugReport.BugReportId, bugReportId);
+		Assert.Equal(viewModelResult?.BugReport.BugReportId, bugReportId);
 	}
 
 	[Fact]
@@ -512,8 +510,8 @@ public class BugReportControllerShould
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(bugReportId, routeValueId);
 	}
 
@@ -564,8 +562,8 @@ public class BugReportControllerShould
 		Assert.Equal("Overview", redirectToActionResult.ActionName);
 		Assert.Equal("Projects", redirectToActionResult.ControllerName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(projectId, routeValueId);
 	}
 
@@ -592,8 +590,8 @@ public class BugReportControllerShould
 		Assert.Equal("Overview", redirectToActionResult.ActionName);
 		Assert.Equal("Projects", redirectToActionResult.ControllerName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(projectId, routeValueId);
 	}
 
@@ -747,7 +745,7 @@ public class BugReportControllerShould
 		Assert.Equal("AssignMember", redirectToActionResult.ActionName);
 
 		Assert.True(redirectToActionResult?.RouteValues?.ContainsKey("bugReportId"));
-		var routeValueId = redirectToActionResult.RouteValues["bugReportId"];
+		var routeValueId = redirectToActionResult.RouteValues?["bugReportId"];
 		Assert.Equal(bugReportId, routeValueId);
 	}
 
@@ -776,8 +774,8 @@ public class BugReportControllerShould
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("AssignMember", redirectToActionResult.ActionName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("bugReportId"));
-		var routeValueId = redirectToActionResult.RouteValues["bugReportId"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("bugReportId"));
+		var routeValueId = redirectToActionResult.RouteValues?["bugReportId"];
 		Assert.Equal(bugReportId, routeValueId);
 	}
 
@@ -888,8 +886,8 @@ public class BugReportControllerShould
 
 		IEnumerable<BugReport> linkedReports = new List<BugReport>
 		{
-			new BugReport{ BugReportId = 2, Title = "First report" },
-			new BugReport{ BugReportId = 3, Title = "Second report" }
+			new() { BugReportId = 2, Title = "First report" },
+			new() { BugReportId = 3, Title = "Second report" }
 		};
 
 		var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId, UserId = "2", UserName = "Test User" });
@@ -958,8 +956,8 @@ public class BugReportControllerShould
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(model.BugReportId, routeValueId);
 	}
 
@@ -1052,8 +1050,8 @@ public class BugReportControllerShould
 		var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 		Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
 
-		Assert.True(redirectToActionResult.RouteValues.ContainsKey("id"));
-		var routeValueId = redirectToActionResult.RouteValues["id"];
+		Assert.True(redirectToActionResult.RouteValues?.ContainsKey("id"));
+		var routeValueId = redirectToActionResult.RouteValues?["id"];
 		Assert.Equal(bugReportId, routeValueId);
 	}
 
