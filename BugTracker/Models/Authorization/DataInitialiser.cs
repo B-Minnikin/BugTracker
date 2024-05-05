@@ -1,34 +1,29 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace BugTracker.Models.Authorization
+namespace BugTracker.Models.Authorization;
+	
+public enum Roles
 {
-	public enum Roles
-	{
-		Superadministrator,
-		Administrator,
-		Member
-	}
+	Superadministrator,
+	Administrator,
+	Member
+}
 
-	public static class DataInitialiser
+public static class DataInitialiser
+{
+	public static async Task SeedRoles(IServiceProvider serviceProvider)
 	{
-		public static async Task SeedRoles(IServiceProvider serviceProvider)
+		using var scope = serviceProvider.CreateScope();
+		var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+		foreach (var role in Enum.GetNames(typeof(Roles)))
 		{
-			using (var scope = serviceProvider.CreateScope())
+			if(!await roleManager.RoleExistsAsync(role))
 			{
-				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-				foreach (var role in Enum.GetNames(typeof(Roles)))
-				{
-					if(!await roleManager.RoleExistsAsync(role))
-					{
-						await roleManager.CreateAsync(new IdentityRole(role));
-					}
-				}
+				await roleManager.CreateAsync(new IdentityRole(role));
 			}
 		}
 	}

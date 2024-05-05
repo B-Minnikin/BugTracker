@@ -54,10 +54,10 @@ namespace BugTracker.Controllers
 			var currentProject = await projectRepository.GetById(projectId);
 			ViewData["BreadcrumbNode"] = BreadcrumbNodeHelper.Milestones(currentProject);
 
-			var authorizationResult = authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
-			bool isAuthorized = authorizationResult.IsCompletedSuccessfully && authorizationResult.Result.Succeeded;
+			var authorizationResult = await authorizationService.AuthorizeAsync(HttpContext.User, currentProject.ProjectId, "ProjectAdministratorPolicy");
+			var isAuthorized = authorizationResult.Succeeded;
 
-			MilestonesViewModel model = new MilestonesViewModel()
+			var model = new MilestonesViewModel
 			{
 				ProjectId = projectId,
 				ShowNewButton = isAuthorized,

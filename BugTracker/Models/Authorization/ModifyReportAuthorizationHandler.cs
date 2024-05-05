@@ -1,43 +1,38 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace BugTracker.Models.Authorization
+namespace BugTracker.Models.Authorization;
+
+public class ModifyReportAuthorizationHandler : AuthorizationHandler<ModifyReportRequirement, object>
 {
-	public class ModifyReportAuthorizationHandler : AuthorizationHandler<ModifyReportRequirement, object>
+	private readonly string connectionString;
+
+	public ModifyReportAuthorizationHandler(string connectionString)
 	{
-		private readonly string connectionString;
-
-		public ModifyReportAuthorizationHandler(string connectionString)
-		{
-			this.connectionString = connectionString;
-		}
-
-		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyReportRequirement requirement, dynamic resource)
-		{
-			string userName = context.User.Identity.Name;
-			if(userName == null)
-			{
-				return Task.CompletedTask;
-			}
-
-			string roleAdministrator = Enum.GetName(typeof(Roles), Roles.Administrator);
-			string roleMember = Enum.GetName(typeof(Roles), Roles.Member);
-
-			bool userIsSuperadministrator = AuthorizationHelper.UserIsSuperadministrator(userName, connectionString);
-			bool userIsProjectAdministrator = AuthorizationHelper.UserIsInProjectRole(userName, roleAdministrator, resource.ProjectId, connectionString);
-			bool userIsReportAuthor = userName == resource.PersonReporting && AuthorizationHelper.UserIsInProjectRole(userName, roleMember, resource.ProjectId, connectionString);
-
-			if(userIsSuperadministrator || userIsProjectAdministrator || userIsReportAuthor)
-			{
-				context.Succeed(requirement);
-			}
-
-			return Task.CompletedTask;
-		}
+		this.connectionString = connectionString;
 	}
 
-	public class ModifyReportRequirement : IAuthorizationRequirement { }
+	protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ModifyReportRequirement requirement, dynamic resource)
+	{
+		var userName = context.User.Identity?.Name;
+		if(userName == null)
+		{
+			return;
+		}
+
+		var roleAdministrator = Enum.GetName(typeof(Roles), Roles.Administrator);
+		var roleMember = Enum.GetName(typeof(Roles), Roles.Member);
+
+		var userIsSuperadministrator = await AuthorizationHelper.UserIsSuperadministrator(userName, connectionString);
+		bool userIsProjectAdministrator = await AuthorizationHelper.UserIsInProjectRole(userName, roleAdministrator, resource.ProjectId, connectionString);
+		bool userIsReportAuthor = userName == resource.PersonReporting && await AuthorizationHelper.UserIsInProjectRole(userName, roleMember, resource.ProjectId, connectionString);
+
+		if(userIsSuperadministrator || userIsProjectAdministrator || userIsReportAuthor)
+		{
+			context.Succeed(requirement);
+		}
+	}
 }
+
+public class ModifyReportRequirement : IAuthorizationRequirement { }

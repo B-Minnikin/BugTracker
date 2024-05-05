@@ -244,17 +244,17 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void Subscribe_ReturnsBadRequest_WhenIdLessThan1()
+		public async Task Subscribe_ReturnsBadRequest_WhenIdLessThan1()
 		{
 			int bugReportId = 0;
 			
-			var result = controller.Subscribe(bugReportId);
+			var result = await controller.Subscribe(bugReportId);
 
 			Assert.IsType<BadRequestResult>(result);
 		}
 
 		[Fact]
-		public void Subscribe_RedirectsToReportOverview_WhenNotAuthorized()
+		public async Task Subscribe_RedirectsToReportOverview_WhenNotAuthorized()
 		{
 			int bugReportId = 1;
 			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = 1 });
@@ -264,7 +264,7 @@ namespace BugTracker.Tests.Controllers
 
 			mockSubscriptions.Setup(_ => _.CreateSubscriptionIfNotSubscribed(It.IsAny<int>(), It.Is<int>(id => id == bugReportId)));
 
-			var result = controller.Subscribe(bugReportId);
+			var result = await controller.Subscribe(bugReportId);
 
 			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 			Assert.Equal("ReportOverview", redirectToActionResult.ActionName);
@@ -278,7 +278,7 @@ namespace BugTracker.Tests.Controllers
 		}
 
 		[Fact]
-		public void Subscribe_ReturnsNotFound_WhenInvalidSessionProjectId()
+		public async Task Subscribe_ReturnsNotFound_WhenInvalidSessionProjectId()
 		{
 			int bugReportId = 1;
 
@@ -288,13 +288,13 @@ namespace BugTracker.Tests.Controllers
 
 			AuthorizationHelper.AllowSuccess(mockAuthorizationService, mockHttpContextAccessor, projectId);
 
-			var result = controller.Subscribe(bugReportId);
+			var result = await controller.Subscribe(bugReportId);
 
 			Assert.IsType<NotFoundResult>(result);
 		}
 
 		[Fact]
-		public void Subscribe_RedirectsToReportOverview_AfterSuccessfulSubscribe()
+		public async Task Subscribe_RedirectsToReportOverview_AfterSuccessfulSubscribe()
 		{
 			int bugReportId = 1;
 			int projectId = 1;
@@ -306,7 +306,7 @@ namespace BugTracker.Tests.Controllers
 
 			mockSubscriptions.Setup(_ => _.CreateSubscriptionIfNotSubscribed(It.IsAny<int>(), It.Is<int>(id => id == bugReportId))).Verifiable();
 
-			var result = controller.Subscribe(bugReportId);
+			var result = await controller.Subscribe(bugReportId);
 
 			var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 			Assert.Equal("ReportOverview", redirectToActionResult.ActionName);

@@ -5,12 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BugTracker.Controllers
@@ -20,7 +16,6 @@ namespace BugTracker.Controllers
 		private readonly ILogger<AccountController> logger;
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly SignInManager<IdentityUser> signInManager;
-		private readonly IConfiguration configuration;
 		private readonly IProjectInviter projectInvitation;
 		private readonly IWebHostEnvironment webHostEnvironment;
 		private readonly IEmailHelper emailHelper;
@@ -28,7 +23,6 @@ namespace BugTracker.Controllers
 		public AccountController(ILogger<AccountController> logger,
 										UserManager<IdentityUser> userManager,
 										SignInManager<IdentityUser> signInManager,
-										IConfiguration configuration,
 										IProjectInviter projectInvitation,
 										IWebHostEnvironment webHostEnvironment,
 										IEmailHelper emailHelper)
@@ -36,7 +30,6 @@ namespace BugTracker.Controllers
 			this.logger = logger;
 			this.userManager = userManager;
 			this.signInManager = signInManager;
-			this.configuration = configuration;
 			this.projectInvitation = projectInvitation;
 			this.webHostEnvironment = webHostEnvironment;
 			this.emailHelper = emailHelper;
@@ -56,7 +49,7 @@ namespace BugTracker.Controllers
 			if (ModelState.IsValid)
 			{
 				var user = await userManager.FindByEmailAsync(model.Email);
-				if (user != null && !user.EmailConfirmed && (await userManager.CheckPasswordAsync(user, model.Password)))
+				if (user != null && !user.EmailConfirmed && await userManager.CheckPasswordAsync(user, model.Password))
 				{
 					ModelState.AddModelError(string.Empty, "Email not confirmed");
 					return View(model);
@@ -105,7 +98,7 @@ namespace BugTracker.Controllers
 					await GenerateConfirmationEmail(createdUser);
 
 					// ---- fulfil stored project invitations if they exist
-					projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);
+					await projectInvitation.AddUserToProjectMemberRoleForAllPendingInvitations(createdUser.Email);
 
 					return View("RegistrationComplete");
 				}
@@ -119,7 +112,7 @@ namespace BugTracker.Controllers
 		private async Task GenerateConfirmationEmail(IdentityUser user)
 		{
 			var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token = token }, Request.Scheme);
+			var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token }, Request.Scheme);
 
 			if (webHostEnvironment.IsDevelopment())
 			{
@@ -196,18 +189,17 @@ namespace BugTracker.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
 		{
-			if (ModelState.IsValid)
+			if (!ModelState.IsValid) return View(model);
+			
+			var user = await userManager.FindByEmailAsync(model.Email);
+			if (user == null)
 			{
-				var user = await userManager.FindByEmailAsync(model.Email);
-				if (user == null)
-					return RedirectToAction("ForgotPasswordConfirmation");
-
-				GenerateForgotPasswordEmail(user);
-
 				return RedirectToAction("ForgotPasswordConfirmation");
 			}
 
-			return View(model);
+			await GenerateForgotPasswordEmail(user);
+
+			return RedirectToAction("ForgotPasswordConfirmation");
 		}
 
 		public IActionResult ForgotPasswordConfirmation()
