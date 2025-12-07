@@ -30,12 +30,7 @@ public class ApplicationUserManager : UserManager<IdentityUser>
 
 	public void RegisterConnectionString(string connectionString)
 	{
-		if(connectionString is null)
-		{
-			throw new ArgumentNullException(connectionString);
-		}
-
-		this.connectionString = connectionString;
+		this.connectionString = connectionString ?? throw new ArgumentNullException(connectionString);
 	}
 
 	public virtual void RegisterUserStore(UserStore userStore)
@@ -46,16 +41,18 @@ public class ApplicationUserManager : UserManager<IdentityUser>
 	public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string roleName, int projectId)
 	{
 		ThrowIfDisposed();
-		if(user == null)
+		if (user == null)
 		{
 			throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", user.Id));
 		}
 
-		bool isAlreadyInRole = await userStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
+		var isAlreadyInRole = await userStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);
 		if (isAlreadyInRole)
 		{
-			IdentityError error = new IdentityError();
-			error.Description = "User already in role";
+			var error = new IdentityError
+			{
+				Description = "User already in role"
+			};
 			return IdentityResult.Failed(error);
 		}
 		await userStore.AddToRoleAsync(user, roleName, projectId, CancellationToken);
@@ -68,7 +65,7 @@ public class ApplicationUserManager : UserManager<IdentityUser>
 		var user = await FindByIdAsync(userId.ToString());
 		if(user == null)
 		{
-			throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", userId));
+			throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "User ID not found: ", userId));
 		}
 		
 		if(!await userStore.IsInRoleAsync(user, roleName, projectId, CancellationToken))
@@ -86,7 +83,7 @@ public class ApplicationUserManager : UserManager<IdentityUser>
 		var user = await FindByIdAsync(userId.ToString());
 		if(user == null)
 		{
-			throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "User ID not found: ", userId));
+			throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "User ID not found: ", userId));
 		}
 
 		return await userStore.IsInRoleAsync(user, roleName, projectId, CancellationToken);

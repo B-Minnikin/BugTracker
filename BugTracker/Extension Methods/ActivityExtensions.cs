@@ -1,56 +1,53 @@
 ﻿using BugTracker.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.Extension_Methods
+namespace BugTracker.Extension_Methods;
+
+public interface IActivityMethods
 {
-	public interface IActivityMethods
-	{
-		public bool HasProperty(Activity activity, string propertyName);
-		public T GetDerivedProperty<T>(Activity thisActivity, string targetProperty);
-	}
+    public bool HasProperty(Activity activity, string propertyName);
+    public T GetDerivedProperty<T>(Activity thisActivity, string targetProperty);
+}
 
-	public class ActivityMethods : IActivityMethods
-	{
-		public bool HasProperty(Activity activity, string propertyName)
-		{
-			if (string.IsNullOrEmpty(propertyName))
-			{
-				return false;
-			}
+public class ActivityMethods : IActivityMethods
+{
+    public bool HasProperty(Activity activity, string propertyName)
+    {
+        if (string.IsNullOrEmpty(propertyName))
+        {
+            return false;
+        }
 
-			var type = activity.GetType();
-			return type.GetProperty(propertyName) != null;
-		}
+        var type = activity.GetType();
+        return type.GetProperty(propertyName) != null;
+    }
 
-		public T GetDerivedProperty<T>(Activity thisActivity, string targetProperty)
-		{
-			var derivedType = thisActivity.GetType();
-			var propertyName = derivedType.GetProperty(targetProperty);
-			T result = (T)propertyName.GetValue(thisActivity);
+    public T GetDerivedProperty<T>(Activity thisActivity, string targetProperty)
+    {
+        var derivedType = thisActivity.GetType();
+        var propertyName = derivedType.GetProperty(targetProperty);
+        var result = (T)propertyName?.GetValue(thisActivity);
 
-			return result;
-		}
-	}
+        return result;
+    }
+}
 
-	public static class ActivityExtensions
-	{
-		private static IActivityMethods defaultImplementation = new ActivityMethods();
-		public static IActivityMethods Implementation { private get; set; } = defaultImplementation;
+public static class ActivityExtensions
+{
+    private static readonly IActivityMethods DefaultImplementation = new ActivityMethods();
+    public static IActivityMethods Implementation { private get; set; } = DefaultImplementation;
 
-		public static void RevertToDefaultImplementation()
-		{
-			Implementation = defaultImplementation;
-		}
+    public static void RevertToDefaultImplementation()
+    {
+        Implementation = DefaultImplementation;
+    }
 
-		public static bool HasProperty(this Activity activity, string propertyName) {
-			return Implementation.HasProperty(activity, propertyName);
-		}
+    public static bool HasProperty(this Activity activity, string propertyName)
+    {
+        return Implementation.HasProperty(activity, propertyName);
+    }
 
-		public static T GetDerivedProperty<T>(this Activity activity, string targetProperty) {
-			return Implementation.GetDerivedProperty<T>(activity, targetProperty);
-		}
-	}
+    public static T GetDerivedProperty<T>(this Activity activity, string targetProperty)
+    {
+        return Implementation.GetDerivedProperty<T>(activity, targetProperty);
+    }
 }

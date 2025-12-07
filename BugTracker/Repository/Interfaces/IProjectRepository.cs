@@ -3,12 +3,11 @@ using BugTracker.Repository.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BugTracker.Repository.Interfaces
+namespace BugTracker.Repository.Interfaces;
+
+public interface IProjectRepository : IAdd<Project>,
+	IUpdate<Project>, IDelete<Project>,
+	IGetById<Project>
 {
-	public interface IProjectRepository : IAdd<Project>,
-		IUpdate<Project>, IDelete<Project>,
-		IGetById<Project>
-	{
-		Task<IEnumerable<Project>> GetAll();
-	}
+	Task<IEnumerable<Project>> GetAll();
 }

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace BugTracker.ViewModels
+namespace BugTracker.ViewModels;
+
+public class CreateProjectViewModel
 {
-	public class CreateProjectViewModel
-	{
-		[Required]
-		public string Name { get; set; }
-		public string Description { get; set; }
-	}
+    [Required] public string Name { get; set; }
+    public string Description { get; set; }
 }

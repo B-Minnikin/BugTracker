@@ -1,16 +1,12 @@
 ﻿using BugTracker.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.ViewModels
+namespace BugTracker.ViewModels;
+
+public class MilestoneOverviewViewModel
 {
-	public class MilestoneOverviewViewModel
-	{
-		public Milestone Milestone { get; set; }
-		public List<MilestoneBugReportEntry> MilestoneBugReportEntries { get; set; }  = new List<MilestoneBugReportEntry>();
+	public Milestone Milestone { get; set; }
+	public List<MilestoneBugReportEntry> MilestoneBugReportEntries { get; set; }  = new();
 
-		public MilestoneContainer ProjectMilestone { get; set; }
-	}
+	public MilestoneContainer ProjectMilestone { get; set; }
 }

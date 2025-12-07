@@ -2,12 +2,11 @@
 using BugTracker.Repository.Common;
 using System.Threading.Tasks;
 
-namespace BugTracker.Repository.Interfaces
+namespace BugTracker.Repository.Interfaces;
+
+public interface ICommentRepository : IAdd<Comment>,
+	IUpdate<Comment>, IDelete<Comment>,
+	IGetById<Comment>, IGetAllById<Comment>
 {
-	public interface ICommentRepository : IAdd<Comment>,
-		IUpdate<Comment>, IDelete<Comment>,
-		IGetById<Comment>, IGetAllById<Comment>
-	{
-		Task<int> GetCommentParentId(int commentId);
-	}
+	Task<int> GetCommentParentId(int commentId);
 }

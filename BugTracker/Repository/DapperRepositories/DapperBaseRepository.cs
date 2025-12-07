@@ -1,18 +1,16 @@
-﻿
-namespace BugTracker.Repository.DapperRepositories
+﻿namespace BugTracker.Repository.DapperRepositories;
+
+public class DapperBaseRepository
 {
-	public class DapperBaseRepository
+	private readonly string connectionString;
+
+	protected DapperBaseRepository(string connectionString)
 	{
-		private readonly string connectionString;
+		this.connectionString = connectionString;
+	}
 
-		public DapperBaseRepository(string connectionString)
-		{
-			this.connectionString = connectionString;
-		}
-
-		protected System.Data.SqlClient.SqlConnection GetConnectionString()
-		{
-			return new System.Data.SqlClient.SqlConnection(connectionString);
-		}
+	protected System.Data.SqlClient.SqlConnection GetConnectionString()
+	{
+		return new System.Data.SqlClient.SqlConnection(connectionString);
 	}
 }

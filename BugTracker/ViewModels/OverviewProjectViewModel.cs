@@ -1,17 +1,13 @@
 ﻿using BugTracker.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.ViewModels
+namespace BugTracker.ViewModels;
+
+public delegate int GetCommentCount(int bugReportId);
+
+public class OverviewProjectViewModel
 {
-	public delegate int GetCommentCount(int bugReportId);
-
-	public class OverviewProjectViewModel
-	{
-		public Project Project { get; set; }
-		public List<BugReport> BugReports {get; set; }
-		public GetCommentCount CommentCountHandler;
-	}
+	public Project Project { get; set; }
+	public List<BugReport> BugReports {get; set; }
+	public GetCommentCount CommentCountHandler;
 }

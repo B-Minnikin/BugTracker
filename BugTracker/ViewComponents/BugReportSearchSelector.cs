@@ -1,26 +1,22 @@
 ﻿using BugTracker.Models;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.ViewComponents
+namespace BugTracker.ViewComponents;
+
+public class BugReportSearchSelector : ViewComponent
 {
-	public class BugReportSearchSelector : ViewComponent
+	public IViewComponentResult Invoke(int projectId, List<MilestoneBugReportEntry> milestoneBugReportEntries, bool showSearchBar = false, bool canRemoveEntry = false)
 	{
-		public IViewComponentResult Invoke(int projectId, List<MilestoneBugReportEntry> milestoneBugReportEntries, bool showSearchBar = false, bool canRemoveEntry = false)
+		var viewModel = new BugReportSearchSelectorViewModel
 		{
-			BugReportSearchSelectorViewModel viewModel = new BugReportSearchSelectorViewModel
-			{
-				ProjectId = projectId,
-				MilestoneBugReportEntries = milestoneBugReportEntries,
-				CanRemoveEntry = canRemoveEntry,
-				ShowSearchBar = showSearchBar
-			};
+			ProjectId = projectId,
+			MilestoneBugReportEntries = milestoneBugReportEntries,
+			CanRemoveEntry = canRemoveEntry,
+			ShowSearchBar = showSearchBar
+		};
 
-			return View(viewModel);
-		}
+		return View(viewModel);
 	}
 }

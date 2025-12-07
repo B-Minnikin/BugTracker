@@ -1,7 +1,7 @@
 ﻿using BugTracker.Controllers;
 using BugTracker.Models;
 using BugTracker.Models.Authorization;
-using BugTracker.Models.Database;
+using BugTracker.Models.Subscription;
 using BugTracker.Repository;
 using BugTracker.Repository.Interfaces;
 using BugTracker.Services;
@@ -40,7 +40,7 @@ namespace BugTracker.Tests.Controllers
 		private readonly Mock<UserStore> mockUserStore;
 		private readonly Mock<ApplicationUserManager> mockUserManager;
 		
-		private BugReportController controller;
+		private readonly BugReportController controller;
 
 		public BugReportControllerShould()
 		{
@@ -382,7 +382,7 @@ namespace BugTracker.Tests.Controllers
 			var project = new Project { };
 
 			mockProjectRepo.Setup(_ => _.GetById(It.Is<int>(i => i == projectId))).Returns(Task.FromResult(project)).Verifiable();
-			mockBugReportStatesRepo.Setup(_ => _.GetLatestState(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(new BugState { StateType = StateType.open})).Verifiable();
+			mockBugReportStatesRepo.Setup(_ => _.GetLatestState(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(new BugState { StateType = StateType.Open})).Verifiable();
 			mockBugReportRepo.Setup(_ => _.GetById(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(new BugReport { PersonReporting = "Test user"})).Verifiable();
 
 			var result = await controller.Edit(bugReportId);
@@ -408,7 +408,7 @@ namespace BugTracker.Tests.Controllers
 			var viewModel = new EditBugReportViewModel
 			{
 				BugReport = bugReport,
-				CurrentState = StateType.open
+				CurrentState = StateType.Open
 			};
 
 			var httpContext = MockHttpContextFactory.GetHttpContext(new HttpContextFactoryOptions { ProjectId = projectId });
@@ -435,7 +435,7 @@ namespace BugTracker.Tests.Controllers
 			var viewModel = new EditBugReportViewModel
 			{
 				BugReport = bugReport,
-				CurrentState = StateType.open
+				CurrentState = StateType.Open
 			};
 
 			var result = await controller.Edit(viewModel);
@@ -462,7 +462,7 @@ namespace BugTracker.Tests.Controllers
 			var viewModel = new EditBugReportViewModel
 			{
 				BugReport = bugReport,
-				CurrentState = StateType.open
+				CurrentState = StateType.Open
 			};
 
 			controller.ModelState.AddModelError("Test key", "Error message");
@@ -498,7 +498,7 @@ namespace BugTracker.Tests.Controllers
 			var viewModel = new EditBugReportViewModel
 			{
 				BugReport = bugReport,
-				CurrentState = StateType.open
+				CurrentState = StateType.Open
 			};
 			var bugState = new BugState
 			{
@@ -509,7 +509,7 @@ namespace BugTracker.Tests.Controllers
 			mockBugReportRepo.Setup(_ => _.GetById(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(bugReport)).Verifiable();
 			mockBugReportRepo.Setup(_ => _.Update(It.IsAny<BugReport>())).Returns(Task.FromResult(bugReport));
 			mockActivityRepo.Setup(_ => _.Add(It.IsAny<ActivityBugReport>())).Returns(Task.FromResult(new ActivityBugReport() as Activity));
-			mockBugReportStatesRepo.Setup(_ => _.GetLatestState(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(new BugState { StateType = StateType.closed}));
+			mockBugReportStatesRepo.Setup(_ => _.GetLatestState(It.Is<int>(i => i == bugReportId))).Returns(Task.FromResult(new BugState { StateType = StateType.Closed}));
 			mockBugReportStatesRepo.Setup(_ => _.Add(It.IsAny<BugState>())).Returns(Task.FromResult(bugState)).Verifiable();
 			mockSubscriptions.Setup(_ => _.NotifyBugReportStateChanged(It.Is<BugState>(s => s.Equals(bugState)), It.IsAny<ApplicationLinkGenerator>(), It.Is<int>(i => i == bugReportId))).Verifiable();
 			mockActivityRepo.Setup(_ => _.Add(It.IsAny<ActivityBugReportStateChange>())).Returns(Task.FromResult(new ActivityBugReportStateChange() as Activity)).Verifiable();

@@ -1,5 +1,4 @@
 ﻿using BugTracker.Repository;
-using System;
 using System.Threading.Tasks;
 
 namespace BugTracker.Models.Authorization;
@@ -19,26 +18,18 @@ public static class AuthorizationHelper
 
 	public static async Task<bool> UserIsProfileOwner(string userName, int userId, string connectionString)
 	{
-		ApplicationUserManager userManager = new ApplicationUserManager(new UserStore(connectionString), connectionString);
+		var userManager = new ApplicationUserManager(new UserStore(connectionString), connectionString);
 		var currentUser = await userManager.FindByNameAsync(userName);
-		return Int32.Parse(currentUser.Id) == userId;
+		return int.Parse(currentUser.Id) == userId;
 	}
 
 	private static async Task<bool> GetUserInRole(string userName, string roleName, int id, string connectionString)
 	{
-		ApplicationUserManager userManager = new ApplicationUserManager(new UserStore(connectionString), connectionString);
+		var userManager = new ApplicationUserManager(new UserStore(connectionString), connectionString);
 		var user = await userManager.FindByNameAsync(userName);
-		bool userIsInRole;
-
-		if (roleName == "Superadministrator")
-		{
-			userIsInRole = await userManager.IsInRoleAsync(user, roleName);
-		}
-		else
-		{
-			userIsInRole = await userManager.IsInRoleAsync(Int32.Parse(user.Id), roleName, id);
-		}
-
-		return userIsInRole;
+		
+		return roleName == "Superadministrator"
+			? await userManager.IsInRoleAsync(user, roleName)
+			: await userManager.IsInRoleAsync(int.Parse(user.Id), roleName, id);
 	}
 }

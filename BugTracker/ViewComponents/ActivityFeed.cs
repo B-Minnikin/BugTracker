@@ -1,23 +1,19 @@
 ﻿using BugTracker.Models;
 using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.ViewComponents
+namespace BugTracker.ViewComponents;
+
+public class ActivityFeed : ViewComponent
 {
-	public class ActivityFeed : ViewComponent
+	public IViewComponentResult Invoke(List<Activity> activities)
 	{
-		public IViewComponentResult Invoke(List<Activity> activities)
+		var viewModel = new ActivityFeedViewModel()
 		{
-			ActivityFeedViewModel viewModel = new ActivityFeedViewModel()
-			{
-				Activities =  activities
-			};
+			Activities =  activities
+		};
 
-			return View(viewModel);
-		}
+		return View(viewModel);
 	}
 }

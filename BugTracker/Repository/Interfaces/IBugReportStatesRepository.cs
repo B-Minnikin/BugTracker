@@ -2,11 +2,10 @@
 using BugTracker.Repository.Common;
 using System.Threading.Tasks;
 
-namespace BugTracker.Repository.Interfaces
+namespace BugTracker.Repository.Interfaces;
+
+public interface IBugReportStatesRepository : IAdd<BugState>,
+	IGetById<BugState>, IGetAllById<BugState>
 {
-	public interface IBugReportStatesRepository : IAdd<BugState>,
-		IGetById<BugState>, IGetAllById<BugState>
-	{
-		Task<BugState> GetLatestState(int bugReportId);
-	}
+	Task<BugState> GetLatestState(int bugReportId);
 }

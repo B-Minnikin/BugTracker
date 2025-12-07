@@ -1,17 +1,16 @@
 ﻿using System;
 
-namespace BugTracker.Models
+namespace BugTracker.Models;
+
+public class ActivityBugReport : Activity
 {
-	public class ActivityBugReport : Activity
+	public int BugReportId { get; set; }
+
+	public ActivityBugReport() : base() { }
+
+	public ActivityBugReport(DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId)
+		: base(timestamp, projectId, messageId, userId)
 	{
-		public int BugReportId { get; set; }
-
-		public ActivityBugReport() : base() { }
-
-		public ActivityBugReport(DateTime timestamp, int projectId, ActivityMessage messageId, int userId, int bugReportId)
-			: base(timestamp, projectId, messageId, userId)
-		{
-			BugReportId = bugReportId;
-		}
+		BugReportId = bugReportId;
 	}
 }

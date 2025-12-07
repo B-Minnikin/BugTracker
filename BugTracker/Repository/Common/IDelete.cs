@@ -1,10 +1,8 @@
-﻿
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace BugTracker.Repository.Common
+namespace BugTracker.Repository.Common;
+
+public interface IDelete<T>
 {
-	public interface IDelete<T>
-	{
-		Task<T> Delete(int id);
-	}
+	Task<T> Delete(int id);
 }

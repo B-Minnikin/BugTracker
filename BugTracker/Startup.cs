@@ -1,6 +1,6 @@
-using BugTracker.Models;
 using BugTracker.Models.Authorization;
-using BugTracker.Models.Database;
+using BugTracker.Models.Messaging;
+using BugTracker.Models.Subscription;
 using BugTracker.Models.ProjectInvitation;
 using BugTracker.Repository;
 using BugTracker.Repository.DapperRepositories;
@@ -15,121 +15,120 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartBreadcrumbs.Extensions;
 
-namespace BugTracker
+namespace BugTracker;
+
+public class Startup
 {
-	public class Startup
+	private IConfiguration Configuration { get; }
+
+	public Startup(IConfiguration configuration)
 	{
-		public IConfiguration Configuration { get; }
+		Configuration = configuration;
+	}
 
-		public Startup(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
+	// This method gets called by the runtime. Use this method to add services to the container.
+	public void ConfigureServices(IServiceCollection services)
+	{
+		var connectionString = Configuration.GetConnectionString("DBConnectionString");
 
-		// This method gets called by the runtime. Use this method to add services to the container.
-		public void ConfigureServices(IServiceCollection services)
-		{
-			string connectionString = Configuration.GetConnectionString("DBConnectionString");
+		services.AddControllersWithViews();
+		services.AddTransient<IEmailHelper, EmailHelper>();
 
-			services.AddControllersWithViews();
-			services.AddTransient<IEmailHelper, EmailHelper>();
+		ConfigureRepositories(services, connectionString);
 
-			ConfigureRepositories(services, connectionString);
+		services.AddTransient<ILinkGenerator, ApplicationLinkGenerator>();
 
-			services.AddTransient<ILinkGenerator, ApplicationLinkGenerator>();
+		services.AddScoped<ISubscriptions, Subscriptions>();
+		services.AddScoped<IProjectInviter, ProjectInviter>();
 
-			services.AddScoped<ISubscriptions, Subscriptions>();
-			services.AddScoped<IProjectInviter, ProjectInviter>();
-
-			services.AddTransient<IUserStore<IdentityUser>, UserStore>(s => new UserStore(connectionString));
-			services.AddTransient<IRoleStore<IdentityRole>, RoleStore>(s => new RoleStore(connectionString));
-			services.AddIdentity<IdentityUser, IdentityRole>(options =>
+		services.AddTransient<IUserStore<IdentityUser>, UserStore>(s => new UserStore(connectionString));
+		services.AddTransient<IRoleStore<IdentityRole>, RoleStore>(s => new RoleStore(connectionString));
+		services.AddIdentity<IdentityUser, IdentityRole>(options =>
 				options.SignIn.RequireConfirmedEmail = true
 			)
-				.AddDefaultTokenProviders()
-				.AddUserManager<ApplicationUserManager>();
+			.AddDefaultTokenProviders()
+			.AddUserManager<ApplicationUserManager>();
 
-			services.AddAuthorization(options =>
-			{
-				options.AddPolicy("CanAccessProjectPolicy", policy =>
-					policy.Requirements.Add(new	ProjectAccessRequirement()));
-				options.AddPolicy("ProjectAdministratorPolicy", policy =>
-					policy.Requirements.Add(new	ProjectAdministratorRequirement()));
-				options.AddPolicy("CanModifyReportPolicy", policy =>
-					policy.Requirements.Add(new ModifyReportRequirement()));
-				options.AddPolicy("CanModifyCommentPolicy", policy =>
-					policy.Requirements.Add(new ModifyCommentRequirement()));
-				options.AddPolicy("CanModifyProfilePolicy", policy =>
-					policy.Requirements.Add(new ModifyProfileRequirement()));
-			});
+		services.AddAuthorization(options =>
+		{
+			options.AddPolicy("CanAccessProjectPolicy", policy =>
+				policy.Requirements.Add(new	ProjectAccessRequirement()));
+			options.AddPolicy("ProjectAdministratorPolicy", policy =>
+				policy.Requirements.Add(new	ProjectAdministratorRequirement()));
+			options.AddPolicy("CanModifyReportPolicy", policy =>
+				policy.Requirements.Add(new ModifyReportRequirement()));
+			options.AddPolicy("CanModifyCommentPolicy", policy =>
+				policy.Requirements.Add(new ModifyCommentRequirement()));
+			options.AddPolicy("CanModifyProfilePolicy", policy =>
+				policy.Requirements.Add(new ModifyProfileRequirement()));
+		});
 
-			ConfigureAuthorizationHandlers(services, connectionString);
+		ConfigureAuthorizationHandlers(services, connectionString);
 
-			services.AddDistributedMemoryCache();
-			services.AddSession(options =>
-			{
-				options.Cookie.HttpOnly = true;
-				options.Cookie.IsEssential = true;
-			});
+		services.AddDistributedMemoryCache();
+		services.AddSession(options =>
+		{
+			options.Cookie.HttpOnly = true;
+			options.Cookie.IsEssential = true;
+		});
 			
-			services.AddBreadcrumbs(GetType().Assembly);
-		}
+		services.AddBreadcrumbs(GetType().Assembly);
+	}
 
-		private void ConfigureRepositories(IServiceCollection services, string connectionString)
+	private void ConfigureRepositories(IServiceCollection services, string connectionString)
+	{
+		services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(new UserStore(connectionString), connectionString));
+
+		services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
+		services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
+		services.AddTransient<IBugReportRepository, DapperBugReportRepository>(s => new DapperBugReportRepository(connectionString));
+		services.AddTransient<IBugReportStatesRepository, DapperBugReportStatesRepository>(s => new DapperBugReportStatesRepository(connectionString));
+		services.AddTransient<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>(s => new DapperUserSubscriptionsRepository(connectionString));
+		services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
+		services.AddTransient<ICommentRepository, DapperCommentRepository>(s => new DapperCommentRepository(connectionString));
+		services.AddTransient<IProjectInvitationsRepository, DapperProjectInvitationsRepository>(s => new DapperProjectInvitationsRepository(connectionString));
+		services.AddTransient<ISearchRepository, DapperSearchRepository>(s => new DapperSearchRepository(connectionString));
+	}
+
+	private void ConfigureAuthorizationHandlers(IServiceCollection services, string connectionString)
+	{
+		services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>(s => new ProjectAccessAuthorizationHandler(connectionString));
+		services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>(s => new ProjectAdministratorAuthorizationHandler(connectionString));
+		services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>(s => new ModifyReportAuthorizationHandler(connectionString));
+		services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>(s => new ModifyCommentAuthorizationHandler(connectionString));
+		services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>(s => new ModifyProfileAuthorizationHandler(connectionString));
+	}
+
+	// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+	{
+		if (env.IsDevelopment())
 		{
-			services.AddScoped<UserManager<IdentityUser>, ApplicationUserManager>(s => new ApplicationUserManager(new UserStore(connectionString), connectionString));
-
-			services.AddTransient<IProjectRepository, DapperProjectRepository>(s => new DapperProjectRepository(connectionString));
-			services.AddTransient<IMilestoneRepository, DapperMilestoneRepository>(s => new DapperMilestoneRepository(connectionString));
-			services.AddTransient<IBugReportRepository, DapperBugReportRepository>(s => new DapperBugReportRepository(connectionString));
-			services.AddTransient<IBugReportStatesRepository, DapperBugReportStatesRepository>(s => new DapperBugReportStatesRepository(connectionString));
-			services.AddTransient<IUserSubscriptionsRepository, DapperUserSubscriptionsRepository>(s => new DapperUserSubscriptionsRepository(connectionString));
-			services.AddTransient<IActivityRepository, DapperActivityRepository>(s => new DapperActivityRepository(connectionString));
-			services.AddTransient<ICommentRepository, DapperCommentRepository>(s => new DapperCommentRepository(connectionString));
-			services.AddTransient<IProjectInvitationsRepository, DapperProjectInvitationsRepository>(s => new DapperProjectInvitationsRepository(connectionString));
-			services.AddTransient<ISearchRepository, DapperSearchRepository>(s => new DapperSearchRepository(connectionString));
+			app.UseDeveloperExceptionPage();
 		}
-
-		private void ConfigureAuthorizationHandlers(IServiceCollection services, string connectionString)
+		else
 		{
-			services.AddSingleton<IAuthorizationHandler, ProjectAccessAuthorizationHandler>(s => new ProjectAccessAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ProjectAdministratorAuthorizationHandler>(s => new ProjectAdministratorAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyReportAuthorizationHandler>(s => new ModifyReportAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyCommentAuthorizationHandler>(s => new ModifyCommentAuthorizationHandler(connectionString));
-			services.AddSingleton<IAuthorizationHandler, ModifyProfileAuthorizationHandler>(s => new ModifyProfileAuthorizationHandler(connectionString));
+			app.UseStatusCodePagesWithReExecute("/Error/{0}");
+			app.UseExceptionHandler("/Error");
+			// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+			app.UseHsts();
 		}
+		app.UseHttpsRedirection();
+		app.UseStaticFiles();
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		app.UseRouting();
+
+		app.UseAuthentication();
+		app.UseAuthorization();
+		app.UseSession();
+
+		DataInitialiser.SeedRoles(app.ApplicationServices).Wait();
+
+		app.UseEndpoints(endpoints =>
 		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-			else
-			{
-				app.UseStatusCodePagesWithReExecute("/Error/{0}");
-				app.UseExceptionHandler("/Error");
-				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-				app.UseHsts();
-			}
-			app.UseHttpsRedirection();
-			app.UseStaticFiles();
-
-			app.UseRouting();
-
-			app.UseAuthentication();
-			app.UseAuthorization();
-			app.UseSession();
-
-			DataInitialiser.SeedRoles(app.ApplicationServices).Wait();
-
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapControllerRoute(
-			    name: "default",
-			    pattern: "{controller=Home}/{action=Index}/{id?}");
-			});
-		}
+			endpoints.MapControllerRoute(
+				name: "default",
+				pattern: "{controller=Home}/{action=Index}/{commentId?}");
+		});
 	}
 }

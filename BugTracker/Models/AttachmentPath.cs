@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace BugTracker.Models
+namespace BugTracker.Models;
+
+public enum AttachmentParentType
 {
-	public enum AttachmentParentType
-	{
-		BugReport, Comment
-	}
+	BugReport, Comment
+}
 
-	public class AttachmentPath
-	{
-		[Key]
-		public int AttachmentPathId { get; set; }
-		public string Path { get; set; }
-	}
+public class AttachmentPath
+{
+	[Key]
+	public int AttachmentPathId { get; set; }
+	public string Path { get; set; }
 }

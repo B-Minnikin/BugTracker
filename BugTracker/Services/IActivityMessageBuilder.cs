@@ -1,14 +1,11 @@
 ﻿using BugTracker.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace BugTracker.Services
+namespace BugTracker.Services;
+
+public interface IActivityMessageBuilder
 {
-	interface IActivityMessageBuilder
-	{
-		Task GenerateMessages(IEnumerable<Activity> activities);
-		Task<string> GetMessage(Activity activity);
-	}
+	Task GenerateMessages(IEnumerable<Activity> activities);
+	Task<string> GetMessage(Activity activity);
 }

@@ -1,10 +1,8 @@
-﻿
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace BugTracker.Repository.Common
+namespace BugTracker.Repository.Common;
+
+public interface IGetById<T>
 {
-	public interface IGetById<T>
-	{
-		Task<T> GetById(int id);
-	}
+	Task<T> GetById(int id);
 }

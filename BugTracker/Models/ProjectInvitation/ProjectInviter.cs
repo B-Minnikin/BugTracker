@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
+using BugTracker.Models.Messaging;
 
 namespace BugTracker.Models.ProjectInvitation;
 

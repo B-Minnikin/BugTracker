@@ -1,23 +1,18 @@
 ﻿using BugTracker.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BugTracker.ViewComponents
+namespace BugTracker.ViewComponents;
+
+public class LinkReportsModal : ViewComponent
 {
-	public class LinkReportsModal : ViewComponent
+	public IViewComponentResult Invoke(int projectId, int bugReportId)
 	{
-		public IViewComponentResult Invoke(int projectId, int bugReportId)
+		var model = new LinkReportsViewModel
 		{
-			LinkReportsViewModel model = new LinkReportsViewModel
-			{
-				ProjectId = projectId,
-				BugReportId = bugReportId
-			};
+			ProjectId = projectId,
+			BugReportId = bugReportId
+		};
 
-			return View(model);
-		}
+		return View(model);
 	}
 }

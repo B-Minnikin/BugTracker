@@ -5,54 +5,53 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 
-namespace BugTracker.Repository.DapperRepositories
+namespace BugTracker.Repository.DapperRepositories;
+
+public class DapperBugReportStatesRepository : DapperBaseRepository, IBugReportStatesRepository
 {
-	public class DapperBugReportStatesRepository : DapperBaseRepository, IBugReportStatesRepository
+	public DapperBugReportStatesRepository(string connectionString) : base(connectionString)
 	{
-		public DapperBugReportStatesRepository(string connectionString) : base(connectionString) { }
+	}
 
-		public async Task<BugState> Add(BugState bugState)
-		{
-			using (IDbConnection connection = GetConnectionString())
+	public async Task<BugState> Add(BugState bugState)
+	{
+		using IDbConnection connection = GetConnectionString();
+		var insertedBugStateId = await connection.ExecuteScalarAsync("dbo.BugStates_Insert", new
 			{
-				var insertedBugStateId = await connection.ExecuteScalarAsync("dbo.BugStates_Insert", new
-				{
-					Author = bugState.Author,
-					Time = bugState.Time,
-					StateType = bugState.StateType,
-					BugReportId = bugState.BugReportId
-				},
-					commandType: CommandType.StoredProcedure);
-				BugState insertedState = await connection.QueryFirstAsync<BugState>("dbo.BugStates_GetById @BugStateId", new { BugStateId = insertedBugStateId });
-				return insertedState;
-			}
-		}
+				Author = bugState.Author,
+				Time = bugState.Time,
+				StateType = bugState.StateType,
+				BugReportId = bugState.BugReportId
+			},
+			commandType: CommandType.StoredProcedure);
+		var insertedState = await connection.QueryFirstAsync<BugState>("dbo.BugStates_GetById @BugStateId",
+			new { BugStateId = insertedBugStateId });
+		return insertedState;
+	}
 
-		public async Task<BugState> GetLatestState(int bugReportId)
-		{
-			using (IDbConnection connection = GetConnectionString())
-			{
-				BugState currentState = await connection.QueryFirstAsync<BugState>("dbo.BugStates_GetLatest @BugReportId", new { BugReportId = bugReportId });
-				return currentState;
-			}
-		}
+	public async Task<BugState> GetLatestState(int bugReportId)
+	{
+		using IDbConnection connection = GetConnectionString();
+		var currentState = await connection.QueryFirstAsync<BugState>("dbo.BugStates_GetLatest @BugReportId",
+			new { BugReportId = bugReportId });
+		return currentState;
+	}
 
-		public async Task<BugState> GetById(int bugStateId)
-		{
-			using (IDbConnection connection = GetConnectionString())
-			{
-				BugState bugState = await connection.QueryFirstAsync<BugState>("dbo.BugStates_GetById @BugStateId", new { BugStateId = bugStateId });
-				return bugState;
-			}
-		}
+	public async Task<BugState> GetById(int bugStateId)
+	{
+		using IDbConnection connection = GetConnectionString();
+		var bugState =
+			await connection.QueryFirstAsync<BugState>("dbo.BugStates_GetById @BugStateId",
+				new { BugStateId = bugStateId });
+		return bugState;
+	}
 
-		public async Task<IEnumerable<BugState>> GetAllById(int bugReportId)
-		{
-			using (IDbConnection connection = GetConnectionString())
-			{
-				var bugStates = await connection.QueryAsync<BugState>("dbo.BugStates_GetAll @BugReportId", new { BugReportId = bugReportId });
-				return bugStates;
-			}
-		}
+	public async Task<IEnumerable<BugState>> GetAllById(int bugReportId)
+	{
+		using IDbConnection connection = GetConnectionString();
+		var bugStates =
+			await connection.QueryAsync<BugState>("dbo.BugStates_GetAll @BugReportId",
+				new { BugReportId = bugReportId });
+		return bugStates;
 	}
 }
